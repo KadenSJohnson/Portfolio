@@ -4,6 +4,9 @@
     --surface-container: #E6E9DF;
     --on-background: #191D17;
     --grid-color: rgba(65, 104, 53, .35);
+    --surface-variant: #DFE4D7;
+    --on-surface-variant: #43483F;
+    --Tertiary: #386668;
 }
 
 @font-face {
@@ -14,16 +17,13 @@
 h1 {
     font-family: Frick;
     font-size: 64px;
-    margin-left: calc(10% - 2px);
     color: var(--on-background);
-    padding-top: 24px;
     line-height: 100%;
 }
 
 h2 {
     font-family: Frick;
     font-size: 40px;
-    margin-left: calc(10% - 0px);
     color: var(--primary);
     padding-top: 8px;
     line-height: 100%;
@@ -32,6 +32,7 @@ h2 {
 * {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
 }
 
 html {
@@ -42,6 +43,9 @@ html {
 body {
     min-height: 100vh;
     background-size: 10vw 10vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     background-image:
       linear-gradient(to right, var(--grid-color), transparent 1px),
       linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
@@ -55,18 +59,32 @@ nav {
     height: 80px;
     position: fixed;
     top: 0;
-    width: 80vw;
+    width: 100vw;
     padding: 0 10vw;
     background-color: var(--surface-container);
     font-size: 16px;
     font-family: Frick;
+    z-index: 5;
 }
 
 .page-1 {
     margin-top: 80px;
-    /* background-image: url(https://images.unsplash.com/photo-1601662528567-526cd06f6582?q=80&w=2515&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D);
-    mix-blend-mode: multiply;
-    opacity: .5; */
+    padding-top: 40px;
+}
+
+.page-2 {
+    margin-top: 64px;
+    flex-direction: column;
+}
+
+.page-2 h1 {
+    margin-bottom: 36px;
+}
+
+section {
+    display: flex;
+    width: 80vw;
+    justify-content: space-between;
 }
 
 .nav-item {
@@ -88,12 +106,164 @@ nav {
     border-radius: 50px;
     text-transform: uppercase;
     font-family: Frick;
+    background-color: var(--surface);
+    display: flex;
+    align-content: center;
+    gap: 8px;
 }
 
 .links {
     display: flex;
-    margin-left: calc(10% - 2px);
+    flex-wrap: wrap;
     margin-top: 32px;
     gap: 32px;
-
 }
+
+.hero-img {
+    object-fit: cover;
+    width: 30vw;
+    height: auto;
+    border-radius: 80px;
+    margin-left: 10vw;
+}
+
+.hero-text {
+    max-width: 50vw;
+}
+
+/* Slideshow container */
+.slideshow-container {
+  width: 75vw;
+  position: relative;
+  margin: auto;
+}
+
+/* Hide the images by default */
+.mySlides {
+    display: none;
+  }
+
+.mySlides img {
+    border-radius: 24px;
+}
+  
+  /* Next & previous buttons */
+  .prev, .next {
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    width: 64px;
+    height: 64px;
+    padding: 16px;
+    color: white;
+    font-weight: bold;
+    font-size: 32px;
+    margin-top: -32px;
+    transition: 0.3s cubic-bezier(0.5, 0.25, 0.25, 0.5);
+    border-radius: 50%;
+    user-select: none;
+    background: linear-gradient(to right, #54634D, #252B21);
+    transform: translateX(-7.5vw);
+  }
+
+  .prev img {
+    transform: rotate(180deg);
+  }
+  
+  /* Position the "next button" to the right */
+  .next {
+    right: 0;
+    transform: translateX(7.5vw);
+  }
+
+/* On hover, add a black background color with a little bit see-through */
+.prev:hover, .next:hover {
+    filter: drop-shadow(0px 10px 10px rgba(0, 0, 0, 0.40));
+    margin-top: -28px;
+  }
+
+/* The dots/bullets/indicators */
+.dot {
+    cursor: pointer;
+    height: 15px;
+    width: 15px;
+    margin: 0 2px;
+    background-color: #bbb;
+    border-radius: 50%;
+    display: inline-block;
+    transition: background-color 0.6s ease;
+  }
+  
+  .active, .dot:hover {
+    background-color: #717171;
+  }
+  
+  .slide-left {
+    animation-name: slideLeft;
+    animation-duration: 800ms;
+    transition: opacity cubic-bezier(0.05, 0.7, 0.1, 1.0);
+  }
+  
+  .slide-right {
+    animation-name: slideRight;
+    animation-duration: 800ms;
+    transition: opacity cubic-bezier(0.05, 0.7, 0.1, 1.0);
+  }
+  
+  @keyframes slideLeft {
+    from {
+      opacity: 0;
+      transform: translateX(100%);
+    }
+    to {
+      opacity: 1;
+      
+    }
+  }
+  
+  @keyframes slideRight {
+    from {
+      opacity: 0;
+      transform: translateX(-100%);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  
+  .caption {
+    background-color: var(--surface-variant);
+    border-radius: 24px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 24px;
+    font-family: sans-serif;
+    font-weight: 600;
+    color: var(--on-surface-variant);
+    font-size: 20px;
+    margin-top: 8px;
+    margin-bottom: 64px;
+  }
+
+  .chip-parent {
+    display: flex;
+    flex-wrap: wrap;
+    width: 90%;
+  }
+
+  .chip {
+    display: flex;
+    padding: 8px 12px;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50px;
+  }
+
+  .tert {
+    background-color: var(--Tertiary);
+    color: white;
+  }
