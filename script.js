@@ -94,7 +94,6 @@ document.querySelectorAll(".carousel").forEach((carousel) => {
           trigger: sectionSelector,
           start: 'top center',
           end: 'bottom center',
-          scrub: true,
           onEnter: () => applyHoverEffect(navItem),
           onLeave: () => removeHoverEffect(navItem),
           onEnterBack: () => applyHoverEffect(navItem),
