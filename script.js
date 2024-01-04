@@ -70,42 +70,52 @@ document.querySelectorAll(".carousel").forEach((carousel) => {
 
   gsap.registerPlugin(ScrollTrigger);
 
-  // Function to apply the hover effect
-  function applyHoverEffect(item) {
-      const hoverEffect = item.querySelector('.hover-effect');
-      gsap.to(hoverEffect, { scale: 1, duration: 0.3 });
-      item.querySelector('.nav-text').style.color = "#FFF";
-      item.querySelector('img').src = "/icons/active-paper-icon.svg";
-  }
-  
-  // Function to remove the hover effect
-  function removeHoverEffect(item) {
-      const hoverEffect = item.querySelector('.hover-effect');
-      gsap.to(hoverEffect, { scale: 0, duration: 0.3 });
-      item.querySelector('.nav-text').style.color = "#000";
-      item.querySelector('img').src = "/icons/paper-icon.svg";
-  }
-  
-  // Function to create a ScrollTrigger for a section
-  function createSectionTrigger(sectionSelector, navItemIndex) {
-      const navItem = document.querySelectorAll('.nav-item')[navItemIndex];
-  
-      ScrollTrigger.create({
-          trigger: sectionSelector,
-          start: 'top center',
-          end: 'bottom center',
-          onEnter: () => applyHoverEffect(navItem),
-          onLeave: () => removeHoverEffect(navItem),
-          onEnterBack: () => applyHoverEffect(navItem),
-          onLeaveBack: () => removeHoverEffect(navItem)
-      });
-  }
-  
-  // Example usage
-  createSectionTrigger('.page-2', 0); // For page 2 and first nav-item
-  createSectionTrigger('.page-3', 1); // For page 3 and second nav-item
-  // Add more as needed
-  
+// Function to apply the hover effect
+function applyHoverEffect(item) {
+    const hoverEffect = item.querySelector('.hover-effect');
+    gsap.to(hoverEffect, { scale: 1, duration: 0.3 });
+    item.querySelector('.nav-text').style.color = "#FFF";
+    item.querySelector('img').src = "/icons/active-paper-icon.svg";
+}
+
+// Function to remove the hover effect
+function removeHoverEffect(item) {
+    const hoverEffect = item.querySelector('.hover-effect');
+    gsap.to(hoverEffect, { scale: 0, duration: 0.3 });
+    item.querySelector('.nav-text').style.color = "#000";
+    item.querySelector('img').src = "/icons/paper-icon.svg";
+}
+
+// Initialize all nav items to their default state
+function initializeNavItems() {
+    document.querySelectorAll('.nav-item').forEach(item => {
+        removeHoverEffect(item);
+    });
+}
+
+// Function to create a ScrollTrigger for a section
+function createSectionTrigger(sectionSelector, navItemIndex) {
+    const navItem = document.querySelectorAll('.nav-item')[navItemIndex];
+
+    ScrollTrigger.create({
+        trigger: sectionSelector,
+        start: 'top center',
+        end: 'center end',
+        onEnter: () => applyHoverEffect(navItem),
+        onLeave: () => removeHoverEffect(navItem),
+        onEnterBack: () => applyHoverEffect(navItem),
+        onLeaveBack: () => removeHoverEffect(navItem)
+    });
+}
+
+// Initialize navigation items and set up triggers
+document.addEventListener('DOMContentLoaded', () => {
+    initializeNavItems();
+    createSectionTrigger('.page-2', 0);
+    createSectionTrigger('.page-3', 1);
+    // ... Add more as needed
+});
+
   
   
   document.querySelectorAll('.nav-item').forEach(item => {
