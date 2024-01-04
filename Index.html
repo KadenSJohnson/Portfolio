@@ -31,56 +31,58 @@
         <h1>My Work</h1>
 
         
-        <!-- First Slideshow -->
-        <div class="slideshow-container" id="slideshow1">
-            <!-- Slides go here -->
-            <div class="mySlides">
-                <img src="/images/gallery1/image1.png" style="width:100%">
+        <div class="carousel-container">
+        <div class="relative">
+            <div class="carousel" id="carousel1">
+              <div class="slides">
+                <img
+                src="/images/gallery1/image1.png"
+                  alt="Slide 1"
+                />
+                <img
+                src="/images/gallery1/image2.png"
+                  alt="Slide 2"
+                />
+                <img
+                src="/images/gallery1/image3.png"
+                  alt="Slide 3"
+                />
+              </div>
+              <button class="prev"><img src="/icons/Arrow Forward Outline White.svg" alt="arrow icon"></button>
+              <button class="next"><img src="/icons/Arrow Forward Outline White.svg" alt="arrow icon"></button>
             </div>
-
-            <div class="mySlides">
-                <img src="/images/gallery1/image2.png" style="width:100%">
-            </div>
-
-            <div class="mySlides">
-                <img src="/images/gallery1/image3.png" style="width:100%">
-            </div>
-
-            <div class="caption">
-                <p>Some sort of description</p>
-                <div class="chip-parent"><div class="chip tert">Design</div></div>
-                
-            </div>
-
-            <a class="prev"><img src="/icons/Arrow Forward Outline White.svg" alt="arrow icon"></a>
-            <a class="next" ><img src="/icons/Arrow Forward Outline White.svg" alt="arrow icon"></a>
         </div>
-        <br>
-
-
-        <!-- Second Slideshow -->
-        <div class="slideshow-container" id="slideshow2">
-            <!-- Slides go here -->
-            <div class="mySlides">
-                <img src="/images/gallery1/image1.png" style="width:100%">
-            </div>
-
-            <div class="mySlides">
-                <img src="/images/gallery1/image2.png" style="width:100%">
-            </div>
-
-            <div class="mySlides">
-                <img src="/images/gallery1/image3.png" style="width:100%">
-            </div>
-
-            <a class="prev"><img src="/icons/Arrow Forward Outline White.svg" alt="arrow icon"></a>
-            <a class="next"><img src="/icons/Arrow Forward Outline White.svg" alt="arrow icon"></a>
+        <div class="caption">
+            <p>Some sort of description</p>
+            <div class="chip-parent"><div class="chip tert">Design</div></div>
+            
         </div>
-        <br>
-
-
-    </section>
-
-    <script src="script.js"></script>
+      
+        <div class="relative">
+            <div class="carousel" id="carousel2">
+              <div class="slides">
+                <img
+                  src="https://loremflickr.com/3200/2400"
+                  alt="Slide 1"
+                />
+                <img
+                  src="https://loremflickr.com/3200/2400"
+                  alt="Slide 2"
+                />
+              </div>
+              <button class="prev"><img src="/icons/Arrow Forward Outline White.svg" alt="arrow icon"></button>
+              <button class="next"><img src="/icons/Arrow Forward Outline White.svg" alt="arrow icon"></button>
+            </div>
+        </div>
+        <div class="caption">
+            <p>Some sort of description</p>
+            <div class="chip-parent"><div class="chip tert">Design</div></div>
+            
+          </div>
+          </div>
+      
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.5.1/gsap.min.js"></script>
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.5.1/ScrollTrigger.min.js"></script>
+          <script src="script.js"></script>
 </body>
 </html>

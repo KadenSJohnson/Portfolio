@@ -1,60 +1,70 @@
-document.addEventListener("DOMContentLoaded", function() {
-    // Your code here
-    const slideshowContainers = document.querySelectorAll('.slideshow-container');
+document.querySelectorAll(".carousel").forEach((carousel) => {
+    const slides = carousel.querySelector(".slides");
+    const images = slides.querySelectorAll('img'); // Select all images
+    const prevButton = carousel.querySelector(".prev");
+    const nextButton = carousel.querySelector(".next");
 
-    slideshowContainers.forEach((container) => {
-        initSlideshow(container);
-    });
+    let currentIndex = 0;
+    const slideCount = slides.childElementCount; // Not including clone
+    let slideWidth; // Variable to store the width of a slide
 
-    function initSlideshow(container) {
-        let slideIndex = 1;
-
-        // Show the first slide initially
-        showSlides(container, slideIndex);
-
-        // Event listeners for next/previous buttons
-        let prevBtn = container.querySelector(".prev");
-        let nextBtn = container.querySelector(".next");
-
-        prevBtn.addEventListener("click", function () {
-            plusSlides(container, -1);
-        });
-
-        nextBtn.addEventListener("click", function () {
-            plusSlides(container, 1);
-        });
-
-        // Thumbnail image controls
-        function plusSlides(container, n) {
-            showSlides(container, (slideIndex += n), n);
-        }
-        
-        function showSlides(container, n, direction) {
-            let i;
-            let slides = container.getElementsByClassName("mySlides");
-        
-            // Wrap around to the first or last slide if reaching the end
-            if (n > slides.length) {
-                slideIndex = 1;
-            }
-            if (n < 1) {
-                slideIndex = slides.length;
-            }
-        
-            // Hide all slides
-            for (i = 0; i < slides.length; i++) {
-                slides[i].style.display = "none";
-            }
-        
-            // Show the current slide
-            slides[slideIndex - 1].style.display = "block";
-        
-            // Determine the animation class based on the direction
-            let animationClass = direction === -1 ? "slide-left" : "slide-right";
-        
-            // Apply the animation class to the current slide
-            slides[slideIndex - 1].classList.remove("slide-left", "slide-right");
-            slides[slideIndex - 1].classList.add(animationClass);
+    // Function to measure and set slide width
+    function setSlideWidth() {
+        if (images.length > 0) {
+            slideWidth = images[0].clientWidth; // Use the width of the first image
+            updateSlidePosition();
         }
     }
-});
+
+    function updateSlidePosition() {
+        gsap.to(slides, {
+            duration: 0.5,
+            x: -currentIndex * slideWidth,
+            ease: "cubic-bezier(0.133333, 0.06, 0.25, 1)"
+        });
+    }
+
+    // Resize event listener
+    window.addEventListener('resize', setSlideWidth);
+
+    // Add load event listener to images
+    images.forEach(image => {
+        if (image.complete) {
+            setSlideWidth();
+        } else {
+            image.addEventListener('load', setSlideWidth);
+        }
+    });
+    
+  
+    prevButton.addEventListener("click", () => {
+      if (currentIndex === 0) {
+        currentIndex = slideCount - 1;
+        slides.style.transition = "none";
+        slides.style.transform = `translateX(-${currentIndex * slideWidth}px)`;
+        setTimeout(() => {
+          slides.style.transition = "";
+          updateSlidePosition();
+        });
+      } else {
+        currentIndex--;
+        updateSlidePosition();
+      }
+    });
+  
+    nextButton.addEventListener("click", () => {
+      if (currentIndex === slideCount - 1) {
+        currentIndex = 0;
+        slides.style.transition = "none";
+        slides.style.transform = "translateX(0)";
+        setTimeout(() => {
+          slides.style.transition = "";
+          updateSlidePosition();
+        });
+      } else {
+        currentIndex++;
+        updateSlidePosition();
+      }
+    });
+  });
+  
