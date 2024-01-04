@@ -50,7 +50,6 @@ body {
     background-image:
       linear-gradient(to right, var(--grid-color), transparent 1px),
       linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
-
     background-color: var(--surface) !important;
 
   }
@@ -84,6 +83,15 @@ nav {
     margin-bottom: 36px;
 }
 
+.page-3 {
+    margin-top: 64px;
+    flex-direction: column;
+}
+
+.page-3 h1 {
+    margin-bottom: 36px;
+}
+
 section {
     display: flex;
     width: 80vw;
@@ -94,10 +102,42 @@ section {
     display: flex;
     flex-direction: column;
     align-items: center;
-    text-decoration: none;
     user-select: none;
     color: var(--on-background) !important;
+    position: relative;
+    padding: 10px 15px;
+    color: #000;
+    text-decoration: none;
+    overflow: hidden;
 }
+
+
+.nav-item::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    background-color: var(--primary); /* or any color you prefer */
+    transform: translate(-50%, -50%) scale(0);
+    transition: transform 0.3s ease; /* Smooth transition for the effect */
+    z-index: -1;
+}
+
+.hover-effect {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    background-color: var(--primary); /* or any color you prefer */
+    transform: translate(-50%, -50%) scale(0);
+    transition: transform 0.3s ease; /* Smooth transition for the effect */
+    z-index: -1;
+    border-radius: 8px;
+}
+
 
 .outlined-btn {
     outline: 3px var(--on-background) solid;
@@ -113,6 +153,7 @@ section {
     display: flex;
     align-content: center;
     gap: 8px;
+    justify-content: center;
 }
 
 .links {
@@ -124,8 +165,8 @@ section {
 
 .hero-img {
     object-fit: cover;
-    width: 30vw;
-    height: auto;
+    width: auto;
+    height: 30vw;
     border-radius: 80px;
     margin-left: 10vw;
 }
@@ -154,6 +195,7 @@ body {
   .carousel {
     width: 75%;
     overflow: hidden;
+    z-index: 3;
   }
 
   .relative {
@@ -246,3 +288,4 @@ body {
     background-color: var(--Tertiary);
     color: white;
   }
+
