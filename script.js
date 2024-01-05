@@ -166,15 +166,15 @@ function pageTransition() {
 
     var tl = gsap.timeline();
 
-    tl.to('ul.morph li', { duration: 1, scaleY: 1, transformOrigin: "bottom left",})
-    tl.to('ul.morph li', { duration: .8, scaleY: 0, transformOrigin: "bottom left"})
+    tl.to('ul.morph li', { duration: 1, scaleY: 1, transformOrigin: "bottom left", ease: "cubic-bezier(0.3, 0.0, 0.8, 0.15)"})
+    tl.to('ul.morph li', { duration: .8, scaleY: 0, transformOrigin: "bottom left", ease: "	cubic-bezier(0.05, 0.7, 0.1, 1.0)"})
     return tl;
 }
 
 function contentAnimation() {
     var tl = gsap.timeline(); 
 
-    tl.from('.hero-text', { duration: 1.5, translateY: 50, opacity: 0})
+    tl.from('.hero-text', { duration: 1, translateY: -50, opacity: 0, delay: .25})
 }
 
 function delay(n) {
@@ -197,18 +197,14 @@ barba.init({
             pageTransition();
             await delay(1500);
             done();
-
-            console.log("leave")
         },
 
         async enter(data) {
             contentAnimation();
-            console.log("enter")
         },
 
         async once(data) {
             contentAnimation();
-            console.log("once loaded")
         },
     }]
 })

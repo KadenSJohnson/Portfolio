@@ -294,6 +294,7 @@ body {
 
   .page-content {
     position: relative;
+    top: 0;
   }
 
   ul.morph {
