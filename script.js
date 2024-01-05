@@ -162,6 +162,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // page transition code 
 
+barba.init({
+
+    sync: true,
+
+    transitions: [{
+        async leave(data) {
+            const done = this.async();
+
+            pageTransition();
+            await delay(1500);
+            done();
+        },
+
+        async enter(data) {
+            contentAnimation();
+        },
+    }]
+})
+
 function pageTransition() {
 
     var tl = gsap.timeline();
@@ -186,25 +205,4 @@ function delay(n) {
     });
 }
 
-barba.init({
 
-    sync: true,
-
-    transitions: [{
-        async leave(data) {
-            const done = this.async();
-
-            pageTransition();
-            await delay(1500);
-            done();
-        },
-
-        async enter(data) {
-            contentAnimation();
-        },
-
-        async once(data) {
-            contentAnimation();
-        },
-    }]
-})
