@@ -178,6 +178,9 @@ barba.init({
         async enter(data) {
             contentAnimation();
         },
+        async once(data) {
+            contentAnimation();
+        },
     }]
 })
 
@@ -185,7 +188,7 @@ function pageTransition() {
 
     var tl = gsap.timeline();
 
-    tl.to('ul.morph li', { duration: 1, scaleY: 1, transformOrigin: "bottom left", ease: "cubic-bezier(0.3, 0.0, 0.8, 0.15)", delay: .5})
+    tl.to('ul.morph li', { duration: .8, scaleY: 1, transformOrigin: "bottom left", ease: "cubic-bezier(0.3, 0.0, 0.8, 0.15)", delay: .5})
     tl.to('ul.morph li', { duration: .8, scaleY: 0, transformOrigin: "bottom left", ease: "	cubic-bezier(0.05, 0.7, 0.1, 1.0)"})
     return tl;
 }
