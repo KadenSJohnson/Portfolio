@@ -18,7 +18,7 @@ document.querySelectorAll(".carousel").forEach((carousel) => {
 
     function updateSlidePosition() {
         gsap.to(slides, {
-            duration: 0.5,
+            duration: .8,
             x: -currentIndex * slideWidth,
             ease: "cubic-bezier(0.133333, 0.06, 0.25, 1)"
         });
@@ -160,8 +160,55 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
+// page transition code 
 
+function pageTransition() {
 
+    var tl = gsap.timeline();
 
-  
-  
+    tl.to('ul.morph li', { duration: 1, scaleY: 1, transformOrigin: "bottom left",})
+    tl.to('ul.morph li', { duration: .8, scaleY: 0, transformOrigin: "bottom left"})
+    return tl;
+}
+
+function contentAnimation() {
+    var tl = gsap.timeline(); 
+
+    tl.from('.hero-text', { duration: 1.5, translateY: 50, opacity: 0})
+}
+
+function delay(n) {
+    n = n || 2000;
+    return new Promise(done => {
+        setTimeout(() => {
+            done();
+        }, n);
+    });
+}
+
+barba.init({
+
+    sync: true,
+
+    transitions: [{
+        async leave(data) {
+            const done = this.async();
+
+            pageTransition();
+            await delay(1500);
+            done();
+
+            console.log("leave")
+        },
+
+        async enter(data) {
+            contentAnimation();
+            console.log("enter")
+        },
+
+        async once(data) {
+            contentAnimation();
+            console.log("once loaded")
+        },
+    }]
+})

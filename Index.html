@@ -6,7 +6,13 @@
     <link rel="stylesheet" href="styles.css">
     <title>Kaden Johnson</title>
 </head>
-<body>
+<body data-barba="wrapper">
+
+    <ul class="morph">
+        <li></li>
+    </ul>
+
+    <div class="page-content" data-barba="container" data-barba-namespace="home">
     <nav>
             
             <a href="#page-2" class="nav-item"><img src="/icons/paper-icon.svg" alt="paper icon" width="24px 24px"><div class="nav-text">Work</div><span class="hover-effect"></span> </a>
@@ -34,7 +40,7 @@
         <div class="carousel-container">
         <div class="relative">
             <div class="carousel" id="carousel1">
-              <div class="slides">
+              <div class="slides" id="navigateButton">
                 <img
                 src="/images/gallery1/image1.png"
                   alt="Slide 1"
@@ -53,14 +59,14 @@
             </div>
         </div>
         <div class="caption">
-            <p>Some sort of description</p>
+            <p>Some sort of description</p><a href="page2.html">See full study</a>
             <div class="chip-parent"><div class="chip tert">Design</div></div>
             
         </div>
       
         <div class="relative">
             <div class="carousel" id="carousel2">
-              <div class="slides">
+              <div class="slides" id="show">
                 <img
                   src="https://loremflickr.com/3200/2400"
                   alt="Slide 1"
@@ -141,7 +147,10 @@
       
           <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.5.1/gsap.min.js"></script>
           <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.5.1/ScrollTrigger.min.js"></script>
+          <script src="https://unpkg.com/@barba/core"></script>
           <script src="script.js"></script>
+          
     </section>
+</div>
 </body>
 </html>
