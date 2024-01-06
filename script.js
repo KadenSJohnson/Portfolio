@@ -203,6 +203,7 @@ function contentAnimation() {
     var tl = gsap.timeline(); 
 
     tl.from('.hero-text', { duration: 1, translateY: -50, opacity: 0, delay: .25})
+    tl.from('.study-text', { duration: 1, translateY: -50, opacity: 0})
 }
 
 function delay(n) {

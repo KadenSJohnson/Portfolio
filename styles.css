@@ -30,6 +30,7 @@ h2 {
     line-height: 100%;
 }
 
+
 * {
     margin: 0;
     padding: 0;
@@ -161,7 +162,7 @@ section {
 .links {
     display: flex;
     flex-wrap: wrap;
-    margin-top: 32px;
+    margin-top: 64px;
     gap: 32px;
 }
 
@@ -177,10 +178,37 @@ section {
     max-width: 50vw;
 }
 
+.study-text {
+    max-width: 80vw;
+    margin-top: 160px;
+}
+
+.study-section {
+    max-width: 80vw;
+    background-color: var(--surface-container);
+    margin-top: 24px;
+    padding: 16px;
+    border-radius: 24px;
+    color: var(--on-background);
+}
+
+.study-section img {
+    max-width: 100%;
+    border-radius: 16px;
+}
+
+.study-section p:first-of-type {
+    margin: 0px;
+    margin-top: 4px;
+}
+
+.study-section p {
+    margin: 16px 0px;
+}
+
 body {
     font-family: Arial, sans-serif;
     display: flex;
-    justify-content: center;
     align-items: center;
     min-height: 100vh;
     margin: 0;
@@ -192,6 +220,13 @@ body {
     flex-direction: column;
     position: relative;
     align-items: center;
+  }
+
+  .carousel-container h2 {
+    color: var(--on-background);
+    font-family: sans-serif;
+    font-size: 32px;
+    margin-bottom: 8px;
   }
   
   .carousel {
