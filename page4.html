@@ -1,166 +1,274 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="styles.css" />
     <script src="https://unpkg.com/@barba/core"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.5.1/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.5.1/ScrollTrigger.min.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/flickity@2/dist/flickity.min.css">
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/flickity@2/dist/flickity.min.css"
+    />
     <script src="https://unpkg.com/flickity@2/dist/flickity.pkgd.min.js"></script>
     <title>Kaden Johnson</title>
-</head>
-<body data-barba="wrapper">
-
+  </head>
+  <body data-barba="wrapper">
     <ul class="morph">
-        <li></li>
+      <li></li>
     </ul>
 
-    <div class="page-content" data-barba="container" data-barba-namespace="page4">
-        <nav>
-            
-            <a href="#" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 0 384 512"><path fill="#ffffff" d="M64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V160H256c-17.7 0-32-14.3-32-32V0H64zM256 0V128H384L256 0zM112 256H272c8.8 0 16 7.2 16 16s-7.2 16-16 16H112c-8.8 0-16-7.2-16-16s7.2-16 16-16zm0 64H272c8.8 0 16 7.2 16 16s-7.2 16-16 16H112c-8.8 0-16-7.2-16-16s7.2-16 16-16zm0 64H272c8.8 0 16 7.2 16 16s-7.2 16-16 16H112c-8.8 0-16-7.2-16-16s7.2-16 16-16z"/></svg>
-                <div class="nav-text">Resume</div> </a>
-            <a href="/about-me.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 0 512 512"><path fill="#ffffff" d="M208 48a48 48 0 1 1 96 0 48 48 0 1 1 -96 0zm40 304V480c0 17.7-14.3 32-32 32s-32-14.3-32-32V256.9l-28.6 47.5c-9.1 15.1-28.8 20-43.9 10.9s-20-28.8-10.9-43.9l58.3-97c17.4-28.9 48.6-46.6 82.3-46.6h29.7c33.7 0 64.9 17.7 82.3 46.6l58.3 97c9.1 15.1 4.2 34.8-10.9 43.9s-34.8 4.2-43.9-10.9L328 256.9V480c0 17.7-14.3 32-32 32s-32-14.3-32-32V352H248zM7 7C16.4-2.3 31.6-2.3 41 7l80 80c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0L7 41C-2.3 31.6-2.3 16.4 7 7zM471 7c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-80 80c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9L471 7zM7 505c-9.4-9.4-9.4-24.6 0-33.9l80-80c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9L41 505c-9.4 9.4-24.6 9.4-33.9 0zm464 0l-80-80c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l80 80c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0z"/></svg>
-                <div class="nav-text">About Me</div></a>
-                <a href="/Index.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 0 512 512"><path fill="#ffffff" d="M208 48a48 48 0 1 1 96 0 48 48 0 1 1 -96 0zm40 304V480c0 17.7-14.3 32-32 32s-32-14.3-32-32V256.9l-28.6 47.5c-9.1 15.1-28.8 20-43.9 10.9s-20-28.8-10.9-43.9l58.3-97c17.4-28.9 48.6-46.6 82.3-46.6h29.7c33.7 0 64.9 17.7 82.3 46.6l58.3 97c9.1 15.1 4.2 34.8-10.9 43.9s-34.8 4.2-43.9-10.9L328 256.9V480c0 17.7-14.3 32-32 32s-32-14.3-32-32V352H248zM7 7C16.4-2.3 31.6-2.3 41 7l80 80c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0L7 41C-2.3 31.6-2.3 16.4 7 7zM471 7c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-80 80c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9L471 7zM7 505c-9.4-9.4-9.4-24.6 0-33.9l80-80c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9L41 505c-9.4 9.4-24.6 9.4-33.9 0zm464 0l-80-80c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l80 80c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0z"/></svg>
-                    <div class="nav-text">Home</div></a>
-                    <div class="dropdown">
-                        <a href="#" class="nav-item">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 0 576 512"><path fill="#ffffff" d="M339.3 367.1c27.3-3.9 51.9-19.4 67.2-42.9L568.2 74.1c12.6-19.5 9.4-45.3-7.6-61.2S517.7-4.4 499.1 9.6L262.4 187.2c-24 18-38.2 46.1-38.4 76.1L339.3 367.1zm-19.6 25.4l-116-104.4C143.9 290.3 96 339.6 96 400c0 3.9 .2 7.8 .6 11.6C98.4 429.1 86.4 448 68.8 448H64c-17.7 0-32 14.3-32 32s14.3 32 32 32H208c61.9 0 112-50.1 112-112c0-2.5-.1-5-.2-7.5z"/></svg>
-                            <div class="nav-text">Work</div>
-                        </a>
-                        <div class="dropdown-content">
-                            <a href="/page2.html">Smart Vision Works</a>
-                            <a href="/page3.html">Design To Delivered</a>
-                            <a href="/page4.html">UVU SLSS</a>
-                        </div>
-                    </div>
-                
-    </nav>
-<div class="study">
+    <div
+      class="page-content"
+      data-barba="container"
+      data-barba-namespace="page4"
+    >
+      <nav>
+        <a href="#" class="nav-item"
+          ><svg
+            xmlns="http://www.w3.org/2000/svg"
+            height="24"
+            width="24"
+            viewBox="0 0 384 512"
+          >
+            <path
+              fill="#ffffff"
+              d="M64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V160H256c-17.7 0-32-14.3-32-32V0H64zM256 0V128H384L256 0zM112 256H272c8.8 0 16 7.2 16 16s-7.2 16-16 16H112c-8.8 0-16-7.2-16-16s7.2-16 16-16zm0 64H272c8.8 0 16 7.2 16 16s-7.2 16-16 16H112c-8.8 0-16-7.2-16-16s7.2-16 16-16zm0 64H272c8.8 0 16 7.2 16 16s-7.2 16-16 16H112c-8.8 0-16-7.2-16-16s7.2-16 16-16z"
+            />
+          </svg>
+          <div class="nav-text">Resume</div>
+        </a>
+        <a href="/about-me.html" class="nav-item"
+          ><svg
+            xmlns="http://www.w3.org/2000/svg"
+            height="24"
+            width="24"
+            viewBox="0 0 512 512"
+          >
+            <path
+              fill="#ffffff"
+              d="M208 48a48 48 0 1 1 96 0 48 48 0 1 1 -96 0zm40 304V480c0 17.7-14.3 32-32 32s-32-14.3-32-32V256.9l-28.6 47.5c-9.1 15.1-28.8 20-43.9 10.9s-20-28.8-10.9-43.9l58.3-97c17.4-28.9 48.6-46.6 82.3-46.6h29.7c33.7 0 64.9 17.7 82.3 46.6l58.3 97c9.1 15.1 4.2 34.8-10.9 43.9s-34.8 4.2-43.9-10.9L328 256.9V480c0 17.7-14.3 32-32 32s-32-14.3-32-32V352H248zM7 7C16.4-2.3 31.6-2.3 41 7l80 80c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0L7 41C-2.3 31.6-2.3 16.4 7 7zM471 7c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-80 80c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9L471 7zM7 505c-9.4-9.4-9.4-24.6 0-33.9l80-80c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9L41 505c-9.4 9.4-24.6 9.4-33.9 0zm464 0l-80-80c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l80 80c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0z"
+            />
+          </svg>
+          <div class="nav-text">About Me</div></a
+        >
+        <a href="/Index.html" class="nav-item"
+          ><svg
+            xmlns="http://www.w3.org/2000/svg"
+            height="24"
+            width="24"
+            viewBox="0 0 512 512"
+          >
+            <path
+              fill="#ffffff"
+              d="M208 48a48 48 0 1 1 96 0 48 48 0 1 1 -96 0zm40 304V480c0 17.7-14.3 32-32 32s-32-14.3-32-32V256.9l-28.6 47.5c-9.1 15.1-28.8 20-43.9 10.9s-20-28.8-10.9-43.9l58.3-97c17.4-28.9 48.6-46.6 82.3-46.6h29.7c33.7 0 64.9 17.7 82.3 46.6l58.3 97c9.1 15.1 4.2 34.8-10.9 43.9s-34.8 4.2-43.9-10.9L328 256.9V480c0 17.7-14.3 32-32 32s-32-14.3-32-32V352H248zM7 7C16.4-2.3 31.6-2.3 41 7l80 80c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0L7 41C-2.3 31.6-2.3 16.4 7 7zM471 7c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-80 80c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9L471 7zM7 505c-9.4-9.4-9.4-24.6 0-33.9l80-80c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9L41 505c-9.4 9.4-24.6 9.4-33.9 0zm464 0l-80-80c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l80 80c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0z"
+            />
+          </svg>
+          <div class="nav-text">Home</div></a
+        >
+        <div class="dropdown">
+          <a href="#" class="nav-item">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              height="24"
+              width="24"
+              viewBox="0 0 576 512"
+            >
+              <path
+                fill="#ffffff"
+                d="M339.3 367.1c27.3-3.9 51.9-19.4 67.2-42.9L568.2 74.1c12.6-19.5 9.4-45.3-7.6-61.2S517.7-4.4 499.1 9.6L262.4 187.2c-24 18-38.2 46.1-38.4 76.1L339.3 367.1zm-19.6 25.4l-116-104.4C143.9 290.3 96 339.6 96 400c0 3.9 .2 7.8 .6 11.6C98.4 429.1 86.4 448 68.8 448H64c-17.7 0-32 14.3-32 32s14.3 32 32 32H208c61.9 0 112-50.1 112-112c0-2.5-.1-5-.2-7.5z"
+              />
+            </svg>
+            <div class="nav-text">Work</div>
+          </a>
+          <div class="dropdown-content">
+            <a href="/page2.html">Smart Vision Works</a>
+            <a href="/page3.html">Design To Delivered</a>
+            <a href="/page4.html">UVU SLSS</a>
+          </div>
+        </div>
+      </nav>
+      <div class="study">
         <div class="study-header">
-            <h1>Utah Valley University</h1>
-            <h2>Student Leadership and Success Studies</h2>
+          <h1>Utah Valley University</h1>
+          <h2>Student Leadership and Success Studies</h2>
         </div>
 
         <div class="study-content">
-        <div class="study-section intro">
+          <div class="study-section intro">
             <div class="study-text">
-                <h3>Introduction</h3>
-        <p>Utah Valley University’s Student Leadership and Success Studies. Quite a mouthful of name for a department. 
-            The department focuses on classes around soft skills such as leadership, stress management, and major/career
-             exploration. As a team with 4 other Web Design and Development students were assigned the task of helping 
-             redesign their website. We competed against other teams of classmates for which redesign the client (the head of the department) 
-             would like best. </p>
+              <h3>Introduction</h3>
+              <p>
+                Utah Valley University’s Student Leadership and Success Studies.
+                Quite a mouthful of name for a department. The department
+                focuses on classes around soft skills such as leadership, stress
+                management, and major/career exploration. As a team with 4 other
+                Web Design and Development students were assigned the task of
+                helping redesign their website. We competed against other teams
+                of classmates for which redesign the client (the head of the
+                department) would like best.
+              </p>
             </div>
             <div class="main-carousel">
-                <div class="carousel-cell"><img src="/images/gallery1/1.1 Programs.jpg" alt=""></div>
-                <div class="carousel-cell">slide 2</div>
-                <div class="carousel-cell">slide 3</div>
+              <div class="carousel-cell">
+                <img src="/images/gallery1/1.1 Programs.jpg" alt="" />
               </div>
+              <div class="carousel-cell">slide 2</div>
+              <div class="carousel-cell">slide 3</div>
             </div>
-              
+          </div>
+
+          <div class="study-section">
+            <div class="study-text">
+              <h3>Department lacked recognition, website has not main CTA</h3>
+              <p>
+                We found from student surveys and interviews and client
+                interviews that the main problems facing the UVU SLSS was that
+                they lacked a lot of recognition for their classes. Students had
+                often heard of some of the classes they offered but didn’t
+                understand the connection to the wider department.
+              </p>
+
+              <p>
+                Our first idea was that the website needed to capitalize on
+                these classes that students already knew about. Our assumption
+                was that the current site didn’t explain what SLSS was or what
+                they had to offer. We wanted to study what people understood
+                from their current website before we jumped into the designs to
+                see if our assumptions were right.
+              </p>
+
+              <p>
+                We performed eye tracking tests and user interviews which proved
+                most of our assumptions were correct. Users had a hard time
+                finding the classes they offered and how to sign up for them.
+                Users didn’t understand the mission statement of the department
+                and had a hard time finding what the department was really
+                about.
+              </p>
+            </div>
+
+            <div class="main-carousel">
+              <div class="carousel-cell">
+                <img src="/images/gallery1/1.1 Programs.jpg" alt="" />
+              </div>
+              <div class="carousel-cell">slide 2</div>
+              <div class="carousel-cell">slide 3</div>
+            </div>
+          </div>
+        </div>
 
         <div class="study-section">
-            <div class="study-text">
-                <h3>Department lacked recognition, website has not main CTA</h3>
-        <p>We found from student surveys and interviews and client interviews that the main problems facing the UVU SLSS 
-            was that they lacked a lot of recognition for their classes. Students had often heard of some of the classes 
-            they offered but didn’t understand the connection to the wider department. </p>
+          <div class="study-text">
+            <h3>Wireframes sitemap and Design Critique</h3>
+            <p>
+              After our research was completed we got into some designing we
+              went through the typical site map and whiteboard wireframes and
+              then ideating on some of the ideas. We broke out some of the pages
+              into similar ideas and assigned them to group members. The main
+              page I was assigned was the landing page.
+            </p>
 
-            <p>Our first idea was that the website needed to capitalize on these classes that students already knew about.
-                 Our assumption was that the current site didn’t explain what SLSS was or what they had to offer. 
-                 We wanted to study what people understood from their current website before we jumped into the designs
-                  to see if our assumptions were right. </p>
-            
-            <p>We performed eye tracking tests and user interviews which proved most of our assumptions were correct. 
-                Users had a hard time finding the classes they offered and how to sign up for them.
-                 Users didn’t understand the mission statement of the department and had a hard time finding what the
-                  department was really about. </p>
+            <p>
+              We received feedback in class from our professor and our peers
+              about our designs and then made some initial surface comps and
+              then again did another design review and got some more feedback
+              which got us to our final design ready to present.
+            </p>
+          </div>
+
+          <div class="main-carousel">
+            <div class="carousel-cell">
+              <img src="/images/gallery1/1.1 Programs.jpg" alt="" />
             </div>
-            
-            <div class="main-carousel">
-                <div class="carousel-cell"><img src="/images/gallery1/1.1 Programs.jpg" alt=""></div>
-                <div class="carousel-cell">slide 2</div>
-                <div class="carousel-cell">slide 3</div>
-              </div>
-            </div>
-            
-            </div>
+            <div class="carousel-cell">slide 2</div>
+            <div class="carousel-cell">slide 3</div>
+          </div>
+        </div>
+      </div>
 
-            <div class="study-section">
-                <div class="study-text">
-                    <h3>Wireframes sitemap and Design Critique</h3>
-                <p>After our research was completed we got into some designing we went through the typical site map
-                     and whiteboard wireframes and then ideating on some of the ideas. We broke out some of the pages
-                      into similar ideas and assigned them to group members. The main page I was assigned was the landing page. </p>
-                
-                <p>We received feedback in class from our professor and our peers about our designs and then made some initial
-                     surface comps and then again did another design review and got some more feedback which got us to our
-                      final design ready to present.  </p>
-                    </div>
+      <div class="study-section">
+        <div class="study-text">
+          <h3>
+            The Results - a new landing page with a clear CTA and better
+            hierarchy
+          </h3>
+          <p>
+            The landing page was my main focus as its the initial impression of
+            the visitors of the site and would be the draw to have them explore
+            more of the site. Our landing page was first focused on the main
+            call to action which we decided should be meeting with a advisor
+            because from our research we found that besides hearing from family
+            and friends, advisors were the biggest reason students took SLSS
+            classes. I decided to use UVU’s card components pretty heavily in my
+            design to show some of SLSS offerings. This gave the site some
+            actionable items and helped students better understand what SLSS was
+            all about.
+          </p>
+        </div>
+      </div>
 
-                    <div class="main-carousel">
-                        <div class="carousel-cell"><img src="/images/gallery1/1.1 Programs.jpg" alt=""></div>
-                        <div class="carousel-cell">slide 2</div>
-                        <div class="carousel-cell">slide 3</div>
-                      </div>
-                    </div>
-                    
-                </div>
+      <div class="study-section">
+        <div class="study-text">
+          <h3>Presentation</h3>
+          <p>
+            We presented our designs to the clients along with the other teams
+            here is what the clients had to say about our designs.
+          </p>
 
-                <div class="study-section">
-                    
-                    <div class="study-text">
-                        <h3>The Results - a new landing page with a clear CTA and better hierarchy </h3>
-                    <p>The landing page was my main focus as its the initial impression of the visitors of the site and would
-                         be the draw to have them explore more of the site. Our landing page was first focused on the main call
-                          to action which we decided should be meeting with a advisor because from our research we found that
-                           besides hearing from family and friends, advisors were the biggest reason students took SLSS classes. 
-                           I decided to use UVU’s card components pretty heavily in my design to show some of SLSS offerings. 
-                           This gave the site some actionable items and helped students better understand what SLSS was all about.</p> 
-                </div>
-                
-                
-                </div>
+          <p>
+            “Probably my favorite presentation. I really like how you used the
+            data, the design of the site, the rationale, etc. Knocked it out of
+            the park!”
+          </p>
 
-                <div class="study-section">
-                    
-                    <div class="study-text">
-                        <h3>Presentation</h3>
-                    </p>We presented our designs to the clients along with the other teams here is what the clients had to say about our designs.</p>
+          <p>
+            Overall this was a great project working with a real client, having
+            to work with a team, and competing against other teams. In the end
+            we were selected with another team to hand off our designs to the
+            development class which I wasn’t a part of but as far as I know is
+            currently in development.
+          </p>
+        </div>
+      </div>
 
-                    </p>“Probably my favorite presentation. I really like how you used the data, the design of the site, 
-                    the rationale, etc. Knocked it out of the park!”</p>
+      <div class="links">
+        <a href="Index.html" class="bottom-btn">Back to Home Page</a>
+        <a href="/page3.html" class="bottom-btn">Next Case Study</a>
+      </div>
 
-                    </p>Overall this was a great project working with a real client, 
-                    having to work with a team, and competing against other teams.
-                     In the end we were selected with another team to hand off our 
-                     designs to the development class which I wasn’t a part of but 
-                     as far as I know is currently in development.  </p>
-                </div>
-                
-                </div>
-                
-                <div class="links">
-                    <a href="Index.html" class="bottom-btn">Back to Home Page</a>
-                    <a href="/page3.html" class="bottom-btn">Next Case Study</a>
-                </div>
-        
-                <footer>
-                    <div class="links">
-                        <a href="https://www.linkedin.com/in/kaden-johnson-40b155196/" class="outlined-btn">LinkedIn<img src="/icons/Arrow Forward Outline.svg" alt="arrow icon" width="24" height="24"></a>
-                        <a href="mailto:nokadensly@gmail.com" class="outlined-btn">Email <img src="/icons/Arrow Forward Outline.svg" alt="arrow icon" width="24" height="24"></a>
-                        <a href="" class="outlined-btn">Resume <img src="/icons/Arrow Forward Outline.svg" alt="arrow icon" width="24" height="24"></a>
-                    </div>
-                </footer>
-                </div>
-            </div>
-   
-          <script src="script.js"></script>
-          
-</div>
-</body>
+      <footer>
+        <div class="links">
+          <a
+            href="https://www.linkedin.com/in/kaden-johnson-40b155196/"
+            class="outlined-btn"
+            >LinkedIn<img
+              src="/icons/Arrow Forward Outline.svg"
+              alt="arrow icon"
+              width="24"
+              height="24"
+          /></a>
+          <a href="mailto:nokadensly@gmail.com" class="outlined-btn"
+            >Email
+            <img
+              src="/icons/Arrow Forward Outline.svg"
+              alt="arrow icon"
+              width="24"
+              height="24"
+          /></a>
+          <a href="" class="outlined-btn"
+            >Resume
+            <img
+              src="/icons/Arrow Forward Outline.svg"
+              alt="arrow icon"
+              width="24"
+              height="24"
+          /></a>
+        </div>
+      </footer>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
 </html>

@@ -1,141 +1,228 @@
 <!DOCTYPE html>
 <html class="index" lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="styles.css" />
     <script src="https://unpkg.com/@barba/core"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.5.1/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.5.1/ScrollTrigger.min.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/flickity@2/dist/flickity.min.css">
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/flickity@2/dist/flickity.min.css"
+    />
     <script src="https://unpkg.com/flickity@2/dist/flickity.pkgd.min.js"></script>
     <title>Kaden Johnson</title>
-</head>
-<body data-barba="wrapper" >
-
+  </head>
+  <body data-barba="wrapper">
     <ul class="morph">
-        <li></li>
+      <li></li>
     </ul>
 
-    <div class="page-content" data-barba="container" data-barba-namespace="home">
-    <nav>
-            
-            <a href="#" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 0 384 512"><path fill="#ffffff" d="M64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V160H256c-17.7 0-32-14.3-32-32V0H64zM256 0V128H384L256 0zM112 256H272c8.8 0 16 7.2 16 16s-7.2 16-16 16H112c-8.8 0-16-7.2-16-16s7.2-16 16-16zm0 64H272c8.8 0 16 7.2 16 16s-7.2 16-16 16H112c-8.8 0-16-7.2-16-16s7.2-16 16-16zm0 64H272c8.8 0 16 7.2 16 16s-7.2 16-16 16H112c-8.8 0-16-7.2-16-16s7.2-16 16-16z"/></svg>
-                <div class="nav-text">Resume</div> </a>
-            <a href="/about-me.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 0 512 512"><path fill="#ffffff" d="M208 48a48 48 0 1 1 96 0 48 48 0 1 1 -96 0zm40 304V480c0 17.7-14.3 32-32 32s-32-14.3-32-32V256.9l-28.6 47.5c-9.1 15.1-28.8 20-43.9 10.9s-20-28.8-10.9-43.9l58.3-97c17.4-28.9 48.6-46.6 82.3-46.6h29.7c33.7 0 64.9 17.7 82.3 46.6l58.3 97c9.1 15.1 4.2 34.8-10.9 43.9s-34.8 4.2-43.9-10.9L328 256.9V480c0 17.7-14.3 32-32 32s-32-14.3-32-32V352H248zM7 7C16.4-2.3 31.6-2.3 41 7l80 80c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0L7 41C-2.3 31.6-2.3 16.4 7 7zM471 7c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-80 80c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9L471 7zM7 505c-9.4-9.4-9.4-24.6 0-33.9l80-80c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9L41 505c-9.4 9.4-24.6 9.4-33.9 0zm464 0l-80-80c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l80 80c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0z"/></svg>
-                <div class="nav-text">About Me</div></a>
-                <a href="/Index.html" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 0 512 512"><path fill="#ffffff" d="M208 48a48 48 0 1 1 96 0 48 48 0 1 1 -96 0zm40 304V480c0 17.7-14.3 32-32 32s-32-14.3-32-32V256.9l-28.6 47.5c-9.1 15.1-28.8 20-43.9 10.9s-20-28.8-10.9-43.9l58.3-97c17.4-28.9 48.6-46.6 82.3-46.6h29.7c33.7 0 64.9 17.7 82.3 46.6l58.3 97c9.1 15.1 4.2 34.8-10.9 43.9s-34.8 4.2-43.9-10.9L328 256.9V480c0 17.7-14.3 32-32 32s-32-14.3-32-32V352H248zM7 7C16.4-2.3 31.6-2.3 41 7l80 80c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0L7 41C-2.3 31.6-2.3 16.4 7 7zM471 7c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-80 80c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9L471 7zM7 505c-9.4-9.4-9.4-24.6 0-33.9l80-80c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9L41 505c-9.4 9.4-24.6 9.4-33.9 0zm464 0l-80-80c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l80 80c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0z"/></svg>
-                    <div class="nav-text">Home</div></a>
-                    <div class="dropdown">
-                        <a href="#" class="nav-item">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 0 576 512"><path fill="#ffffff" d="M339.3 367.1c27.3-3.9 51.9-19.4 67.2-42.9L568.2 74.1c12.6-19.5 9.4-45.3-7.6-61.2S517.7-4.4 499.1 9.6L262.4 187.2c-24 18-38.2 46.1-38.4 76.1L339.3 367.1zm-19.6 25.4l-116-104.4C143.9 290.3 96 339.6 96 400c0 3.9 .2 7.8 .6 11.6C98.4 429.1 86.4 448 68.8 448H64c-17.7 0-32 14.3-32 32s14.3 32 32 32H208c61.9 0 112-50.1 112-112c0-2.5-.1-5-.2-7.5z"/></svg>
-                            <div class="nav-text">Work</div>
-                        </a>
-                        <div class="dropdown-content">
-                            <a href="/page2.html">Smart Vision Works</a>
-                            <a href="/page3.html">Design To Delivered</a>
-                            <a href="/page4.html">UVU SLSS</a>
-                        </div>
-                    </div>
-                
-    </nav>
-    <section class="page-1" id="page-1">
-        <div class="hero-text">
-            <h1>Kaden Johnson</h1>
-            <h2>helping grow digital ideas</h2>
-
-
+    <div
+      class="page-content"
+      data-barba="container"
+      data-barba-namespace="home"
+    >
+      <nav>
+        <a href="#" class="nav-item"
+          ><svg
+            xmlns="http://www.w3.org/2000/svg"
+            height="24"
+            width="24"
+            viewBox="0 0 384 512"
+          >
+            <path
+              fill="#ffffff"
+              d="M64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V160H256c-17.7 0-32-14.3-32-32V0H64zM256 0V128H384L256 0zM112 256H272c8.8 0 16 7.2 16 16s-7.2 16-16 16H112c-8.8 0-16-7.2-16-16s7.2-16 16-16zm0 64H272c8.8 0 16 7.2 16 16s-7.2 16-16 16H112c-8.8 0-16-7.2-16-16s7.2-16 16-16zm0 64H272c8.8 0 16 7.2 16 16s-7.2 16-16 16H112c-8.8 0-16-7.2-16-16s7.2-16 16-16z"
+            />
+          </svg>
+          <div class="nav-text">Resume</div>
+        </a>
+        <a href="/about-me.html" class="nav-item"
+          ><svg
+            xmlns="http://www.w3.org/2000/svg"
+            height="24"
+            width="24"
+            viewBox="0 0 512 512"
+          >
+            <path
+              fill="#ffffff"
+              d="M208 48a48 48 0 1 1 96 0 48 48 0 1 1 -96 0zm40 304V480c0 17.7-14.3 32-32 32s-32-14.3-32-32V256.9l-28.6 47.5c-9.1 15.1-28.8 20-43.9 10.9s-20-28.8-10.9-43.9l58.3-97c17.4-28.9 48.6-46.6 82.3-46.6h29.7c33.7 0 64.9 17.7 82.3 46.6l58.3 97c9.1 15.1 4.2 34.8-10.9 43.9s-34.8 4.2-43.9-10.9L328 256.9V480c0 17.7-14.3 32-32 32s-32-14.3-32-32V352H248zM7 7C16.4-2.3 31.6-2.3 41 7l80 80c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0L7 41C-2.3 31.6-2.3 16.4 7 7zM471 7c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-80 80c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9L471 7zM7 505c-9.4-9.4-9.4-24.6 0-33.9l80-80c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9L41 505c-9.4 9.4-24.6 9.4-33.9 0zm464 0l-80-80c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l80 80c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0z"
+            />
+          </svg>
+          <div class="nav-text">About Me</div></a
+        >
+        <a href="/Index.html" class="nav-item"
+          ><svg
+            xmlns="http://www.w3.org/2000/svg"
+            height="24"
+            width="24"
+            viewBox="0 0 512 512"
+          >
+            <path
+              fill="#ffffff"
+              d="M208 48a48 48 0 1 1 96 0 48 48 0 1 1 -96 0zm40 304V480c0 17.7-14.3 32-32 32s-32-14.3-32-32V256.9l-28.6 47.5c-9.1 15.1-28.8 20-43.9 10.9s-20-28.8-10.9-43.9l58.3-97c17.4-28.9 48.6-46.6 82.3-46.6h29.7c33.7 0 64.9 17.7 82.3 46.6l58.3 97c9.1 15.1 4.2 34.8-10.9 43.9s-34.8 4.2-43.9-10.9L328 256.9V480c0 17.7-14.3 32-32 32s-32-14.3-32-32V352H248zM7 7C16.4-2.3 31.6-2.3 41 7l80 80c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0L7 41C-2.3 31.6-2.3 16.4 7 7zM471 7c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-80 80c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9L471 7zM7 505c-9.4-9.4-9.4-24.6 0-33.9l80-80c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9L41 505c-9.4 9.4-24.6 9.4-33.9 0zm464 0l-80-80c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l80 80c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0z"
+            />
+          </svg>
+          <div class="nav-text">Home</div></a
+        >
+        <div class="dropdown">
+          <a href="#" class="nav-item">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              height="24"
+              width="24"
+              viewBox="0 0 576 512"
+            >
+              <path
+                fill="#ffffff"
+                d="M339.3 367.1c27.3-3.9 51.9-19.4 67.2-42.9L568.2 74.1c12.6-19.5 9.4-45.3-7.6-61.2S517.7-4.4 499.1 9.6L262.4 187.2c-24 18-38.2 46.1-38.4 76.1L339.3 367.1zm-19.6 25.4l-116-104.4C143.9 290.3 96 339.6 96 400c0 3.9 .2 7.8 .6 11.6C98.4 429.1 86.4 448 68.8 448H64c-17.7 0-32 14.3-32 32s14.3 32 32 32H208c61.9 0 112-50.1 112-112c0-2.5-.1-5-.2-7.5z"
+              />
+            </svg>
+            <div class="nav-text">Work</div>
+          </a>
+          <div class="dropdown-content">
+            <a href="/page2.html">Smart Vision Works</a>
+            <a href="/page3.html">Design To Delivered</a>
+            <a href="/page4.html">UVU SLSS</a>
+          </div>
         </div>
-        <img src="/images/IMG_3302.JPG" alt="profile picture" class="hero-img">
-    </section>
-    <section class="page-2" id="page-2">
+      </nav>
+      <section class="page-1" id="page-1">
+        <div class="hero-text">
+          <h1>Kaden Johnson</h1>
+          <h2>helping grow digital ideas</h2>
+        </div>
+        <img
+          src="/images/IMG_3302.JPG"
+          alt="profile picture"
+          class="hero-img"
+        />
+      </section>
+      <section class="page-2" id="page-2">
         <h1>My Work</h1>
         <div class="carousel-container">
-
-            <h2>Design 2 Delivered Competition</h2>
-            <div class="main-carousel">
-                <div class="carousel-cell"><img
-                    src="/images/gallery3/compare intrests.png"
-                    alt="Slide 1"
-                  /></div>
-                <div class="carousel-cell"><img
-                    src="/images/gallery3/Shots create mockups (10).png"
-                    alt="Slide 2"
-                  /></div>
-                <div class="carousel-cell"><img
-                    src="/images/gallery3/linkedin.png"
-                    alt="Slide 3"
-                  /></div>
-                  <div class="carousel-cell"><img
-                    src="/images/gallery3/styleguide.png"
-                    alt="Slide 3"
-                  /></div>
-              </div>
-        <div class="caption">
-            <p>How I along with a team of 4 other designers created an award winning pitch that included UI design, marketing, and a business plan for a beta social events app. </p>
-            <div class="chip-parent"><a href="page3.html" class="chip tert">See Full Case Study</a></div>
+          <h2>Design 2 Delivered Competition</h2>
+          <div class="main-carousel">
+            <div class="carousel-cell">
+              <img src="/images/gallery3/compare intrests.png" alt="Slide 1" />
+            </div>
+            <div class="carousel-cell">
+              <img
+                src="/images/gallery3/Shots create mockups (10).png"
+                alt="Slide 2"
+              />
+            </div>
+            <div class="carousel-cell">
+              <img src="/images/gallery3/linkedin.png" alt="Slide 3" />
+            </div>
+            <div class="carousel-cell">
+              <img src="/images/gallery3/styleguide.png" alt="Slide 3" />
+            </div>
+          </div>
+          <div class="caption">
+            <p>
+              How I along with a team of 4 other designers created an award
+              winning pitch that included UI design, marketing, and a business
+              plan for a beta social events app.
+            </p>
+            <div class="chip-parent">
+              <a href="page3.html" class="chip tert">See Full Case Study</a>
+            </div>
           </div>
 
-            <h2>Smart Vision Works</h2>
-            <div class="main-carousel">
-                <div class="carousel-cell"><img
-                    src="/images/gallery2/Shots create mockups (13).png"
-                      alt="Slide 3"
-                    /></div>
-                <div class="carousel-cell"><img
-                    src="/images/gallery2/Shots Create Mockups (10).png"
-                      alt="Slide 1"
-                    /></div>
-                <div class="carousel-cell"><img
-                    src="/images/gallery2/Shots Create Mockups (12).png"
-                      alt="Slide 2"
-                    /></div>
-              </div>
-        <div class="caption">
-            <p>In my UX role at a B2B AI food inspection company, my responsibilities extended from crafting design guidelines
-                 and color schemes to help developers make consistent UI. To engaging in user research and finding design solutions 
-                 that worked for users, stakeholders, and developers. </p>
-            <div class="chip-parent"><a href="page2.html" class="chip tert">See Full Case Study</a></div>
-            
-        </div>
-        <h2>UVU Student Leadership and Success Studies</h2>
-            <div class="main-carousel">
-                <div class="carousel-cell"><img
-                  src="/images/gallery1/image1.png"
-                  alt="Slide 1"
-                /></div>
-                <div class="carousel-cell"><img
-                    src="/images/gallery1/image2.png"
-                    alt="Slide 2"
-                  /></div>
-                <div class="carousel-cell"><img
-                    src="/images/gallery1/image3.png"
-                    alt="Slide 3"
-                  /></div>
-              </div>
-        <div class="caption">
-            <p>"As part of a design team in a school project, we overhauled UVU's SLSS department website. 
-                My role was focused designing the homepage informed by user research, utilizing eye-tracking, 
-                conducting interviews, and surveys to improve Call to Actions."</p>
-            <div class="chip-parent"><a href="page4.html" class="chip tert">See Full Case Study</a></div>
-            
+          <h2>Smart Vision Works</h2>
+          <div class="main-carousel">
+            <div class="carousel-cell">
+              <img
+                src="/images/gallery2/Shots create mockups (13).png"
+                alt="Slide 3"
+              />
+            </div>
+            <div class="carousel-cell">
+              <img
+                src="/images/gallery2/Shots Create Mockups (10).png"
+                alt="Slide 1"
+              />
+            </div>
+            <div class="carousel-cell">
+              <img
+                src="/images/gallery2/Shots Create Mockups (12).png"
+                alt="Slide 2"
+              />
+            </div>
           </div>
-          
+          <div class="caption">
+            <p>
+              In my UX role at a B2B AI food inspection company, my
+              responsibilities extended from crafting design guidelines and
+              color schemes to help developers make consistent UI. To engaging
+              in user research and finding design solutions that worked for
+              users, stakeholders, and developers.
+            </p>
+            <div class="chip-parent">
+              <a href="page2.html" class="chip tert">See Full Case Study</a>
+            </div>
+          </div>
+          <h2>UVU Student Leadership and Success Studies</h2>
+          <div class="main-carousel">
+            <div class="carousel-cell">
+              <img src="/images/gallery1/image1.png" alt="Slide 1" />
+            </div>
+            <div class="carousel-cell">
+              <img src="/images/gallery1/image2.png" alt="Slide 2" />
+            </div>
+            <div class="carousel-cell">
+              <img src="/images/gallery1/image3.png" alt="Slide 3" />
+            </div>
+          </div>
+          <div class="caption">
+            <p>
+              "As part of a design team in a school project, we overhauled UVU's
+              SLSS department website. My role was focused designing the
+              homepage informed by user research, utilizing eye-tracking,
+              conducting interviews, and surveys to improve Call to Actions."
+            </p>
+            <div class="chip-parent">
+              <a href="page4.html" class="chip tert">See Full Case Study</a>
+            </div>
+          </div>
 
           <footer>
             <div class="links">
-                <a href="https://www.linkedin.com/in/kaden-johnson-40b155196/" class="outlined-btn">LinkedIn<img src="/icons/Arrow Forward Outline.svg" alt="arrow icon" width="24" height="24"></a>
-                <a href="mailto:nokadensly@gmail.com" class="outlined-btn">Email <img src="/icons/Arrow Forward Outline.svg" alt="arrow icon" width="24" height="24"></a>
-                <a href="" class="outlined-btn">Resume <img src="/icons/Arrow Forward Outline.svg" alt="arrow icon" width="24" height="24"></a>
+              <a
+                href="https://www.linkedin.com/in/kaden-johnson-40b155196/"
+                class="outlined-btn"
+                >LinkedIn<img
+                  src="/icons/Arrow Forward Outline.svg"
+                  alt="arrow icon"
+                  width="24"
+                  height="24"
+              /></a>
+              <a href="mailto:nokadensly@gmail.com" class="outlined-btn"
+                >Email
+                <img
+                  src="/icons/Arrow Forward Outline.svg"
+                  alt="arrow icon"
+                  width="24"
+                  height="24"
+              /></a>
+              <a href="" class="outlined-btn"
+                >Resume
+                <img
+                  src="/icons/Arrow Forward Outline.svg"
+                  alt="arrow icon"
+                  width="24"
+                  height="24"
+              /></a>
             </div>
-        </footer>
-        
-    </section>
-</div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.5.1/gsap.min.js"></script>
-          <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.5.1/ScrollTrigger.min.js"></script>
-          <script src="script.js"></script>
-
-          
-</body>
+          </footer>
+        </div>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.5.1/gsap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.5.1/ScrollTrigger.min.js"></script>
+        <script src="script.js"></script>
+      </section>
+    </div>
+  </body>
 </html>
