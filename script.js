@@ -1,3 +1,68 @@
+document.addEventListener('DOMContentLoaded', function() {
+    setActiveNavItem();
+    setupDropdownClicks();
+});
+
+function setupDropdownClicks() {
+    // Get all dropdowns
+    const dropdowns = document.querySelectorAll('.dropdown');
+
+    dropdowns.forEach(dropdown => {
+        const navItem = dropdown.querySelector('.nav-item');
+
+        // Toggle dropdown on click
+        navItem.addEventListener('click', function(event) {
+            event.stopPropagation(); // Prevent event from bubbling up
+            closeAllDropdowns(); // Close all dropdowns first
+            dropdown.classList.toggle('open'); // Then toggle this one
+        });
+    });
+
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', function(event) {
+        if (!event.target.matches('.dropdown, .dropdown *')) {
+            closeAllDropdowns();
+        }
+    });
+}
+
+function closeAllDropdowns() {
+    document.querySelectorAll('.dropdown').forEach(dropdown => {
+        dropdown.classList.remove('open');
+    });
+}
+
+window.addEventListener('popstate', setActiveNavItem);
+
+function setActiveNavItem() {
+    const currentPath = window.location.pathname;
+
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.remove('active');
+
+        if (item.getAttribute('href') === currentPath) {
+            item.classList.add('active');
+        }
+    });
+
+    document.querySelectorAll('.dropdown-content a').forEach(link => {
+        link.classList.remove('active');
+
+        if (link.getAttribute('href') === currentPath) {
+            link.classList.add('active');
+            let parentNavItem = link.closest('.dropdown').querySelector('.nav-item');
+            if (parentNavItem) {
+                parentNavItem.classList.add('active');
+            }
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', setActiveNavItem);
+window.addEventListener('popstate', setActiveNavItem);
+
+
+
 // page transition code 
 
 barba.init({
@@ -16,12 +81,16 @@ barba.init({
         async enter(data) {
             contentAnimation();
             window.scrollTo(0, 0);
-            initializeFlick()
+            initializeFlick();
+            setActiveNavItem();
+            setupDropdownClicks();
         },
         async once(data) {
             contentAnimation();
             window.scrollTo(0, 0);
-            initializeFlick()
+            initializeFlick();
+            setActiveNavItem();
+            setupDropdownClicks();
         },
     }]
 })

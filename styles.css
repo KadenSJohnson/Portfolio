@@ -1,6 +1,7 @@
 :root {
     --surface: #F8FBF0;
     --inverse-surface: #2E322B;
+    --inverse-surface-light: #42483d;
     --primary: #416835;
     --surface-container: #E6E9DF;
     --on-background: #191D17;
@@ -83,6 +84,45 @@ nav {
     z-index: 5;
 }
 
+.dropdown {
+    position: relative;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: var(--inverse-surface);
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+.dropdown.open .dropdown-content {
+    display: block;
+}
+
+.dropdown-content a {
+    color: white;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+.dropdown-content a:hover {
+    background-color: var(--inverse-surface-light);
+}
+
+
+.active {
+    background-color: var(--primary);
+    color: white; 
+    font-weight: bold;
+}
+
 .page-1 {
     margin-top: 80px;
     padding-top: 40px;
@@ -97,14 +137,6 @@ nav {
     margin-bottom: 36px;
 }
 
-.page-3 {
-    margin-top: 64px;
-    flex-direction: column;
-}
-
-.page-3 h1 {
-    margin-bottom: 36px;
-}
 
 section {
     display: flex;
@@ -360,19 +392,21 @@ section {
 
 .study .main-carousel {
     width: 50vw;
-    height: 50vw;
+    height: 40vw;
     margin: auto;
     border-radius: 8px;
   }
 
 .study  .carousel-cell {
     width: 100%;
-    height: 50vw; 
+    height: 40vw; 
     margin-right: 10px;
   }
 
 .study  .carousel-cell img {
     width: 50vw;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
     border-radius: 8px;
   }
 
