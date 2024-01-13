@@ -133,3 +133,6 @@ function initializeFlick() {
 }
 
 
+function refreshPage() {
+    location.reload();
+}
