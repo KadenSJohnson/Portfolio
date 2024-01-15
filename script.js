@@ -70,7 +70,6 @@ barba.init({
     {
       async leave(data) {
         const done = this.async();
-
         pageTransition();
         await delay(1500);
         done();
@@ -149,6 +148,7 @@ function initializeFlick() {
       cellAlign: "left",
       contain: true,
       wrapAround: true,
+      draggable: true,
     });
   }
 }

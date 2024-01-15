@@ -1,4 +1,4 @@
-@media screen and (max-width: 1024px) {
+@media screen and (max-width: 860px) {
   .hero-text {
     max-width: 100vw;
     text-align: center;
@@ -110,7 +110,7 @@
 
   .study .main-carousel {
     width: 90vw;
-    height: 65vw;
+    height: auto;
   }
 
   .study .carousel-cell {
