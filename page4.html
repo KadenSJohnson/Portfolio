@@ -92,8 +92,22 @@
       </nav>
       <div class="study">
         <div class="study-header">
-          <h1>Utah Valley University</h1>
-          <h2>Student Leadership and Success Studies</h2>
+          <div>
+            <h1>Utah Valley University</h1>
+            <h2>Student Leadership and Success Studies</h2>
+          </div>
+          <div class="switch-parent">
+            <p>Select Case Study Version</p>
+            <label class="switch">
+              <input
+                class="switch-input"
+                type="checkbox"
+                onchange="toggleText()"
+              />
+              <span class="switch-label" data-on="Short" data-off="Long"></span>
+              <span class="switch-handle"></span>
+            </label>
+          </div>
         </div>
 
         <div class="study-content">

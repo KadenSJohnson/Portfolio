@@ -107,7 +107,7 @@
   }
 
   .study-section {
-    width: 100vw;
+    width: 95vw;
     background-color: var(--surface-container);
     color: var(--On-Secondary-Container);
     display: flex;
