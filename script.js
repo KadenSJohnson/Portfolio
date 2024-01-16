@@ -153,6 +153,18 @@ function initializeFlick() {
   }
 }
 
-function refreshPage() {
-  location.reload();
+function toggleText() {
+  var shortTextElements = document.querySelectorAll(".short-text");
+  var longTextElements = document.querySelectorAll(".long-text");
+  var isShortTextVisible =
+    shortTextElements[0] &&
+    getComputedStyle(shortTextElements[0]).display !== "none";
+
+  shortTextElements.forEach(function (element) {
+    element.style.display = isShortTextVisible ? "none" : "block";
+  });
+
+  longTextElements.forEach(function (element) {
+    element.style.display = isShortTextVisible ? "block" : "none";
+  });
 }

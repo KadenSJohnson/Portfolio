@@ -88,6 +88,22 @@
     margin-top: 24px;
     margin-bottom: 0px;
     margin-left: 5vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .switch-parent {
+    width: 95vw;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    margin-top: 16px;
+    flex-direction: column;
+  }
+
+  .switch-parent p {
+    color: var(--inverse-surface);
   }
 
   .study-section {
@@ -103,7 +119,7 @@
   }
 
   .study-text {
-    max-width: 95vw;
+    width: 95vw;
     padding: 24px;
     font-size: 20px;
   }
