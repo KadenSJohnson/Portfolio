@@ -126,12 +126,12 @@
 
   .study .main-carousel {
     width: 90vw;
-    height: auto;
+    height: 50vw;
   }
 
   .study .carousel-cell {
     width: 100%;
-    height: 100%;
+    height: 50vw;
   }
 
   .study .carousel-cell img {
