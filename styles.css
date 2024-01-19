@@ -69,7 +69,7 @@ body {
 
 nav {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: center;
   height: 80px;
   position: fixed;
@@ -241,7 +241,7 @@ section {
   gap: 32px;
   padding: 32px 0px;
   margin: 32px 0px;
-  border-radius: 24px;
+  border-radius: 8px;
 }
 
 .study-section p {
@@ -414,6 +414,10 @@ ul.morph li {
   aspect-ratio: 4 / 3;
   object-fit: cover;
   border-radius: 8px;
+}
+
+.study .carousel-cell .top-img {
+  object-position: 0% 0%;
 }
 
 .study .flickity-button:focus {
@@ -614,4 +618,8 @@ footer {
 
 .short-text {
   display: none;
+}
+
+.left-nav {
+  display: flex;
 }
