@@ -81,6 +81,7 @@ barba.init({
         initializeFlick();
         setActiveNavItem();
         setupDropdownClicks();
+        riveAnime();
       },
       async once(data) {
         contentAnimation();
@@ -88,6 +89,7 @@ barba.init({
         initializeFlick();
         setActiveNavItem();
         setupDropdownClicks();
+        riveAnime();
       },
     },
   ],
@@ -169,12 +171,14 @@ function toggleText() {
   });
 }
 
-const r = new rive.Rive({
-  src: "Bush animation.riv",
-  canvas: document.getElementById("riveCanvas"),
-  autoplay: true,
-  stateMachines: "State Machine 1",
-  onLoad: () => {
-    r.resizeDrawingSurfaceToCanvas();
-  },
-});
+function riveAnime() {
+  const r = new rive.Rive({
+    src: "Bush animation.riv",
+    canvas: document.getElementById("riveCanvas"),
+    autoplay: true,
+    stateMachines: "State Machine 1",
+    onLoad: () => {
+      r.resizeDrawingSurfaceToCanvas();
+    },
+  });
+}
