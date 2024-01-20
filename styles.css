@@ -623,3 +623,8 @@ footer {
 .left-nav {
   display: flex;
 }
+
+#riveCanvas {
+  border-radius: 24px;
+  width: 50vw;
+}

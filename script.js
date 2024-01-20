@@ -168,3 +168,13 @@ function toggleText() {
     element.style.display = isShortTextVisible ? "block" : "none";
   });
 }
+
+const r = new rive.Rive({
+  src: "Bush animation.riv",
+  canvas: document.getElementById("riveCanvas"),
+  autoplay: true,
+  stateMachines: "State Machine 1",
+  onLoad: () => {
+    r.resizeDrawingSurfaceToCanvas();
+  },
+});
