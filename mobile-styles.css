@@ -142,12 +142,12 @@
 
   .study .main-carousel {
     width: 90vw;
-    height: 50vw;
+    height: 65vw;
   }
 
   .study .carousel-cell {
     width: 100%;
-    height: 50vw;
+    height: 65vw;
   }
 
   .study .carousel-cell img {
@@ -168,5 +168,36 @@
   #riveCanvas {
     border-radius: 24px;
     width: 90vw;
+  }
+
+  .about-me {
+    flex-direction: column-reverse;
+  }
+
+  .about-me .profile-pic {
+    width: 60vw;
+    height: 45vw;
+    object-fit: cover;
+    object-position: 0% 14%;
+    border-radius: 24px;
+    margin: 0 auto;
+  }
+
+  .page-content {
+    min-height: 160vh;
+    height: max-content;
+  }
+
+  .a-text {
+    margin-top: 24px;
+    width: 90%;
+  }
+
+  footer {
+    padding: 16px;
+  }
+
+  .links {
+    gap: 16px;
   }
 }

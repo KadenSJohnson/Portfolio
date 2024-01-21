@@ -451,6 +451,12 @@ ul.morph li {
   font-size: 24px;
 }
 
+.bottom-btn:first-of-type {
+  border: 2px solid var(--primary);
+  background-color: var(--surface);
+  color: var(--primary);
+}
+
 .bottom-btn:hover {
   /* background-color: var(--primary);  */
   box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.4);
@@ -472,6 +478,7 @@ footer {
   background-color: var(--surface-container);
   padding: 16px;
   border-radius: 16px;
+  margin-bottom: 24px;
 }
 
 .about-me h2 {
@@ -481,16 +488,35 @@ footer {
   margin-bottom: 16px;
 }
 
+.about-me p {
+  margin: 24px 0px;
+  font-size: 20px;
+}
+
 .tools {
   margin: 8px 0px;
 }
 
 .about-me img {
   width: 35%;
+  object-fit: cover;
+  border-radius: 24px;
 }
 
 .a-text {
   width: 60%;
+}
+
+.tools p {
+  display: flex;
+  width: 200px;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tools p img {
+  height: 32px;
+  object-fit: contain;
 }
 
 .switch {
@@ -627,4 +653,9 @@ footer {
 #riveCanvas {
   border-radius: 24px;
   width: 50vw;
+}
+
+.tools H4 {
+  margin-top: 24px;
+  font-size: 24px;
 }

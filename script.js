@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
   setActiveNavItem();
   setupDropdownClicks();
+  setActiveNavItem();
 });
 
 function setupDropdownClicks() {
@@ -58,7 +59,6 @@ function setActiveNavItem() {
   });
 }
 
-document.addEventListener("DOMContentLoaded", setActiveNavItem);
 window.addEventListener("popstate", setActiveNavItem);
 
 // page transition code
@@ -82,6 +82,7 @@ barba.init({
         setActiveNavItem();
         setupDropdownClicks();
         riveAnime();
+        console.log("enter");
       },
       async once(data) {
         contentAnimation();
@@ -90,6 +91,7 @@ barba.init({
         setActiveNavItem();
         setupDropdownClicks();
         riveAnime();
+        console.log("once");
       },
     },
   ],
