@@ -2,6 +2,7 @@ document.addEventListener("DOMContentLoaded", function () {
   setActiveNavItem();
   setupDropdownClicks();
   setActiveNavItem();
+  window.addEventListener("popstate", setActiveNavItem);
 });
 
 function setupDropdownClicks() {
@@ -59,8 +60,6 @@ function setActiveNavItem() {
   });
 }
 
-window.addEventListener("popstate", setActiveNavItem);
-
 // page transition code
 
 barba.init({
@@ -77,20 +76,21 @@ barba.init({
 
       async enter(data) {
         contentAnimation();
-        window.scrollTo(0, 0);
         initializeFlick();
         setActiveNavItem();
         setupDropdownClicks();
-        riveAnime();
+        if (data.next.namespace === "home") {
+          riveAnime();
+        }
         console.log("enter");
       },
       async once(data) {
-        contentAnimation();
-        window.scrollTo(0, 0);
         initializeFlick();
         setActiveNavItem();
         setupDropdownClicks();
-        riveAnime();
+        if (data.next.namespace === "home") {
+          riveAnime();
+        }
         console.log("once");
       },
     },
@@ -124,13 +124,11 @@ function contentAnimation() {
     duration: 1,
     translateY: -50,
     opacity: 0,
-    delay: 0.25,
   });
   tl.from(".study-header", {
     duration: 1,
     translateY: -50,
     opacity: 0,
-    delay: 0.25,
   });
 }
 
@@ -174,6 +172,7 @@ function toggleText() {
 }
 
 function riveAnime() {
+  console.log("rive animation?");
   const r = new rive.Rive({
     src: "Bush animation.riv",
     canvas: document.getElementById("riveCanvas"),
