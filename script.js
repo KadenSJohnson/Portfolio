@@ -83,7 +83,6 @@ barba.init({
         if (data.next.namespace === "home") {
           riveAnime();
         }
-        console.log("enter");
       },
       async once(data) {
         window.scrollTo(0, 0);
@@ -93,7 +92,6 @@ barba.init({
         if (data.next.namespace === "home") {
           riveAnime();
         }
-        console.log("once");
       },
     },
   ],
