@@ -455,6 +455,7 @@ ul.morph li {
   border: 2px solid var(--primary);
   background-color: var(--surface);
   color: var(--primary);
+  font-weight: 700;
 }
 
 .bottom-btn:hover {
@@ -658,4 +659,17 @@ footer {
 .tools H4 {
   margin-top: 24px;
   font-size: 24px;
+}
+
+.img-caption {
+  position: absolute;
+  z-index: 4;
+  bottom: 8px;
+  left: 24px;
+  background-color: var(--Secondary-Container);
+  color: var(--On-Secondary-Container);
+  padding: 8px 12px;
+  border-radius: 16px;
+  font-weight: 500;
+  max-width: calc(50vw - 48px);
 }

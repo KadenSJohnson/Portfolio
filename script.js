@@ -75,6 +75,7 @@ barba.init({
       },
 
       async enter(data) {
+        window.scrollTo(0, 0);
         contentAnimation();
         initializeFlick();
         setActiveNavItem();
