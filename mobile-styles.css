@@ -202,8 +202,9 @@
   }
 
   .img-caption {
-    bottom: 8px;
-    left: 24px;
+    bottom: 4px;
+    left: 12px;
     margin: 0px !important;
+    max-width: calc(90vw - 24px);
   }
 }
