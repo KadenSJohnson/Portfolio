@@ -86,6 +86,7 @@ barba.init({
         console.log("enter");
       },
       async once(data) {
+        window.scrollTo(0, 0);
         initializeFlick();
         setActiveNavItem();
         setupDropdownClicks();
