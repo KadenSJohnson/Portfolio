@@ -666,8 +666,8 @@ footer {
   z-index: 4;
   bottom: 8px;
   left: 24px;
-  background-color: var(--Secondary-Container);
-  color: var(--On-Secondary-Container);
+  background-color: var(--inverse-surface);
+  color: var(--surface);
   padding: 8px 12px;
   border-radius: 16px;
   font-weight: 500;

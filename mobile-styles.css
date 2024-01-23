@@ -200,4 +200,10 @@
   .links {
     gap: 16px;
   }
+
+  .img-caption {
+    bottom: 8px;
+    left: 24px;
+    margin: 0px !important;
+  }
 }
