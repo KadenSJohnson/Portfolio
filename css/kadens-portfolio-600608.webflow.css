@@ -2627,6 +2627,9 @@ figcaption {
 }
 
 .text-span-2 {
+  background-image: linear-gradient(#66b600, #519000);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
   color: var(--base-color-brand--primary);
   font-family: Delarge, sans-serif;
 }
