@@ -1333,7 +1333,8 @@ const Model3D = (() => {
       f.classList.add("is-loaded");
       if (++loaded >= frames.length && hint) hint.hidden = true;
     }, { once: true }));
-    const t = setTimeout(() => { if (hint) hint.hidden = true; frames.forEach((f) => f.classList.add("is-loaded")); }, 20000);
+    // If the archive is slow, keep the screenshots up and say so; each page appears when it arrives
+    const t = setTimeout(() => { if (hint && !hint.hidden) hint.textContent = "Still loading the live pages…"; }, 15000);
     dragHandle(ba);
     if (list) list.push(() => { clearTimeout(t); ro && ro.disconnect(); });
   };
