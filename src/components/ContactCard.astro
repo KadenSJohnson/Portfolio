@@ -1,0 +1,18 @@
+---
+import { CONTACT, type Contact } from "../data/projects";
+interface Props { item: Contact }
+const { item } = Astro.props;
+---
+<section class="obj acrylic contact wide" data-cat="widget" style={`--r:${item.r}deg`} id="say-hi" aria-labelledby="contact-h">
+  <h2 id="contact-h">Say hi</h2>
+  <p class="c-lede">Hire me, work with me, or just say hi.</p>
+  <div class="c-row">
+    <span class="c-email" id="email-text">{CONTACT.email}</span>
+    <button class="copy" type="button" data-copy={CONTACT.email}>Copy email</button>
+  </div>
+  <ul class="c-links">
+    <li><a href={CONTACT.linkedin} target="_blank" rel="noopener">LinkedIn</a></li>
+    <li><a href={CONTACT.x} target="_blank" rel="noopener">X / @kadensly</a></li>
+    <li><a href={CONTACT.form} target="_blank" rel="noopener">Contact form</a></li>
+  </ul>
+</section>

@@ -1,0 +1,37 @@
+---
+import Layout from "../layouts/Layout.astro";
+import MatMarks from "../components/MatMarks.astro";
+import Intro from "../components/Intro.astro";
+import Filters from "../components/Filters.astro";
+import WorkCard from "../components/WorkCard.astro";
+import QuoteCard from "../components/QuoteCard.astro";
+import ContactCard from "../components/ContactCard.astro";
+import Lightbox from "../components/Lightbox.astro";
+import { ITEMS, CONTACT } from "../data/projects";
+import kiwiObj from "../models/kiwi.obj?raw";
+import rockObj from "../models/rock.obj?raw";
+const objs = { kiwi: kiwiObj, rock: rockObj };
+---
+<Layout title="Kaden Johnson · Portfolio" description="Kaden Johnson is a UX/UI designer in Springville, Utah, working across websites, product, and internal tools.">
+  <div class="mat" id="mat">
+    <MatMarks />
+    <div class="page">
+      <Intro />
+      <Filters />
+      <main class="gallery" id="work">
+        {ITEMS.map((it) =>
+          it.kind === "work" ? <WorkCard item={it} /> : it.kind === "quote" ? <QuoteCard item={it} /> : <ContactCard item={it} />
+        )}
+      </main>
+      <footer class="foot">
+        <span>© 2026 Kaden Johnson</span>
+        <span>{CONTACT.email}</span>
+      </footer>
+    </div>
+  </div>
+  <Lightbox />
+  {Object.entries(objs).map(([k, src]) => <script type="text/plain" id={`obj-${k}`} is:inline set:html={src}></script>)}
+  <script>
+    import "../scripts/app.js";
+  </script>
+</Layout>

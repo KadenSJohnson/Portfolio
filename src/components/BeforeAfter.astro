@@ -1,0 +1,34 @@
+---
+// Before/after compare. The card shows a static split; the lightbox version embeds the
+// interactive homepage prototypes side by side with a draggable handle.
+import type { Work } from "../data/projects";
+interface Props { ba: NonNullable<Work["ba"]>; big?: boolean }
+const { ba, big = false } = Astro.props;
+const { before, after, beforeLabel: lb, afterLabel: la } = ba;
+const rangeLabel = `Compare the KPM homepage in ${lb} with now. Slide left to see more of now, right to see more of ${lb}.`;
+const sandbox = "allow-scripts allow-same-origin allow-popups allow-forms";
+---
+{big && ba.live ? (
+  <>
+    <div class="ba big live" style={`--pos:50%;--b-img:url(/images/${before});--a-img:url(/images/${after})`}>
+      <div class="ba-layer ba-after"><iframe src={ba.live[1]} title="KPM Analytics homepage now (interactive prototype)" sandbox={sandbox} referrerpolicy="no-referrer"></iframe></div>
+      <div class="ba-layer ba-before"><iframe src={ba.live[0]} title={`KPM Analytics homepage in ${lb} (interactive prototype)`} sandbox={sandbox} referrerpolicy="no-referrer"></iframe></div>
+      <span class="ba-line" aria-hidden="true"><span class="ba-knob"><svg viewBox="0 0 24 24"><path d="M9 6l-6 6 6 6M15 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.6" /></svg></span></span>
+      <span class="ba-tag l" aria-hidden="true">{lb}</span><span class="ba-tag r" aria-hidden="true">{la}</span>
+      <span class="ba-hint" aria-hidden="true">Loading the prototypes…</span>
+      <input class="ba-range" type="range" min="0" max="100" value="50" aria-label={rangeLabel} />
+    </div>
+    <p class="ba-note">
+      Working prototypes of the homepage in October 2024 and today, rebuilt from the real pages. Scroll, click the carousels and watch the animations. Each side scrolls on its own. Drag the handle to compare.
+      {ba.links?.map(([t, u]) => <a href={u} target="_blank" rel="noopener">{t} ↗</a>)}
+    </p>
+  </>
+) : (
+  <div class={`ba${big ? " big" : ""}`} style="--pos:50%">
+    <img class="ba-after" src={`/images/${after}`} alt={`KPM Analytics homepage ${la.toLowerCase()}`} loading="lazy" />
+    <img class="ba-before" src={`/images/${before}`} alt={`KPM Analytics homepage in ${lb}`} loading="lazy" />
+    <span class="ba-line" aria-hidden="true"><span class="ba-knob"><svg viewBox="0 0 24 24"><path d="M9 6l-6 6 6 6M15 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.6" /></svg></span></span>
+    <span class="ba-tag l" aria-hidden="true">{lb}</span><span class="ba-tag r" aria-hidden="true">{la}</span>
+    {big && <input class="ba-range" type="range" min="0" max="100" value="50" aria-label={rangeLabel} />}
+  </div>
+)}

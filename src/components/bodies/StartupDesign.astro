@@ -1,0 +1,24 @@
+---
+import Meta from "../Meta.astro";
+import Stats from "../Stats.astro";
+import Sec from "../Sec.astro";
+import Figs from "../Figs.astro";
+import ProblemSolution from "../ProblemSolution.astro";
+---
+<Meta rows={[["Role", "UI/UX Designer"], ["Team", "1 Designer, 7 Developers"], ["Company", "Smart Vision Works"], ["Skills", "UI Design, UX Design, UI Development"]]} />
+<ProblemSolution problem="Inconsistent design, little user research, and little to no UI design" solution="A design system, user feedback, and Figma added to the workflow" />
+<p class="lead">Smart Vision Works is an AI food inspection tech company. I worked on UX, UI, graphic design, and more, alongside PhD experts in AI, machine learning, and manufacturing.</p>
+<Sec h="Consistency and speed of development">
+  <p>A content audit found over 34 different shades of blue, the company's primary color, in the code base. Developers had no quick way to find brand colors, so they spent extra time hunting or used colors that didn't fit.</p>
+  <p>I worked with other departments on official brand color documentation, and built a color system and SCSS file that sped up developers choosing colors by over 50%.</p>
+  <Stats items={[["34", "Shades of blue found in the code base"], ["50%+", "Faster color choices for developers"]]} />
+  <Figs items={[["Colors.png", "Color system"]]} cols={1} />
+</Sec>
+<Sec h="Reducing dead clicks">
+  <p>During a usability study I found a table design that was causing a lot of dead clicks: users averaged 4 per use. After the redesign, dead clicks dropped to zero.</p>
+  <Figs items={[["Before--After.png", "Table, before and after"]]} cols={1} />
+</Sec>
+<Sec h="V2 design using Figma">
+  <p>I worked with developers and managers to create a complete design for a new version of one of the SVW products. Adding Figma to the process let stakeholders get much more involved, and kept designs consistent with the design system.</p>
+  <Figs items={[["Shots-mockup-1.png", "V2 product design"], ["SVW-Cover.png", "Smart Vision Works brand pattern"]]} />
+</Sec>

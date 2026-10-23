@@ -1,0 +1,8 @@
+---
+import Ph from "./Ph.astro";
+interface Props { items: [string, string][]; cols?: number }
+const { items, cols = 2 } = Astro.props;
+---
+<div class={`figs c${cols}`}>
+  {items.map(([src, label]) => <figure><Ph src={src} label={label} ratio="16/10" /><figcaption>{label}</figcaption></figure>)}
+</div>

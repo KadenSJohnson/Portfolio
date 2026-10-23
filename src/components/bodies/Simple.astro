@@ -1,0 +1,8 @@
+---
+import Figs from "../Figs.astro";
+interface Props { desc: string; figs?: [string, string][] }
+const { desc, figs } = Astro.props;
+---
+<p class="lead">{desc}</p>
+<p class="note">Add a short description of this project: what it was, your role, and how it turned out.</p>
+{figs && <Figs items={figs} />}

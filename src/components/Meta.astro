@@ -1,0 +1,4 @@
+---
+interface Props { rows: [string, string][] }
+---
+<dl class="meta">{Astro.props.rows.map(([k, v]) => <div><dt>{k}</dt><dd>{v}</dd></div>)}</dl>

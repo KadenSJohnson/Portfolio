@@ -1,0 +1,25 @@
+---
+import Meta from "../Meta.astro";
+import Stats from "../Stats.astro";
+import Sec from "../Sec.astro";
+import Figs from "../Figs.astro";
+---
+<Meta rows={[["Role", "UX Designer / Researcher"], ["Team", "3 UX Designers"], ["Type", "Prototype · Mobile App · Research"]]} />
+<p class="lead">Our first assumption was that most people at sit-down casual restaurants would rather use a physical menu than a digital one.</p>
+<Sec h="Initial research">
+  <p>We surveyed to find who visits sit-down casual restaurants most (in our college town, 16 to 28 year olds) and asked about eating habits, age, and current use of digital menus.</p>
+  <p>Our assumption was right: most users preferred physical menus. What they liked best about digital menus was the images, and interviews showed images were a real advantage.</p>
+  <Figs items={[["Shots-create-mockups-1.png", "Initial wireframes"]]} cols={1} />
+</Sec>
+<Sec h="Generating concepts">
+  <p>After a brainstorming session and some low-fidelity prototypes, one idea stood out: a menu we called “Tinder for food menus.” Users swipe left or right on dishes, which gives every item a large image and makes choosing a meal more interactive.</p>
+  <Figs items={[["Shots-Create-Mockups-5_1.png", "Low-fidelity prototype"]]} cols={1} />
+</Sec>
+<Sec h="Progressive disclosure">
+  <p>Testing showed users weren't engaging with much of the information and had trouble swiping the right way, so we built another iteration. We also raised the fidelity, using Olive Garden's branding and a selection of main entrees.</p>
+  <Figs items={[["Shots-create-mockups-6.png", "High-fidelity iteration"], ["64shots-screenshot.png", "Final dish screen"]]} />
+</Sec>
+<Sec h="Results">
+  <Stats items={[["97%", "Increase in user decision making"], ["54%", "Increase in user satisfaction"]]} />
+  <p><a class="ext" href="https://www.youtube.com/watch?v=Tl5kheAT5Tc" target="_blank" rel="noopener">Watch the final prototype on YouTube</a></p>
+</Sec>

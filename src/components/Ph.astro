@@ -1,0 +1,16 @@
+---
+// Image box: the real image when there is one, otherwise a labeled placeholder
+import { img } from "../data/projects";
+interface Props { src?: string | null; label: string; ratio?: string; alt?: string }
+const { src, label, ratio = "4/3", alt } = Astro.props;
+const file = img(src);
+---
+{file ? (
+  <div class="ph is-real" style={`aspect-ratio:${ratio}`}>
+    <img src={`/images/${file}`} alt={alt || label} loading="lazy" decoding="async" />
+  </div>
+) : (
+  <div class="ph empty" style={`aspect-ratio:${ratio}`}>
+    <span class="ph-tag"><b>{label}</b><span>Image goes here</span></span>
+  </div>
+)}
