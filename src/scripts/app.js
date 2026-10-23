@@ -125,6 +125,7 @@ import { Model3D } from "./model3d.js";
      scrolls proportionally so both reach their footers together. The handle drags. */
   const setupBA = (root, list) => {
     root.querySelectorAll(".ba.big").forEach((ba) => {
+      if (ba.classList.contains("split")) { dragHandle(ba); return; }
       const sc = ba.querySelector(".ba-scroll");
       if (!sc) return;
       const st = sc.querySelector(".ba-stage");

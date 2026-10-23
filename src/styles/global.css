@@ -160,20 +160,20 @@ img.init{object-fit:cover;padding:0}
 .ba-tag.l{left:10px}.ba-tag.r{right:10px}
 .ba-range{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:ew-resize;touch-action:pan-y}
 .ba.big:has(.ba-range:focus-visible) .ba-knob{outline:3px solid var(--ink);outline-offset:3px}
-/* Lightbox: a window onto both full-length homepages that scrolls together */
-.ba.big:has(.ba-scroll){aspect-ratio:16/10;max-height:72vh;width:100%;max-width:100%}
-.ba-scroll{position:absolute;inset:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none}
-.ba-scroll::-webkit-scrollbar{display:none}
-.ba-scroll:focus-visible{outline:3px solid var(--ink);outline-offset:-3px}
-.ba-stage{position:relative;width:100%}
-.ba .ba-stage img{inset:0 auto auto 0;height:auto;object-fit:fill;will-change:transform}
-.ba.big:has(.ba-scroll) .ba-range{pointer-events:none}
-.ba.big:has(.ba-scroll) .ba-line{width:44px;margin-left:-22px;background:none;box-shadow:none;pointer-events:auto;cursor:ew-resize;touch-action:none}
-.ba.big:has(.ba-scroll) .ba-line::before{content:"";position:absolute;top:0;bottom:0;left:50%;width:3px;margin-left:-1.5px;background:#FFFFFF;box-shadow:0 0 0 1px rgba(0,0,0,.25)}
-.ba-hint{position:absolute;top:10px;left:50%;transform:translateX(-50%);padding:5px 10px;border-radius:999px;background:rgba(12,12,12,.82);color:#FFFFFF;font:600 11px/1 var(--mono);letter-spacing:.04em;white-space:nowrap;pointer-events:none}
+/* Lightbox: both full-length homepages side by side behind the handle; each side scrolls on its own */
+.ba.split{aspect-ratio:16/10;max-height:72vh;width:100%;max-width:100%}
+.ba.split .ba-layer{position:absolute;inset:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;background:#EDEDED}
+.ba.split .ba-layer::-webkit-scrollbar{display:none}
+.ba.split .ba-layer:focus-visible{outline:3px solid var(--ink);outline-offset:-3px}
+.ba.split .ba-layer img{position:static;inset:auto;width:100%;height:auto;object-fit:fill}
+.ba.split .ba-range{pointer-events:none}
+.ba.split .ba-line{width:44px;margin-left:-22px;background:none;box-shadow:none;pointer-events:auto;cursor:ew-resize;touch-action:none;z-index:2}
+.ba.split .ba-line::before{content:"";position:absolute;top:0;bottom:0;left:50%;width:3px;margin-left:-1.5px;background:#FFFFFF;box-shadow:0 0 0 1px rgba(0,0,0,.25)}
+.ba.split .ba-tag{z-index:2}
+.ba.split.dragging .ba-layer{pointer-events:none}
 .ba-note{margin:10px 0 0;color:#6B6B6B;font-size:13px;line-height:1.5}
 .ba-note a{color:#1A1A1A;font-weight:600;text-underline-offset:3px;margin-left:8px;white-space:nowrap}
-@media (max-width:640px){.ba.big:has(.ba-scroll){aspect-ratio:4/5}}
+@media (max-width:640px){.ba.split{aspect-ratio:4/5}}
 
 
 /* ---------- Intro ---------- */

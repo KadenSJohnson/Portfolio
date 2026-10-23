@@ -56,7 +56,6 @@ export const ITEMS: Item[] = [
   { kind: "work", id: "online-menu", title: "Creating an Engaging Online Menu Experience", sub: "Improving a restaurant's digital menu experience prototype", cats: ["uxui"], mat: "paper", wide: true, r: 0.6,
     src: "334shots-so.png", label: "Menu app on three phones", ratio: "16/9", body: "online-menu" },
   { kind: "work", id: "boulder", title: "Boulder Icon Logo", sub: TBD, cats: ["icon"], mat: "metal", r: 1.0, src: "Boulder-Icon-Logo.png", label: "Boulder icon logo", ratio: "1/1", body: "simple" },
-  { kind: "work", id: "login-page", title: "Login Page", sub: TBD, cats: ["uxui"], mat: "stock", r: -0.9, src: "Login-Page.png", label: "Login page", body: "simple" },
   { kind: "quote", id: "q2", r: -1.3, who: "Casey Merrill", role: "Software Engineering Manager, Smart Vision Works", photo: "Casey-Headshot.jpeg", logo: "SVW-Logo.png",
     quote: "Kaden is an excellent designer who really tries to understand the customer's perspective." },
   { kind: "work", id: "vela", title: "Vela", sub: TBD, cats: ["icon"], mat: "acrylic", r: 0.8, src: "8.svg", label: "Vela logo", ratio: "16/9", body: "simple",
