@@ -18,6 +18,5 @@ npm run build    # static site in dist/
 - `src/scripts/`: filters, lightbox, rulers, compare slider, and the WebGL model viewer
 - `src/styles/global.css`: all styles
 - `public/images/`: portfolio images
-- `public/kpm/`: the two interactive KPM homepage prototypes used in the compare slider
 
 To add a project, add an entry to `ITEMS` in `src/data/projects.ts`, put its image in `public/images/`, and (for a full case study) add a body component in `src/components/bodies/`.

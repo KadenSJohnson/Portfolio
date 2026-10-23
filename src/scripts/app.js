@@ -121,36 +121,11 @@ import { Model3D } from "./model3d.js";
     line.addEventListener("pointercancel", end);
   };
 
-  /* Live compare: two real pages rendered at desktop width and scaled to fit the window */
-  const setupLive = (ba, list) => {
-    const fit = () => {
-      const w = ba.clientWidth || 1;
-      const vw = 1440; // the prototypes are desktop pages
-      ba.style.setProperty("--vw", vw + "px");
-      ba.style.setProperty("--s", String(w / vw));
-    };
-    fit();
-    let ro = null;
-    if ("ResizeObserver" in window) { ro = new ResizeObserver(fit); ro.observe(ba); }
-    const hint = ba.querySelector(".ba-hint");
-    const frames = Array.from(ba.querySelectorAll("iframe"));
-    let loaded = 0;
-    frames.forEach((f) => f.addEventListener("load", () => {
-      f.classList.add("is-loaded");
-      if (++loaded >= frames.length && hint) hint.hidden = true;
-    }, { once: true }));
-    // If the archive is slow, keep the screenshots up and say so; each page appears when it arrives
-    const t = setTimeout(() => { if (hint && !hint.hidden) hint.textContent = "Still loading the prototypes…"; }, 15000);
-    dragHandle(ba);
-    if (list) list.push(() => { clearTimeout(t); ro && ro.disconnect(); });
-  };
-
   /* Full-length compare: one scroll window moves both pages; the shorter page
      scrolls proportionally so both reach their footers together. The handle drags. */
   const setupBA = (root, list) => {
     root.querySelectorAll(".ba.big").forEach((ba) => {
       const sc = ba.querySelector(".ba-scroll");
-      if (ba.classList.contains("live")) return setupLive(ba, list);
       if (!sc) return;
       const st = sc.querySelector(".ba-stage");
       const imgs = Array.from(st.querySelectorAll("img"));

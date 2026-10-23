@@ -31,7 +31,7 @@ export interface Work {
   kind: "work"; id: string; title: string; sub: string; cats: CatKey[];
   mat: "paper" | "metal" | "acrylic" | "stock"; r: number; wide?: boolean;
   src?: string | null; label: string; ratio?: string; body: Body; figs?: [string, string][];
-  ba?: { before: string; after: string; beforeLabel: string; afterLabel: string; live?: [string, string]; links?: [string, string][] };
+  ba?: { before: string; after: string; beforeLabel: string; afterLabel: string; full?: { before: [string, number, number]; after: [string, number, number] }; links?: [string, string][] };
   model?: { key: string; what: string; yaw: number; pitch: number; color?: string };
 }
 export interface Quote { kind: "quote"; id: string; r: number; who: string; role: string; photo: string; logo: string; quote: string }
@@ -44,8 +44,8 @@ export const ITEMS: Item[] = [
   { kind: "work", id: "kpm", title: "KPM Analytics Website", sub: "Owning the company website end to end in Webflow", cats: ["uxui"], mat: "metal", wide: true, r: -0.5,
     label: "KPM Analytics website", ratio: "16/9", body: "kpm",
     ba: { before: "kpm-site-2024-10.webp", after: "kpm-site-now.webp", beforeLabel: "October 2024", afterLabel: "Now",
-      // Working prototypes rebuilt from the real pages (kpmanalytics.com and the archive refuse to be framed)
-      live: ["/kpm/2024.html", "/kpm/now.html"],
+      // Full-length homepage screenshots (1440px wide) for the scrolling compare in the lightbox
+      full: { before: ["kpm-site-2024-10-full.webp", 1440, 6666], after: ["kpm-site-now-full.webp", 1440, 4332] },
       links: [["Visit the live site", "https://www.kpmanalytics.com/"], ["View the October 2024 archive", "https://web.archive.org/web/20241001071259/https://www.kpmanalytics.com/"]] } },
   { kind: "work", id: "class-sign-ups", title: "Design to Improve Class Sign Ups", sub: "University department website design and research", cats: ["uxui"], mat: "paper", r: 1.1,
     src: "986shots-so.png", label: "SLSS website on a monitor", body: "class-sign-ups" },
