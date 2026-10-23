@@ -53,15 +53,18 @@ import { Model3D } from "./model3d.js";
 
   /* Category filter */
   const chips = Array.from(document.querySelectorAll(".chip"));
+  const pick = document.getElementById("cat-select");
   const objs = Array.from(document.querySelectorAll(".gallery > .obj"));
   const applyFilter = (f) => {
     chips.forEach((c) => c.setAttribute("aria-pressed", String(c.dataset.filter === f)));
+    if (pick) pick.value = f;
     objs.forEach((o) => {
       const cats = (o.dataset.cat || "").split(" ");
       o.hidden = f !== "all" && !cats.includes(f);
     });
   };
   chips.forEach((c) => c.addEventListener("click", () => applyFilter(c.dataset.filter)));
+  if (pick) pick.addEventListener("change", () => applyFilter(pick.value));
 
   /* Copy email */
   document.querySelectorAll("[data-copy]").forEach((b) => {
