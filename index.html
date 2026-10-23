@@ -188,6 +188,20 @@ img.init{object-fit:cover;padding:0}
 .ba-note{margin:10px 0 0;color:#6B6B6B;font-size:13px;line-height:1.5}
 .ba-note a{color:#1A1A1A;font-weight:600;text-underline-offset:3px;margin-left:8px;white-space:nowrap}
 @media (max-width:640px){.ba.big:has(.ba-scroll){aspect-ratio:4/5}}
+/* Live pages: each side is a real page rendered at desktop width and scaled to fit */
+.ba.live{aspect-ratio:16/10;max-height:72vh;width:100%;max-width:100%;--s:.65;--vw:1440px}
+.ba-layer{position:absolute;inset:0;overflow:hidden;background:#EDEDED top center/100% auto no-repeat}
+.ba-layer.ba-after{background-image:var(--a-img)}
+.ba-layer.ba-before{background-image:var(--b-img)}
+.ba-layer iframe{position:absolute;top:0;left:0;width:var(--vw);height:calc(100% / var(--s));border:0;transform:scale(var(--s));transform-origin:0 0;background:#FFFFFF;opacity:0;transition:opacity .3s}
+.ba-layer iframe.is-loaded{opacity:1}
+.ba.live .ba-range{pointer-events:none}
+.ba.live .ba-line{width:44px;margin-left:-22px;background:none;box-shadow:none;pointer-events:auto;cursor:ew-resize;touch-action:none;z-index:2}
+.ba.live .ba-line::before{content:"";position:absolute;top:0;bottom:0;left:50%;width:3px;margin-left:-1.5px;background:#FFFFFF;box-shadow:0 0 0 1px rgba(0,0,0,.25)}
+.ba.live .ba-tag,.ba.live .ba-hint{z-index:2}
+.ba.live.dragging iframe{pointer-events:none}
+@media (max-width:640px){.ba.live{aspect-ratio:4/5}}
+@media (prefers-reduced-motion:reduce){.ba-layer iframe{transition:none}}
 
 /* ---------- Intro ---------- */
 .intro-row{display:grid;margin-bottom:clamp(36px,5vw,64px)}
@@ -344,7 +358,7 @@ img.init{object-fit:cover;padding:0}
   <button class="hit" type="button" data-open="kpm" aria-haspopup="dialog" aria-labelledby="t-kpm"></button>
 </article>
 <template id="p-kpm" data-title="KPM Analytics Website" data-sub="Owning the company website end to end in Webflow" data-cats="uxui">
-  <div class="lb-hero"><div class="ba big" style="--pos:50%"><div class="ba-scroll" tabindex="0" aria-label="Full KPM homepages. Scroll to move down both pages."><div class="ba-stage"><img class="ba-after" src="images/kpm-site-now-full.webp" width="1440" height="4332" alt="Full KPM Analytics homepage now" decoding="async"><img class="ba-before" src="images/kpm-site-2024-10-full.webp" width="1440" height="6666" alt="Full KPM Analytics homepage in October 2024" decoding="async"></div></div><span class="ba-line" aria-hidden="true"><span class="ba-knob"><svg viewBox="0 0 24 24"><path d="M9 6l-6 6 6 6M15 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.6"/></svg></span></span><span class="ba-tag l" aria-hidden="true">October 2024</span><span class="ba-tag r" aria-hidden="true">Now</span><span class="ba-hint" aria-hidden="true">Scroll to see the full page</span><input class="ba-range" type="range" min="0" max="100" value="50" aria-label="Compare the KPM homepage in October 2024 with now. Slide left to see more of now, right to see more of October 2024."></div><p class="ba-note">Scroll inside the window to move down both pages. Drag the handle to compare. <a href="https://www.kpmanalytics.com/" target="_blank" rel="noopener">Visit the live site ↗</a> <a href="https://web.archive.org/web/20241001071259/https://www.kpmanalytics.com/" target="_blank" rel="noopener">View the October 2024 archive ↗</a></p></div>
+  <div class="lb-hero"><div class="ba big live" style="--pos:50%;--b-img:url(images/kpm-site-2024-10.webp);--a-img:url(images/kpm-site-now.webp)"><div class="ba-layer ba-after"><iframe src="https://web.archive.org/web/20261003001209if_/https://www.kpmanalytics.com/" title="KPM Analytics homepage now (live, interactive)" sandbox="allow-scripts allow-same-origin allow-popups allow-forms" referrerpolicy="no-referrer"></iframe></div><div class="ba-layer ba-before"><iframe src="https://web.archive.org/web/20241001071259if_/https://www.kpmanalytics.com/" title="KPM Analytics homepage in October 2024 (live, interactive)" sandbox="allow-scripts allow-same-origin allow-popups allow-forms" referrerpolicy="no-referrer"></iframe></div><span class="ba-line" aria-hidden="true"><span class="ba-knob"><svg viewBox="0 0 24 24"><path d="M9 6l-6 6 6 6M15 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.6"/></svg></span></span><span class="ba-tag l" aria-hidden="true">October 2024</span><span class="ba-tag r" aria-hidden="true">Now</span><span class="ba-hint" aria-hidden="true">Loading the live pages…</span><input class="ba-range" type="range" min="0" max="100" value="50" aria-label="Compare the KPM homepage in October 2024 with now. Slide left to see more of now, right to see more of October 2024."></div><p class="ba-note">These are the real pages from the Internet Archive, so you can scroll, click the carousels and see the animations. Each side scrolls on its own. Drag the handle to compare. <a href="https://www.kpmanalytics.com/" target="_blank" rel="noopener">Visit the live site ↗</a> <a href="https://web.archive.org/web/20241001071259/https://www.kpmanalytics.com/" target="_blank" rel="noopener">View the October 2024 archive ↗</a></p></div>
   <div class="lb-body"><dl class="meta"><div><dt>Role</dt><dd>Graphic Designer (Web &amp; UX)</dd></div><div><dt>Company</dt><dd>KPM Analytics</dd></div><div><dt>Timeline</dt><dd>October 2024 – Present</dd></div><div><dt>Tools</dt><dd>Webflow, Figma, PostHog, Microsoft Clarity, Google Analytics</dd></div></dl><p class="lead">I own the company website in Webflow end to end, from research and design through build and ongoing updates, and partner with an outside dev team on SEO.</p><div class="stats"><div class="stat"><p class="num">~43%</p><p class="lbl">Better average Google search ranking</p></div><div class="stat"><p class="num">12.6%</p><p class="lbl">More search impressions, year over year</p></div><div class="stat"><p class="num">~50%</p><p class="lbl">Faster mobile page load (LCP)</p></div><div class="stat"><p class="num">12%</p><p class="lbl">More engagement time on organic visits</p></div></div><section class="lb-sec"><h3>What I&#x27;ve done</h3><p>Led the redesign of the homepage and blog. [Add the problem it solved and the result.]</p><p>Helped build the team's design process, introducing A/B testing, a design system, and user research using PostHog, Microsoft Clarity, and Google Analytics.</p><p>Raised the share of mobile visits with good page load by 22 percentage points, and passed Core Web Vitals on desktop.</p><p>Designed landing page and social media templates that let marketing test ideas faster, and created sales tools and assets.</p><p>Partnered with engineering on UI work, and created AI skills to keep company use of Claude and other AI tools on brand.</p></section></div>
 </template>
 <article class="obj paper" data-cat="uxui" data-id="class-sign-ups" style="--r:1.1deg">
@@ -1283,11 +1297,53 @@ const Model3D = (() => {
     e.target.closest(".ba").style.setProperty("--pos", e.target.value + "%");
   });
 
+  /* Drag the compare handle (pointer capture keeps the drag going over the pages) */
+  const dragHandle = (ba) => {
+    const line = ba.querySelector(".ba-line");
+    const range = ba.querySelector(".ba-range");
+    let drag = false;
+    const move = (e) => {
+      const r = ba.getBoundingClientRect();
+      const p = Math.max(0, Math.min(100, ((e.clientX - r.left) / r.width) * 100));
+      ba.style.setProperty("--pos", p + "%");
+      if (range) range.value = String(Math.round(p));
+    };
+    const end = () => { drag = false; ba.classList.remove("dragging"); };
+    line.addEventListener("pointerdown", (e) => { drag = true; ba.classList.add("dragging"); line.setPointerCapture(e.pointerId); move(e); e.preventDefault(); });
+    line.addEventListener("pointermove", (e) => { if (drag) move(e); });
+    line.addEventListener("pointerup", end);
+    line.addEventListener("pointercancel", end);
+  };
+
+  /* Live compare: two real pages rendered at desktop width and scaled to fit the window */
+  const setupLive = (ba, list) => {
+    const fit = () => {
+      const w = ba.clientWidth || 1;
+      const vw = w < 600 ? 1280 : 1440;
+      ba.style.setProperty("--vw", vw + "px");
+      ba.style.setProperty("--s", String(w / vw));
+    };
+    fit();
+    let ro = null;
+    if ("ResizeObserver" in window) { ro = new ResizeObserver(fit); ro.observe(ba); }
+    const hint = ba.querySelector(".ba-hint");
+    const frames = Array.from(ba.querySelectorAll("iframe"));
+    let loaded = 0;
+    frames.forEach((f) => f.addEventListener("load", () => {
+      f.classList.add("is-loaded");
+      if (++loaded >= frames.length && hint) hint.hidden = true;
+    }, { once: true }));
+    const t = setTimeout(() => { if (hint) hint.hidden = true; frames.forEach((f) => f.classList.add("is-loaded")); }, 20000);
+    dragHandle(ba);
+    if (list) list.push(() => { clearTimeout(t); ro && ro.disconnect(); });
+  };
+
   /* Full-length compare: one scroll window moves both pages; the shorter page
      scrolls proportionally so both reach their footers together. The handle drags. */
   const setupBA = (root, list) => {
     root.querySelectorAll(".ba.big").forEach((ba) => {
       const sc = ba.querySelector(".ba-scroll");
+      if (ba.classList.contains("live")) return setupLive(ba, list);
       if (!sc) return;
       const st = sc.querySelector(".ba-stage");
       const imgs = Array.from(st.querySelectorAll("img"));
@@ -1306,18 +1362,7 @@ const Model3D = (() => {
       let ro = null;
       if ("ResizeObserver" in window) { ro = new ResizeObserver(layout); ro.observe(sc); }
       layout();
-      const line = ba.querySelector(".ba-line");
-      let drag = false;
-      const move = (e) => {
-        const r = ba.getBoundingClientRect();
-        const p = Math.max(0, Math.min(100, ((e.clientX - r.left) / r.width) * 100));
-        ba.style.setProperty("--pos", p + "%");
-        if (range) range.value = String(Math.round(p));
-      };
-      line.addEventListener("pointerdown", (e) => { drag = true; line.setPointerCapture(e.pointerId); move(e); e.preventDefault(); });
-      line.addEventListener("pointermove", (e) => { if (drag) move(e); });
-      line.addEventListener("pointerup", () => { drag = false; });
-      line.addEventListener("pointercancel", () => { drag = false; });
+      dragHandle(ba);
       if (list) list.push(() => { ro && ro.disconnect(); });
     });
   };
