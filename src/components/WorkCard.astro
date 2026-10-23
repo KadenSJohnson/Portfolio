@@ -1,42 +1,32 @@
 ---
 // A project on the mat, plus the <template> the lightbox clones when it opens
-import type { Work } from "../data/projects";
+import type { Project } from "../lib/content";
+import { FEATURES } from "../data/projects";
 import Ph from "./Ph.astro";
 import Tag from "./Tag.astro";
 import BeforeAfter from "./BeforeAfter.astro";
 import ModelView from "./ModelView.astro";
-import Kpm from "./bodies/Kpm.astro";
-import ClassSignUps from "./bodies/ClassSignUps.astro";
-import StartupDesign from "./bodies/StartupDesign.astro";
-import OnlineMenu from "./bodies/OnlineMenu.astro";
-import Simple from "./bodies/Simple.astro";
-import Model from "./bodies/Model.astro";
-interface Props { item: Work }
+import RichText from "./RichText.astro";
+interface Props { item: Project }
 const { item: it } = Astro.props;
-const metal = it.mat === "metal";
+const f = FEATURES[it.id] || {};
+const metal = it.material === "metal";
 ---
-<article class={`obj ${it.mat}${it.wide ? " wide" : ""}`} data-cat={it.cats.join(" ")} data-id={it.id} style={`--r:${it.r}deg`}>
+<article class={`obj ${it.material}${it.wide ? " wide" : ""}`} data-cat={it.categories.join(" ")} data-id={it.id} style={`--r:${it.tilt}deg`}>
   {metal && <><i class="screw s1"></i><i class="screw s2"></i><i class="screw s3"></i><i class="screw s4"></i></>}
   <div class="obj-img">
-    {it.ba ? <BeforeAfter ba={it.ba} /> : it.model ? <ModelView model={it.model} /> : <Ph src={it.src} label={it.label} ratio={it.ratio} />}
+    {f.ba ? <BeforeAfter ba={f.ba} /> : f.model ? <ModelView model={f.model} /> : <Ph src={it.imageFile} image={it.image} label={it.imageLabel} ratio={it.imageRatio || "4/3"} />}
   </div>
   <div class="obj-cap">
     <h2 class="obj-title" id={`t-${it.id}`}>{it.title}</h2>
-    <p class="obj-sub">{it.sub}</p>
-    <div class="tags">{it.cats.map((c) => <Tag cat={c} />)}</div>
+    <p class="obj-sub">{it.subtitle}</p>
+    <div class="tags">{it.categories.map((c) => <Tag cat={c} />)}</div>
   </div>
   <button class="hit" type="button" data-open={it.id} aria-haspopup="dialog" aria-labelledby={`t-${it.id}`}></button>
 </article>
-<template id={`p-${it.id}`} data-title={it.title} data-sub={it.sub} data-cats={it.cats.join(" ")}>
+<template id={`p-${it.id}`} data-title={it.title} data-sub={it.subtitle} data-cats={it.categories.join(" ")}>
   <div class="lb-hero">
-    {it.ba ? <BeforeAfter ba={it.ba} big /> : it.model ? <ModelView model={it.model} big /> : <Ph src={it.src} label={it.label} ratio="16/9" />}
+    {f.ba ? <BeforeAfter ba={f.ba} big /> : f.model ? <ModelView model={f.model} big /> : <Ph src={it.imageFile} image={it.image} label={it.imageLabel} ratio="16/9" />}
   </div>
-  <div class="lb-body">
-    {it.body === "kpm" && <Kpm />}
-    {it.body === "class-sign-ups" && <ClassSignUps />}
-    {it.body === "startup-design" && <StartupDesign />}
-    {it.body === "online-menu" && <OnlineMenu />}
-    {it.body === "simple" && <Simple desc={it.sub} figs={it.figs} />}
-    {it.body === "model" && <Model desc={it.sub} />}
-  </div>
+  <div class="lb-body"><RichText blocks={it.body} /></div>
 </template>

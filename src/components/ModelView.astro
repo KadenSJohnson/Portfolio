@@ -1,7 +1,7 @@
 ---
 // WebGL canvas for a low poly model; src/scripts/app.js mounts it (OBJ text is inlined on the page)
-import type { Work } from "../data/projects";
-interface Props { model: NonNullable<Work["model"]>; big?: boolean }
+import type { ModelInfo } from "../data/projects";
+interface Props { model: ModelInfo; big?: boolean }
 const { model, big = false } = Astro.props;
 ---
 {big ? (

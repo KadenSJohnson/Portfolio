@@ -1,0 +1,21 @@
+---
+// Renders a project's lightbox text (Portable Text). Each "h3" heading starts a section that
+// runs until the next heading, matching the case study layout.
+import type { Block } from "../lib/content";
+import RichBlock from "./RichBlock.astro";
+interface Props { blocks: Block[] }
+const blocks = Astro.props.blocks || [];
+type Group = { h?: string; items: Block[] };
+const groups: Group[] = [{ items: [] }];
+for (const b of blocks) {
+  if (b._type === "block" && b.style === "h3") groups.push({ h: b.children.map((c) => c.text).join(""), items: [] });
+  else groups[groups.length - 1].items.push(b);
+}
+---
+{groups.map((g) =>
+  g.h ? (
+    <section class="lb-sec"><h3>{g.h}</h3>{g.items.map((b) => <RichBlock block={b} />)}</section>
+  ) : (
+    g.items.map((b) => <RichBlock block={b} />)
+  )
+)}

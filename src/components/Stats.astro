@@ -1,8 +1,8 @@
 ---
-interface Props { items: [string, string, string?][] }
+interface Props { items: { num: string; label: string; detail?: string }[] }
 ---
 <div class="stats">
-  {Astro.props.items.map(([n, t, d]) => (
-    <div class="stat"><p class="num">{n}</p><p class="lbl">{t}</p>{d && <p class="sm">{d}</p>}</div>
+  {Astro.props.items.map((s) => (
+    <div class="stat"><p class="num">{s.num}</p><p class="lbl">{s.label}</p>{s.detail && <p class="sm">{s.detail}</p>}</div>
   ))}
 </div>

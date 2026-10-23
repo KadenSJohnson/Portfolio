@@ -1,8 +1,9 @@
 ---
 import Ph from "./Ph.astro";
-interface Props { items: [string, string][]; cols?: number }
+import type { SanityImage } from "../data/local";
+interface Props { items: { imageFile?: string; image?: SanityImage; label: string }[]; cols?: number }
 const { items, cols = 2 } = Astro.props;
 ---
 <div class={`figs c${cols}`}>
-  {items.map(([src, label]) => <figure><Ph src={src} label={label} ratio="16/10" /><figcaption>{label}</figcaption></figure>)}
+  {items.map((f) => <figure><Ph src={f.imageFile} image={f.image} label={f.label} ratio="16/10" /><figcaption>{f.label}</figcaption></figure>)}
 </div>

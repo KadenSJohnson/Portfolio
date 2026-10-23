@@ -1,7 +1,9 @@
 ---
-import { CATS, ITEMS, type CatKey, type Work } from "../data/projects";
-const works = ITEMS.filter((i): i is Work => i.kind === "work");
-const cats = (Object.keys(CATS) as CatKey[]).map((k) => ({ k, ...CATS[k], n: works.filter((w) => w.cats.includes(k)).length })).filter((c) => c.n);
+import { CATS, type CatKey } from "../data/projects";
+import type { Project } from "../lib/content";
+interface Props { projects: Project[] }
+const works = Astro.props.projects;
+const cats = (Object.keys(CATS) as CatKey[]).map((k) => ({ k, ...CATS[k], n: works.filter((w) => w.categories.includes(k)).length })).filter((c) => c.n);
 ---
 <nav class="filters" aria-label="Filter work by category">
   <button class="chip" type="button" data-filter="all" aria-pressed="true">All <span class="ct">{works.length}</span></button>

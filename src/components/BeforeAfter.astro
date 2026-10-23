@@ -1,8 +1,8 @@
 ---
 // Before/after compare. The card shows a static split; the lightbox shows both full-length
 // homepages side by side behind a draggable handle; each side scrolls on its own.
-import type { Work } from "../data/projects";
-interface Props { ba: NonNullable<Work["ba"]>; big?: boolean }
+import type { Compare } from "../data/projects";
+interface Props { ba: Compare; big?: boolean }
 const { ba, big = false } = Astro.props;
 const { before, after, beforeLabel: lb, afterLabel: la } = ba;
 const rangeLabel = `Compare the KPM homepage in ${lb} with now. Slide left to see more of now, right to see more of ${lb}.`;

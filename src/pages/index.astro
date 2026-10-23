@@ -7,25 +7,31 @@ import WorkCard from "../components/WorkCard.astro";
 import QuoteCard from "../components/QuoteCard.astro";
 import ContactCard from "../components/ContactCard.astro";
 import Lightbox from "../components/Lightbox.astro";
-import { ITEMS, CONTACT } from "../data/projects";
+import { getContent } from "../lib/content";
 import kiwiObj from "../models/kiwi.obj?raw";
 import rockObj from "../models/rock.obj?raw";
+
+const { settings, projects, testimonials } = await getContent();
+// Projects and testimonials share one gallery, ordered by their "order" number
+const gallery = [
+  ...projects.map((p) => ({ kind: "work" as const, order: p.order ?? 0, p })),
+  ...testimonials.map((t) => ({ kind: "quote" as const, order: t.order ?? 0, t })),
+].sort((a, b) => a.order - b.order);
 const objs = { kiwi: kiwiObj, rock: rockObj };
 ---
 <Layout title="Kaden Johnson · Portfolio" description="Kaden Johnson is a UX/UI designer in Springville, Utah, working across websites, product, and internal tools.">
   <div class="mat" id="mat">
     <MatMarks />
     <div class="page">
-      <Intro />
-      <Filters />
+      <Intro settings={settings} />
+      <Filters projects={projects} />
       <main class="gallery" id="work">
-        {ITEMS.map((it) =>
-          it.kind === "work" ? <WorkCard item={it} /> : it.kind === "quote" ? <QuoteCard item={it} /> : <ContactCard item={it} />
-        )}
+        {gallery.map((g) => (g.kind === "work" ? <WorkCard item={g.p} /> : <QuoteCard item={g.t} />))}
+        <ContactCard settings={settings} />
       </main>
       <footer class="foot">
         <span>© 2026 Kaden Johnson</span>
-        <span>{CONTACT.email}</span>
+        <span>{settings.email}</span>
       </footer>
     </div>
   </div>

@@ -1,10 +1,14 @@
 ---
-import { img, type Quote } from "../data/projects";
-interface Props { item: Quote }
+import { img } from "../data/projects";
+import { imageUrl, type Testimonial } from "../lib/content";
+interface Props { item: Testimonial }
 const { item: q } = Astro.props;
+const path = (f: string) => `/images/${img(f)}`;
+const logo = imageUrl(q.logo, q.logoFile, path, 400);
+const photo = imageUrl(q.photo, q.photoFile, path, 160);
 ---
-<figure class="obj index quote" data-cat="widget" style={`--r:${q.r}deg`}>
-  <img class="q-logo" src={`/images/${img(q.logo)}`} alt="" loading="lazy" />
+<figure class="obj index quote" data-cat="widget" style={`--r:${q.tilt}deg`}>
+  {logo && <img class="q-logo" src={logo} alt="" loading="lazy" />}
   <blockquote><p>“{q.quote}”</p></blockquote>
-  <figcaption><img class="init" src={`/images/${img(q.photo)}`} alt="" loading="lazy" /><span><b>{q.who}</b><span>{q.role}</span></span></figcaption>
+  <figcaption>{photo && <img class="init" src={photo} alt="" loading="lazy" />}<span><b>{q.name}</b><span>{q.role}</span></span></figcaption>
 </figure>

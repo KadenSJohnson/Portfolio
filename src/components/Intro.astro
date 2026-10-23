@@ -1,15 +1,17 @@
 ---
-import { CONTACT } from "../data/projects";
+import type { Settings } from "../lib/content";
+interface Props { settings: Settings }
+const { settings: s } = Astro.props;
 ---
 <header class="intro-row">
   <div class="obj paper intro" style="--r:-0.6deg">
     <img class="intro-logo" src="/images/Kaden-Logo-copy-01.svg" alt="" width="40" height="40" />
-    <h1>Hi, I'm Kaden Johnson <span class="mu">making the internet easier to use.</span></h1>
-    <p class="bio">UX/UI designer at KPM Analytics with 5+ years across websites, product, and internal tools. Based in Springville, Utah.</p>
+    <h1>{s.headline} <span class="mu">{s.headlineMuted}</span></h1>
+    <p class="bio">{s.bio}</p>
     <ul class="intro-links">
       <li><a href="#say-hi">Say hi</a></li>
-      <li><a href={CONTACT.linkedin} target="_blank" rel="noopener">LinkedIn</a></li>
-      <li><a href={CONTACT.x} target="_blank" rel="noopener">X</a></li>
+      <li><a href={s.linkedin} target="_blank" rel="noopener">LinkedIn</a></li>
+      <li><a href={s.x} target="_blank" rel="noopener">X</a></li>
       <li class="time"><span data-clock>Mountain Time</span></li>
     </ul>
   </div>
