@@ -12,7 +12,7 @@ const QUERY = `{
     "id": slug.current, order, title, subtitle, categories, material, wide, tilt, imageFile, image, imageLabel, imageRatio, body
   },
   "testimonials": *[_type == "testimonial"] | order(order asc){
-    "id": _id, order, quote, name, role, photoFile, logoFile, photo, logo, tilt
+    "id": _id, order, ask, quote, name, role, photoFile, logoFile, photo, logo, tilt
   }
 }`;
 

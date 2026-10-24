@@ -95,6 +95,7 @@ const project = defineType({
 const testimonial = defineType({
   name: "testimonial", title: "Testimonial", type: "document",
   fields: [
+    defineField({ name: "ask", title: "Your message to them", type: "string", description: "Kaden's opening text in the Messages animation. Keep it short enough for one line.", validation: (r) => r.max(40) }),
     defineField({ name: "quote", type: "text", rows: 4, validation: (r) => r.required() }),
     defineField({ name: "name", type: "string" }),
     defineField({ name: "role", type: "string" }),

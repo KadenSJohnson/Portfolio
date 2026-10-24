@@ -40,7 +40,7 @@ export interface Project {
   material: "paper" | "metal" | "acrylic" | "stock"; wide?: boolean; tilt: number;
   imageFile?: string | null; image?: SanityImage; imageLabel: string; imageRatio?: string; body: Block[];
 }
-export interface Testimonial { id: string; order: number; quote: string; name: string; role: string; photoFile: string; logoFile: string; photo?: SanityImage; logo?: SanityImage; tilt: number }
+export interface Testimonial { id: string; order: number; ask?: string; quote: string; name: string; role: string; photoFile: string; logoFile: string; photo?: SanityImage; logo?: SanityImage; tilt: number }
 
 export const settings: Settings = {
   headline: "Hi, I'm Kaden Johnson",
@@ -126,10 +126,10 @@ export const projects: Project[] = [
 ];
 
 export const testimonials: Testimonial[] = [
-  { id: "q1", order: 40, tilt: 1.4, name: "Emily Hedrick", role: "Assistant Professor of Digital Media, UVU", photoFile: "Emily-Headshot.jpeg", logoFile: "UVUHorizontalGreen-0009.png",
+  { id: "q1", order: 40, ask: "Could I get a quote for my website?", tilt: 1.4, name: "Emily Hedrick", role: "Assistant Professor of Digital Media, UVU", photoFile: "Emily-Headshot.jpeg", logoFile: "UVUHorizontalGreen-0009.png",
     quote: "Kaden is easy to work with, is organized, communicates well, and has all the characteristics one would hope in a UX designer." },
-  { id: "q2", order: 70, tilt: -1.3, name: "Casey Merrill", role: "Software Engineering Manager, Smart Vision Works", photoFile: "Casey-Headshot.jpeg", logoFile: "SVW-Logo.png",
+  { id: "q2", order: 70, ask: "What was it like working with me?", tilt: -1.3, name: "Casey Merrill", role: "Software Engineering Manager, Smart Vision Works", photoFile: "Casey-Headshot.jpeg", logoFile: "SVW-Logo.png",
     quote: "Kaden is an excellent designer who really tries to understand the customer's perspective." },
-  { id: "q3", order: 120, tilt: 0.9, name: "Sarah Prince", role: "Customer Support Integration Manager, Smart Vision Works", photoFile: "Sarah-Prince-photo.jpeg", logoFile: "SVW-Logo.png",
+  { id: "q3", order: 120, ask: "Got a minute to write me a quote?", tilt: 0.9, name: "Sarah Prince", role: "Customer Support Integration Manager, Smart Vision Works", photoFile: "Sarah-Prince-photo.jpeg", logoFile: "SVW-Logo.png",
     quote: "Kaden has a great work ethic and eye for what's missing or needed. He's reliable and the kind of employee I could put on any task." },
 ];
