@@ -1,70 +1,68 @@
-/* Testimonials as iOS Messages: when a thread scrolls into view, each bubble shows typing dots
-   and then its text, one after another. The photo opens a contact card; Done closes it.
-   Reduced motion: the messages are simply there. */
+/* Testimonials as iOS Messages: when a thread scrolls into view it plays out in order.
+   Kaden types his ask on the keyboard and sends it, the person "types" (dots) and their quote
+   arrives one bubble at a time, then Kaden types a thank-you. The photo opens a contact card;
+   Done closes it. Every bubble keeps its space from the start, so nothing shifts.
+   Reduced motion: the whole conversation is simply there. */
 (() => {
   const threads = Array.from(document.querySelectorAll("[data-imsg]"));
   if (!threads.length) return;
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
-  const play = async (card) => {
-    if (card.dataset.played) return;
-    card.dataset.played = "1";
-    const bubbles = Array.from(card.querySelectorAll(".im-msgs .im-bubble"));
-    await wait(350);
-    for (const b of bubbles) {
-      const len = b.querySelector(".im-text").textContent.length;
-      b.classList.add("typing");
-      await wait(Math.min(1700, 700 + len * 9));
-      b.classList.remove("typing");
-      b.classList.add("in");
-      await wait(450);
-    }
-    await reply(card);
+  // Their message: typing dots, then the text
+  const theirs = async (b) => {
+    const len = b.querySelector(".im-text").textContent.length;
+    b.classList.add("typing");
+    await wait(Math.min(1700, 700 + len * 9));
+    b.classList.remove("typing");
+    b.classList.add("in");
+    await wait(450);
   };
 
-  // Kaden types a reply: the keyboard slides up, keys light up as each letter is typed,
-  // then send, the keyboard drops and the blue bubble arrives
-  const reply = async (card) => {
-    const me = card.querySelector(".im-bubble.me");
+  // Kaden's message: keyboard up, keys light up as each character goes into the bar, send
+  const mine = async (card, b, perChar) => {
     const screen = card.querySelector(".im-screen");
     const kb = card.querySelector(".im-kb");
     const typed = card.querySelector(".im-typed");
     const send = card.querySelector(".im-send");
-    const status = card.querySelector(".im-status");
-    if (!me || !kb) return;
-    const text = me.dataset.reply || me.textContent;
-    await wait(700);
+    const text = b.dataset.type || b.textContent;
     screen.style.setProperty("--kbh", kb.offsetHeight + "px");
     screen.classList.add("kb");
-    await wait(450);
-    const press = async (key, hold = 85) => {
-      if (!key) return;
-      key.classList.add("down");
-      await wait(hold);
-      key.classList.remove("down");
-    };
+    await wait(420);
+    const tap = async (key, hold) => { if (!key) return; key.classList.add("down"); await wait(hold); key.classList.remove("down"); };
     for (const ch of text) {
       const lower = ch.toLowerCase();
-      if (ch !== lower) await press(kb.querySelector('[data-k="shift"]'), 70);
-      const key = kb.querySelector(`[data-k="${lower === " " ? " " : lower}"]`);
-      key && key.classList.add("down");
+      if (ch !== lower) await tap(kb.querySelector('[data-k="shift"]'), perChar * 0.6);
+      const key = kb.querySelector(`[data-k="${CSS.escape(lower)}"]`); // punctuation has no key on this layer
+      if (key) key.classList.add("down");
       typed.textContent += ch;
       send.classList.add("on");
-      await wait(80);
-      key && key.classList.remove("down");
-      await wait(40 + Math.random() * 70);
+      await wait(perChar * 0.6);
+      if (key) key.classList.remove("down");
+      await wait(perChar * (0.3 + Math.random() * 0.6));
     }
-    await wait(350);
+    await wait(300);
     send.classList.add("down");
-    await wait(140);
+    await wait(130);
     send.classList.remove("down", "on");
     typed.textContent = "";
     screen.classList.remove("kb");
-    await wait(180);
-    me.classList.add("in");
-    await wait(700);
-    status && status.classList.add("in");
+    await wait(160);
+    b.classList.add("in");
+    await wait(500);
+  };
+
+  const play = async (card) => {
+    if (card.dataset.played) return;
+    card.dataset.played = "1";
+    await wait(300);
+    for (const b of card.querySelectorAll(".im-thread .im-bubble")) {
+      if (b.classList.contains("me")) await mine(card, b, b.classList.contains("ask") ? 45 : 95);
+      else await theirs(b);
+      if (b.classList.contains("ask")) await wait(350);
+    }
+    const status = card.querySelector(".im-status");
+    if (status) status.classList.add("in");
   };
 
   if (!reduce && "IntersectionObserver" in window) {

@@ -133,8 +133,8 @@ a{color:inherit}
 /* Testimonials sit in the grid as plain quote tiles */
 /* Testimonials: an iOS Messages thread inside the card */
 .imsg{padding-top:1px}
-@media (min-width:720px){.im-screen{min-height:calc(var(--cell) * 9)}}
-.im-screen{position:relative;display:flex;flex-direction:column;flex:1;min-height:calc(var(--cell) * 13);overflow:hidden;background:#FFFFFF;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",var(--display)}
+@media (min-width:720px){.im-screen{min-height:calc(var(--cell) * 11)}}
+.im-screen{position:relative;display:flex;flex-direction:column;flex:1;min-height:calc(var(--cell) * 15);overflow:hidden;background:#FFFFFF;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",var(--display)}
 .im-head{position:relative;display:grid;place-items:center;padding:10px 12px 8px;background:rgba(247,247,247,.96);border-bottom:1px solid #E5E5E5}
 .im-back{position:absolute;left:14px;top:50%;width:11px;height:19px;margin-top:-10px;color:#8A8A8A}
 .im-back svg,.im-name svg{display:block;width:100%;height:100%}
@@ -147,7 +147,8 @@ a{color:inherit}
 .im-thread{display:flex;flex-direction:column;flex:1;padding:12px 12px 14px}
 .im-time{margin-bottom:10px;text-align:center;font:500 11px/1.2 var(--display);color:#8E8E93}
 .im-time b{font-weight:600}
-.im-msgs{display:grid;justify-items:start;gap:4px;margin:0}
+.im-msgs{display:grid;justify-items:start;gap:4px;margin:8px 0 0}
+.im-bubble.ask{margin-top:0}
 .im-bubble{position:relative;max-width:82%;margin:0;padding:8px 12px;border-radius:18px;background:#E9E9EB;color:#0C0C0C;
   font:400 15px/1.33 var(--display);letter-spacing:-.005em;text-wrap:pretty}
 .im-bubble:last-child{border-bottom-left-radius:6px}
@@ -164,12 +165,12 @@ a{color:inherit}
 .im-send.on{opacity:1;transform:none}
 .im-send.down{transform:scale(.85);filter:brightness(.85)}
 /* Kaden's reply: a blue bubble on the right, space held from the start */
-.im-bubble.me{align-self:flex-end;margin-top:8px;background:#007AFF;color:#FFFFFF;border-radius:18px;border-bottom-right-radius:6px;transform-origin:100% 100%}
+.im-bubble.me{align-self:flex-end;max-width:82%;margin-top:8px;background:#007AFF;color:#FFFFFF;border-radius:18px;border-bottom-right-radius:6px;transform-origin:100% 100%}
 .im-status{align-self:flex-end;margin-top:2px;font:500 11px/1.2 var(--display);color:#8E8E93}
 .js-imsg .im-status{opacity:0;transition:opacity .3s}
 .js-imsg .im-status.in{opacity:1}
 /* iOS keyboard that slides up while the reply is typed */
-.im-kb{position:absolute;left:0;right:0;bottom:0;z-index:2;display:grid;gap:9px;padding:8px 3px 10px;background:#D1D4DA;
+.im-kb{position:absolute;left:0;right:0;bottom:0;z-index:4;display:grid;gap:9px;padding:8px 3px 10px;background:#D1D4DA;
   transform:translateY(100%);transition:transform .32s cubic-bezier(.2,.8,.2,1);--kh:34px}
 .kb .im-kb{transform:none}
 .kb .im-input{transform:translateY(calc(-1 * var(--kbh,190px)))}

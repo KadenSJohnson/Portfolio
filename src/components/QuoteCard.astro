@@ -22,8 +22,9 @@ for (const s of sentences) {
   else bubbles.push(s);
 }
 const id = `contact-${q.id}`;
-// Kaden's reply, typed on the keyboard (letters and spaces only, like a quick text)
-const reply = `Thank you so much ${first}`;
+// Kaden opens by asking for the testimonial and replies with thanks; both are typed on the keyboard
+const ask = `Hey ${first}, would you be up for writing a quick testimonial about working with me?`;
+const reply = `Thank you so much ${first}!`;
 const rows = ["qwertyuiop", "asdfghjkl", "zxcvbnm"];
 ---
 <figure class="obj quote imsg" data-cat="widget" data-imsg>
@@ -37,12 +38,13 @@ const rows = ["qwertyuiop", "asdfghjkl", "zxcvbnm"];
     </div>
     <div class="im-thread">
       <p class="im-time" aria-hidden="true">Today 9:41 AM</p>
+      <p class="im-bubble me ask" aria-hidden="true" data-type={ask}><span class="im-text">{ask}</span></p>
       <blockquote class="im-msgs">
         {bubbles.map((b) => (
           <p class="im-bubble"><span class="im-dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="im-text">{b}</span></p>
         ))}
       </blockquote>
-      <p class="im-bubble me" aria-hidden="true" data-reply={reply}><span class="im-text">{reply}</span></p>
+      <p class="im-bubble me reply" aria-hidden="true" data-type={reply}><span class="im-text">{reply}</span></p>
       <p class="im-status" aria-hidden="true">Delivered</p>
     </div>
     <div class="im-input" aria-hidden="true">
