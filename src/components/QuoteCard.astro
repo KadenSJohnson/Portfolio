@@ -30,7 +30,7 @@ const rows = ["qwertyuiop", "asdfghjkl", "zxcvbnm"];
 <figure class="obj quote imsg" data-cat="widget" data-imsg>
   <div class="im-screen">
     <div class="im-head">
-      <span class="im-back" aria-hidden="true"><svg viewBox="0 0 12 20"><path d="M10 2 2 10l8 8" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" /></svg></span>
+      <button class="im-back" type="button" aria-label="Replay the conversation"><svg viewBox="0 0 12 20"><path d="M10 2 2 10l8 8" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" /></svg></button>
       <button class="im-who" type="button" aria-haspopup="dialog" aria-controls={id} aria-label={`${q.name}: view contact info`}>
         {photo ? <img class="im-av" src={photo} alt="" loading="lazy" /> : <span class="im-av im-ini">{q.name.split(" ").map((p) => p[0]).join("")}</span>}
         <span class="im-name">{first}<svg viewBox="0 0 8 12" aria-hidden="true"><path d="M2 1.5 6.5 6 2 10.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg></span>

@@ -7,10 +7,13 @@
   const threads = Array.from(document.querySelectorAll("[data-imsg]"));
   if (!threads.length) return;
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+  // Each playthrough has a run number; skipping or restarting bumps it, and the old run stops
+  // at its next pause
+  class Stop extends Error {}
+  const pause = (card, run, ms) => new Promise((r, x) => setTimeout(() => (card._run === run ? r() : x(new Stop())), ms));
 
   // Their message: typing dots, then the text
-  const theirs = async (b) => {
+  const theirs = async (b, wait) => {
     const len = b.querySelector(".im-text").textContent.length;
     b.classList.add("typing");
     await wait(Math.min(1100, 450 + len * 5));
@@ -20,7 +23,7 @@
   };
 
   // Kaden's message: keyboard up, keys light up as each character goes into the bar, send
-  const mine = async (card, b, perChar) => {
+  const mine = async (card, b, perChar, wait) => {
     const screen = card.querySelector(".im-screen");
     const kb = card.querySelector(".im-kb");
     const typed = card.querySelector(".im-typed");
@@ -52,17 +55,33 @@
     await wait(320);
   };
 
+  const reset = (card) => {
+    card.querySelectorAll(".im-thread .im-bubble, .im-status").forEach((el) => el.classList.remove("in", "typing"));
+    card.querySelectorAll(".k.down").forEach((k) => k.classList.remove("down"));
+    card.querySelector(".im-screen").classList.remove("kb");
+    const typed = card.querySelector(".im-typed"); if (typed) typed.textContent = "";
+    const send = card.querySelector(".im-send"); if (send) send.classList.remove("on", "down");
+  };
+  // Double tap: jump to the finished conversation
+  const finish = (card) => {
+    card._run = (card._run || 0) + 1;
+    reset(card);
+    card.querySelectorAll(".im-thread .im-bubble, .im-status").forEach((el) => el.classList.add("in"));
+  };
   const play = async (card) => {
-    if (card.dataset.played) return;
-    card.dataset.played = "1";
-    await wait(200);
-    for (const b of card.querySelectorAll(".im-thread .im-bubble")) {
-      if (b.classList.contains("me")) await mine(card, b, b.classList.contains("ask") ? 40 : 60);
-      else await theirs(b);
-      if (b.classList.contains("ask")) await wait(200);
-    }
-    const status = card.querySelector(".im-status");
-    if (status) status.classList.add("in");
+    const run = (card._run = (card._run || 0) + 1);
+    const wait = (ms) => pause(card, run, ms);
+    reset(card);
+    try {
+      await wait(200);
+      for (const b of card.querySelectorAll(".im-thread .im-bubble")) {
+        if (b.classList.contains("me")) await mine(card, b, b.classList.contains("ask") ? 40 : 60, wait);
+        else await theirs(b, wait);
+        if (b.classList.contains("ask")) await wait(200);
+      }
+      const status = card.querySelector(".im-status");
+      if (status) status.classList.add("in");
+    } catch (e) { if (!(e instanceof Stop)) throw e; }
   };
 
   if (!reduce && "IntersectionObserver" in window) {
@@ -71,6 +90,20 @@
       if (e.isIntersecting) { io.unobserve(e.target); play(e.target); }
     }), { threshold: 0.55 });
     threads.forEach((t) => io.observe(t));
+    threads.forEach((card) => {
+      const screen = card.querySelector(".im-screen");
+      // double tap (or double click) on the conversation skips to the end
+      let last = 0;
+      screen.addEventListener("pointerup", (e) => {
+        if (e.target.closest("button, .im-card")) return;
+        const now = Date.now();
+        if (now - last < 320) { finish(card); last = 0; } else last = now;
+      });
+      screen.addEventListener("dblclick", (e) => { if (!e.target.closest("button, .im-card")) e.preventDefault(); });
+      // the back chevron plays it again
+      const back = card.querySelector(".im-back");
+      if (back) back.addEventListener("click", () => play(card));
+    });
   }
 
   // Contact card
