@@ -2,11 +2,12 @@
    name sits inside a Figma-style selection box and gets dragged up to full size, then the work
    grid (two columns of large rounded media tiles with captions), a contact block and a footer.
    Each project opens in a lightbox sheet. */
+@font-face{font-family:"Timeless Sans";src:url("/fonts/TimelessSansVF.woff") format("woff");font-weight:300 800;font-style:normal;font-display:swap}
 :root{
   --bg:#FFFFFF; --ink:#0C0C0C; --sub:#5C5C5C; --mu:#8A8A8A; --line:#E8E8E8; --tile:#F3F3F3;
   --grid:#ECECEC;
   --sel:#0D99FF; /* Figma's selection blue: only the selection box, handles and size label */
-  --display:"Inter Tight","Helvetica Neue",Helvetica,Arial,sans-serif;
+  --display:"Timeless Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
   /* Layout grid: the content width is split into --cols square cells (12 on phones, 24 wider).
      src/scripts/grid.js measures the cell; spacing and sizes below are whole cells, and block
@@ -114,7 +115,9 @@ a{color:inherit}
 .ph.empty{background:var(--tile);outline:1.5px dashed #CFCFCF;outline-offset:-10px}
 .ph-tag{display:inline-flex;flex-direction:column;gap:3px;max-width:100%;padding:7px 10px;border-radius:8px;background:#FFFFFF;font:500 11px/1.25 var(--mono);overflow-wrap:anywhere}
 .ph-tag b{font:700 12px/1.2 var(--display)}
-.ph.is-real{padding:0;background:none}
+.ph.is-real{position:relative;padding:0;background:none;overflow:hidden}
+/* Images fill their reserved box exactly; positioned so Safari can't size them from the file instead */
+.ph.is-real img{position:absolute;inset:0}
 .ph img{display:block;width:100%;height:100%;object-fit:cover}
 .obj-cap{display:grid;align-content:start;gap:4px;padding:calc(var(--cell) / 2);border-top:1px solid var(--grid)}
 .obj-title{font:600 clamp(18px,1.6vw,21px)/1.2 var(--display);letter-spacing:-.02em;text-wrap:balance}
