@@ -30,7 +30,6 @@ const meta = (rows: [string, string][]): Block => ({ _type: "metaTable", _key: k
 const stats = (items: [string, string, string?][]): Block => ({ _type: "stats", _key: k(), items: items.map(([num, label, detail]) => ({ _key: k(), num, label, ...(detail ? { detail } : {}) })) });
 const figs = (items: [string, string][], cols: 1 | 2 = 2): Block => ({ _type: "figures", _key: k(), cols, items: items.map(([imageFile, label]) => ({ _key: k(), imageFile, label })) });
 const pull = (text: string, cite: string): Block => ({ _type: "pullQuote", _key: k(), text, cite });
-const ps = (problem: string, solution: string): Block => ({ _type: "problemSolution", _key: k(), problem, solution });
 
 export interface Settings {
   headline: string; headlineMuted: string; bio: string; email: string; linkedin: string; x: string; contactForm: string;
@@ -103,7 +102,6 @@ export const projects: Project[] = [
     imageFile: "487shots-screenshot.png", imageLabel: "Smart Vision Works dashboard",
     body: [
       meta([["Role", "UI/UX Designer"], ["Team", "1 Designer, 7 Developers"], ["Company", "Smart Vision Works"], ["Skills", "UI Design, UX Design, UI Development"]]),
-      ps("Inconsistent design, little user research, and little to no UI design", "A design system, user feedback, and Figma added to the workflow"),
       lead("Smart Vision Works is an AI food inspection tech company. I worked on UX, UI, graphic design, and more, alongside PhD experts in AI, machine learning, and manufacturing."),
       h("Consistency and speed of development"),
       p("A content audit found over 34 different shades of blue, the company's primary color, in the code base. Developers had no quick way to find brand colors, so they spent extra time hunting or used colors that didn't fit."),
@@ -117,30 +115,10 @@ export const projects: Project[] = [
       p("I worked with developers and managers to create a complete design for a new version of one of the SVW products. Adding Figma to the process let stakeholders get much more involved, and kept designs consistent with the design system."),
       figs([["Shots-mockup-1.png", "V2 product design"], ["SVW-Cover.png", "Smart Vision Works brand pattern"]]),
     ] },
-  { id: "online-menu", order: 50, title: "Creating an Engaging Online Menu Experience", subtitle: "Improving a restaurant's digital menu experience prototype", categories: ["uxui"], material: "paper", wide: true, tilt: 0.6,
-    imageFile: "334shots-so.png", imageLabel: "Menu app on three phones", imageRatio: "16/9",
-    body: [
-      meta([["Role", "UX Designer / Researcher"], ["Team", "3 UX Designers"], ["Type", "Prototype · Mobile App · Research"]]),
-      lead("Our first assumption was that most people at sit-down casual restaurants would rather use a physical menu than a digital one."),
-      h("Initial research"),
-      p("We surveyed to find who visits sit-down casual restaurants most (in our college town, 16 to 28 year olds) and asked about eating habits, age, and current use of digital menus."),
-      p("Our assumption was right: most users preferred physical menus. What they liked best about digital menus was the images, and interviews showed images were a real advantage."),
-      figs([["Shots-create-mockups-1.png", "Initial wireframes"]], 1),
-      h("Generating concepts"),
-      p("After a brainstorming session and some low-fidelity prototypes, one idea stood out: a menu we called “Tinder for food menus.” Users swipe left or right on dishes, which gives every item a large image and makes choosing a meal more interactive."),
-      figs([["Shots-Create-Mockups-5_1.png", "Low-fidelity prototype"]], 1),
-      h("Progressive disclosure"),
-      p("Testing showed users weren't engaging with much of the information and had trouble swiping the right way, so we built another iteration. We also raised the fidelity, using Olive Garden's branding and a selection of main entrees."),
-      figs([["Shots-create-mockups-6.png", "High-fidelity iteration"], ["64shots-screenshot.png", "Final dish screen"]]),
-      h("Results"),
-      stats([["97%", "Increase in user decision making"], ["54%", "Increase in user satisfaction"]]),
-      link("Watch the final prototype on YouTube", "https://www.youtube.com/watch?v=Tl5kheAT5Tc"),
-    ] },
   { id: "boulder", order: 60, title: "Boulder Icon Logo", subtitle: TBD, categories: ["icon"], material: "metal", tilt: 1.0, imageFile: "Boulder-Icon-Logo.png", imageLabel: "Boulder icon logo", imageRatio: "1/1", body: simple(TBD) },
   { id: "vela", order: 80, title: "Vela", subtitle: TBD, categories: ["icon"], material: "acrylic", tilt: 0.8, imageFile: "8.svg", imageLabel: "Vela logo", imageRatio: "16/9",
     body: simple(TBD, [figs([["8.svg", "Vela wordmark"], ["4.png", "Vela mark"]])]) },
   { id: "wolf-article", order: 90, title: "[Project title]", subtitle: TBD, categories: ["uxui"], material: "paper", tilt: -0.7, imageFile: "Shots-create-mockups-12.png", imageLabel: "Wolf article on a phone", body: simple(TBD) },
-  { id: "emma-site", order: 100, title: "Emma Johnson Website", subtitle: TBD, categories: ["uxui"], material: "stock", tilt: 0.4, imageFile: "Amazing-Mockup.png", imageLabel: "Emma Johnson site on a phone", body: simple(TBD) },
   { id: "app-icon-slot", order: 110, title: "[Add App Icon work]", subtitle: TBD, categories: ["app"], material: "metal", tilt: -1.0, imageFile: null, imageLabel: "App icon", imageRatio: "1/1", body: simple(TBD) },
   { id: "surf-watch", order: 130, title: "[Project title]", subtitle: TBD, categories: ["uxui"], material: "paper", tilt: 1.2, imageFile: "Shots-create-mockups-11.png", imageLabel: "Surf report on a watch", body: simple(TBD) },
   { id: "low-poly-kiwi", order: 140, title: "Low Poly Kiwi", subtitle: TBD, categories: ["3d"], material: "acrylic", tilt: -0.6, imageFile: null, imageLabel: "Low poly kiwi", imageRatio: "1/1", body: model(TBD) },

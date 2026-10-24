@@ -151,6 +151,7 @@ import { Model3D } from "./model3d.js";
     lbDisposers.forEach((off) => off()); lbDisposers = [];
     content.replaceChildren(tpl.content.cloneNode(true));
     realize(content);
+    content.querySelectorAll(".ph.is-real img").forEach((im) => { im.tabIndex = 0; im.setAttribute("role", "button"); im.setAttribute("aria-label", "View larger: " + (im.alt || "image")); });
     mountModels(content, lbDisposers);
     setupBA(content, lbDisposers);
     sheet.scrollTop = 0;
@@ -162,6 +163,7 @@ import { Model3D } from "./model3d.js";
   };
   const close = () => { if (dlg.open) dlg.close(); };
   dlg.addEventListener("close", () => {
+    closeZoom();
     document.documentElement.style.overflow = "";
     lbDisposers.forEach((off) => off()); lbDisposers = [];
     setHash("");
@@ -180,7 +182,50 @@ import { Model3D } from "./model3d.js";
     opener = document.querySelector('[data-open="' + next + '"]');
     show(next);
   }));
+  /* Image viewer: any image in a project opens full screen; tap or click it to see it at 2x and pan */
+  const zoom = document.getElementById("zoom");
+  const zImg = document.getElementById("zoom-img");
+  let zoomFrom = null;
+  const openZoom = (img) => {
+    zoomFrom = img;
+    zImg.src = img.currentSrc || img.src;
+    zImg.alt = img.alt || "";
+    zImg.style.width = "";
+    zoom.classList.remove("actual", "tall");
+    const tall = () => zoom.classList.toggle("tall", zImg.naturalHeight > zImg.naturalWidth * 1.6);
+    if (zImg.complete && zImg.naturalWidth) tall(); else zImg.addEventListener("load", tall, { once: true });
+    zoom.hidden = false;
+    zoom.scrollTo(0, 0);
+    zoom.querySelector("[data-zoom-close]").focus();
+  };
+  const closeZoom = () => {
+    if (zoom.hidden) return;
+    zoom.hidden = true;
+    zImg.removeAttribute("src");
+    if (zoomFrom && document.contains(zoomFrom)) zoomFrom.focus();
+  };
+  const imgOf = (el) => el.closest && el.closest("#lb-content .ph.is-real img");
+  content.addEventListener("click", (e) => { const img = imgOf(e.target); if (img) openZoom(img); });
+  content.addEventListener("keydown", (e) => {
+    const img = imgOf(e.target);
+    if (img && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); openZoom(img); }
+  });
+  zImg.addEventListener("click", (e) => {
+    e.stopPropagation();
+    if (zoom.classList.contains("actual")) { zoom.classList.remove("actual"); zImg.style.width = ""; return; }
+    const w = zImg.getBoundingClientRect().width;
+    const fx = e.offsetX / w, fy = e.offsetY / zImg.getBoundingClientRect().height;
+    zImg.style.width = Math.round(w * 2) + "px";
+    zoom.classList.add("actual");
+    // keep the tapped spot under the finger
+    zoom.scrollTo(fx * zImg.offsetWidth - zoom.clientWidth / 2, fy * zImg.offsetHeight - zoom.clientHeight / 2);
+  });
+  zoom.addEventListener("click", (e) => { if (e.target === zoom) closeZoom(); });
+  zoom.querySelector("[data-zoom-close]").addEventListener("click", closeZoom);
+  dlg.addEventListener("cancel", (e) => { if (!zoom.hidden) { e.preventDefault(); closeZoom(); } });
+
   dlg.addEventListener("keydown", (e) => {
+    if (!zoom.hidden) { if (e.key === "Escape") { e.preventDefault(); closeZoom(); } return; }
     if (e.target.closest("a,button") && (e.key === "Enter" || e.key === " ")) return;
     if (e.target.closest("canvas[data-model], .ba-range")) return;
     if (e.key === "ArrowRight") dlg.querySelector('[data-step="1"]').click();
