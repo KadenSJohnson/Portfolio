@@ -13,10 +13,10 @@
   const theirs = async (b) => {
     const len = b.querySelector(".im-text").textContent.length;
     b.classList.add("typing");
-    await wait(Math.min(1700, 700 + len * 9));
+    await wait(Math.min(1100, 450 + len * 5));
     b.classList.remove("typing");
     b.classList.add("in");
-    await wait(450);
+    await wait(280);
   };
 
   // Kaden's message: keyboard up, keys light up as each character goes into the bar, send
@@ -28,7 +28,7 @@
     const text = b.dataset.type || b.textContent;
     screen.style.setProperty("--kbh", kb.offsetHeight + "px");
     screen.classList.add("kb");
-    await wait(420);
+    await wait(320);
     const tap = async (key, hold) => { if (!key) return; key.classList.add("down"); await wait(hold); key.classList.remove("down"); };
     for (const ch of text) {
       const lower = ch.toLowerCase();
@@ -41,25 +41,25 @@
       if (key) key.classList.remove("down");
       await wait(perChar * (0.3 + Math.random() * 0.6));
     }
-    await wait(300);
+    await wait(180);
     send.classList.add("down");
     await wait(130);
     send.classList.remove("down", "on");
     typed.textContent = "";
     screen.classList.remove("kb");
-    await wait(160);
+    await wait(120);
     b.classList.add("in");
-    await wait(500);
+    await wait(320);
   };
 
   const play = async (card) => {
     if (card.dataset.played) return;
     card.dataset.played = "1";
-    await wait(300);
+    await wait(200);
     for (const b of card.querySelectorAll(".im-thread .im-bubble")) {
-      if (b.classList.contains("me")) await mine(card, b, b.classList.contains("ask") ? 45 : 95);
+      if (b.classList.contains("me")) await mine(card, b, b.classList.contains("ask") ? 40 : 60);
       else await theirs(b);
-      if (b.classList.contains("ask")) await wait(350);
+      if (b.classList.contains("ask")) await wait(200);
     }
     const status = card.querySelector(".im-status");
     if (status) status.classList.add("in");
