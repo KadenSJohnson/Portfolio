@@ -22,7 +22,7 @@ import { Model3D } from "./model3d.js";
   /* Local time under the intro */
   const fmt = new Intl.DateTimeFormat("en-US", { hour: "numeric", minute: "2-digit", timeZone: "America/Denver" });
   const clocks = document.querySelectorAll("[data-clock]");
-  const tick = () => { const t = "Springville, Utah · " + fmt.format(new Date()) + " MT"; clocks.forEach((c) => { c.textContent = t; }); };
+  const tick = () => { const t = "Salt Lake City, Utah · " + fmt.format(new Date()) + " MT"; clocks.forEach((c) => { c.textContent = t; }); };
   tick();
   setInterval(tick, 15000);
 

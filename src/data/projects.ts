@@ -15,7 +15,7 @@ const FILES: Record<string, string> = {
   "487shots-screenshot": "487shots-screenshot.webp", "64shots-screenshot": "64shots-screenshot.webp", "8": "8.svg",
   "986shots-so": "986shots-so.webp", "Amazing-Mockup": "Amazing-Mockup.webp", "Before--After": "Before--After.webp",
   "Boulder-Icon-Logo": "Boulder-Icon-Logo.png", "Casey-Headshot": "Casey-Headshot.jpeg", "Colors": "Colors.webp",
-  "Emily-Headshot": "Emily-Headshot.jpeg", "Kaden-Logo-copy-01": "Kaden-Logo-copy-01.svg", "Login-Page": "Login-Page.webp",
+  "Emily-Headshot": "Emily-Headshot.jpeg", "Login-Page": "Login-Page.webp",
   "SVW-Cover": "SVW-Cover.webp", "SVW-Logo": "SVW-Logo.png", "Sarah-Prince-photo": "Sarah-Prince-photo.jpeg",
   "Shots-Create-Mockups-5_1": "Shots-Create-Mockups-5_1.webp", "Shots-create-mockups-1": "Shots-create-mockups-1.webp",
   "Shots-create-mockups-11": "Shots-create-mockups-11.webp", "Shots-create-mockups-12": "Shots-create-mockups-12.webp",

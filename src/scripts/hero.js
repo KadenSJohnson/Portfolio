@@ -30,7 +30,8 @@
   let raf = 0;
   const play = () => {
     cancelAnimationFrame(raf);
-    if (reduce) { setK(1); showDims(); return; }
+    if (reduce) { setK(1); showDims(); sel.classList.add("done"); return; }
+    sel.classList.remove("done");
     setK(START); showDims();
     cur.classList.remove("dragging");
     const t0 = performance.now();
@@ -55,8 +56,10 @@
         cur.classList.remove("dragging");
         const p = ease(clamp((t - 2550) / 750)), h = handle();
         place(h.x + 40 * p, h.y + 26 * p, 5, 3, 1 - clamp((t - 2850) / 450));
+      } else if (t < 3350) {
+        place(0, 0, 0, 0, 0);                            // the selection lets go about 0.8s after full size
       } else {
-        place(0, 0, 0, 0, 0);
+        sel.classList.add("done");
         return;
       }
       raf = requestAnimationFrame(frame);

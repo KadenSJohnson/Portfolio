@@ -3,4 +3,4 @@ import { CATS, type CatKey } from "../data/projects";
 interface Props { cat: CatKey }
 const c = CATS[Astro.props.cat];
 ---
-<span class="tag"><span class="dot" style={`--c:var(--${c.color})`}><svg viewBox="0 0 24 24" aria-hidden="true"><use href={`#${c.icon}`} /></svg></span>{c.name}</span>
+<span class="tag"><span class="dot"><svg viewBox="0 0 24 24" aria-hidden="true"><use href={`#${c.icon}`} /></svg></span>{c.name}</span>

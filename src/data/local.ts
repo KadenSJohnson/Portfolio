@@ -46,7 +46,7 @@ export interface Testimonial { id: string; order: number; quote: string; name: s
 export const settings: Settings = {
   headline: "Hi, I'm Kaden Johnson",
   headlineMuted: "making the internet easier to use.",
-  bio: "UX/UI designer at KPM Analytics with 5+ years across websites, product, and internal tools. Based in Springville, Utah.",
+  bio: "UX/UI designer at KPM Analytics with 5+ years across websites, product, and internal tools. Based in Salt Lake City, Utah.",
   email: "nokadensly@gmail.com",
   linkedin: "https://www.linkedin.com/in/kaden-johnson-40b155196",
   x: "https://twitter.com/kadensly",

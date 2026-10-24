@@ -9,7 +9,7 @@ const cats = (Object.keys(CATS) as CatKey[]).map((k) => ({ k, ...CATS[k], n: wor
   <button class="chip" type="button" data-filter="all" aria-pressed="true">All <span class="ct">{works.length}</span></button>
   {cats.map((c) => (
     <button class="chip" type="button" data-filter={c.k} aria-pressed="false">
-      <span class="dot" style={`--c:var(--${c.color})`}><svg viewBox="0 0 24 24" aria-hidden="true"><use href={`#${c.icon}`} /></svg></span>{c.name} <span class="ct">{c.n}</span>
+      <span class="dot"><svg viewBox="0 0 24 24" aria-hidden="true"><use href={`#${c.icon}`} /></svg></span>{c.name} <span class="ct">{c.n}</span>
     </button>
   ))}
   <div class="filter-pick">

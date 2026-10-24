@@ -5,7 +5,6 @@
 :root{
   --bg:#FFFFFF; --ink:#0C0C0C; --sub:#5C5C5C; --mu:#8A8A8A; --line:#E8E8E8; --tile:#F3F3F3;
   --sel:#0D99FF; /* Figma's selection blue: only the selection box, handles and size label */
-  --yellow:#FCCC0A; --red:#FF1F41; --blue:#0A66C2; --green:#00933C; --orange:#FF6319;
   --display:"Inter Tight","Helvetica Neue",Helvetica,Arial,sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
   --F:min(12.4vw,150px); /* the name's final size */
@@ -28,7 +27,6 @@ a{color:inherit}
 /* ---------- Top bar ---------- */
 .top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-block:20px}
 .brand{display:flex;align-items:center;gap:10px;text-decoration:none;font:600 15px/1.2 var(--display);white-space:nowrap}
-.brand img{width:26px;height:26px;filter:invert(1)}
 .brand span{color:var(--mu);font-weight:500}
 .top nav{display:flex;align-items:center;gap:4px 20px;font:500 15px/1 var(--display)}
 .top nav a{padding-block:12px;text-decoration:none;color:var(--sub)}
@@ -41,19 +39,22 @@ a{color:inherit}
 
 /* ---------- Hero: the name, selected like a text layer in Figma ---------- */
 .hero{padding-block:clamp(40px,7vw,96px) clamp(48px,6vw,80px)}
-.name-stage{position:relative;height:calc(var(--F) * 1.02 + 34px)}
+.name-stage{position:relative;height:calc(var(--F) * 1.02 + 6px)}
 .name{font:700 var(--F)/1 var(--display);letter-spacing:-.04em;white-space:nowrap}
 .sel{--k:.3;position:relative;display:inline-block;font-size:calc(var(--k) * 1em);padding:0 .03em .02em;outline:1.5px solid var(--sel)}
-.hd{position:absolute;width:9px;height:9px;background:#FFFFFF;border:1.5px solid var(--sel)}
+.hd{position:absolute;width:9px;height:9px;background:#FFFFFF;border:1.5px solid var(--sel);transition:opacity .45s ease}
+.sel{transition:outline-color .45s ease}
+.dims{transition:opacity .45s ease}
+.sel.done{outline-color:transparent}.sel.done .hd,.sel.done .dims{opacity:0}
 .hd.tl{top:-5px;left:-5px}.hd.tr{top:-5px;right:-5px}.hd.bl{bottom:-5px;left:-5px}.hd.br{bottom:-5px;right:-5px}
-.dims{position:absolute;top:calc(100% + 9px);left:50%;transform:translateX(-50%);padding:3px 6px;border-radius:3px;background:var(--sel);color:#FFFFFF;
+.dims{position:absolute;z-index:2;top:calc(100% + 9px);left:50%;transform:translateX(-50%);padding:3px 6px;border-radius:3px;background:var(--sel);color:#FFFFFF;
   font:600 11px/1.2 var(--display);letter-spacing:0;white-space:nowrap;font-variant-numeric:tabular-nums}
 .cursor{position:absolute;top:0;left:0;width:24px;height:24px;pointer-events:none;opacity:0;will-change:transform}
 .cursor svg{position:absolute;inset:0;width:100%;height:100%}
 .cursor .resize{display:none}
 .cursor.dragging .arrow{display:none}.cursor.dragging .resize{display:block}
-@media (prefers-reduced-motion:reduce){.sel{--k:1}}
-.bio{max-width:44ch;margin-top:clamp(18px,2.4vw,28px);font:400 clamp(18px,1.9vw,23px)/1.45 var(--display);color:var(--sub);text-wrap:pretty}
+@media (prefers-reduced-motion:reduce){.sel{--k:1;outline-color:transparent}.sel .hd,.sel .dims{opacity:0}}
+.bio{max-width:44ch;margin-top:clamp(14px,1.8vw,22px);font:400 clamp(18px,1.9vw,23px)/1.45 var(--display);color:var(--sub);text-wrap:pretty}
 .bio b{color:var(--ink);font-weight:600}
 .where{margin-top:14px;font:500 13px/1.4 var(--mono);color:var(--mu);font-variant-numeric:tabular-nums}
 
@@ -93,7 +94,7 @@ a{color:inherit}
 .obj-sub{font:400 15px/1.4 var(--display);color:var(--sub)}
 .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .tag{display:inline-flex;align-items:center;gap:7px;padding:3px 10px 3px 3px;border-radius:999px;font:500 12px/1 var(--display);background:var(--tile)}
-.dot{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--c);color:var(--ink);flex:none}
+.dot{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:#FFFFFF;color:var(--ink);flex:none;box-shadow:inset 0 0 0 1px #E2E2E2}
 .dot svg{width:13px;height:13px}
 .hit{position:absolute;inset:0;z-index:3;width:100%;padding:0;border:0;border-radius:16px;background:none;cursor:pointer}
 .hit:focus-visible{outline-offset:6px}
