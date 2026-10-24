@@ -38,5 +38,5 @@ export const FEATURES: Record<string, { ba?: Compare; model?: ModelInfo; video?:
     // Full-length homepage screenshots (1440px wide) for the side-by-side compare in the lightbox
     full: { before: ["kpm-site-2024-10-full.webp", 1440, 6666], after: ["kpm-site-now-full.webp", 1440, 4332] },
     links: [["Visit the live site", "https://www.kpmanalytics.com/"], ["View the October 2024 archive", "https://web.archive.org/web/20241001071259/https://www.kpmanalytics.com/"]] } },
-  knapper: { video: { src: "/video/stone-materials.mp4", poster: "stone-materials-poster.jpg", label: "A stone made in Knapper turning as its material changes" } },
+  flint: { video: { src: "/video/flint.mp4", poster: "flint-poster.jpg", label: "A stone made in Flint turning as its material changes" } },
 };

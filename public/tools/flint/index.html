@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="Knapper: shape a 3D stone or gem by hand, then export it as SVG, PNG or OBJ.">
-<title>Knapper</title>
+<meta name="description" content="Flint: shape a 3D stone or gem by hand, then export it as SVG, PNG or OBJ.">
+<title>Flint</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=Instrument+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap">
@@ -235,8 +235,8 @@ const DEFAULTS = {
   yaw: -0.38, pitch: 0.3, chips: [],
 };
 let state = { ...DEFAULTS };
-try { const s = JSON.parse(localStorage.getItem('knapper3d-v3') || 'null'); if (s && typeof s === 'object') state = { ...state, ...s }; } catch (e) {}
-const save = () => { try { localStorage.setItem('knapper3d-v3', JSON.stringify(state)); } catch (e) {} };
+try { const s = JSON.parse(localStorage.getItem('flint-v1') || 'null'); if (s && typeof s === 'object') state = { ...state, ...s }; } catch (e) {}
+const save = () => { try { localStorage.setItem('flint-v1', JSON.stringify(state)); } catch (e) {} };
 
 /* ================= math ================= */
 function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
@@ -820,7 +820,7 @@ function saveFile(filename, data) {
     toast('Downloaded ' + filename);
   } catch (e) { toast('That file could not be downloaded'); }
 }
-const baseName = () => 'knapper-' + (state.mode === 'gem' ? 'gem' : 'rock') + '-' + state.seed + (state.chips.length ? '-' + state.chips.length + 'chips' : '');
+const baseName = () => 'flint-' + (state.mode === 'gem' ? 'gem' : 'rock') + '-' + state.seed + (state.chips.length ? '-' + state.chips.length + 'chips' : '');
 function copySvg() {
   const fallback = () => { const box = $('#codebox'); box.hidden = false; box.open = true; const ta = $('#code'); ta.value = lastExport; ta.focus(); ta.select(); toast('Code selected below. Copy it from there.'); };
   try { navigator.clipboard.writeText(lastExport).then(() => toast('SVG code copied'), fallback); } catch (e) { fallback(); }
@@ -851,12 +851,12 @@ function buildObj(poly, name) {
     faceLines.push('f ' + vs.map(v => vi(v) + '//' + ni).join(' '));
   }
   const [r, g, b] = hexToRgb(state.color).map(x => (x / 255).toFixed(4));
-  const obj = `# Knapper rock, seed ${state.seed}, ${state.chips.length} chips\nmtllib ${name}.mtl\no rock\n` +
+  const obj = `# Flint rock, seed ${state.seed}, ${state.chips.length} chips\nmtllib ${name}.mtl\no rock\n` +
     verts.map(v => 'v ' + v).join('\n') + '\n' + normals.map(n => 'vn ' + n).join('\n') + '\nusemtl stone\ns off\n' + faceLines.join('\n') + '\n';
   const gemMode = state.mode === 'gem', op = gemMode ? (1 - state.transp * 0.9 + state.frost * 0.3) : 1;
   const mtl = gemMode
-    ? `# Knapper gem material\nnewmtl stone\nKa 0 0 0\nKd ${r} ${g} ${b}\nKs ${state.shine.toFixed(3)} ${state.shine.toFixed(3)} ${state.shine.toFixed(3)}\nNs ${Math.round(10 + state.shine * 900 * (1 - state.frost * 0.7))}\nNi 1.55\nd ${clamp(op, 0.08, 1).toFixed(3)}\nTr ${(1 - clamp(op, 0.08, 1)).toFixed(3)}\nillum 4\n`
-    : `# Knapper stone material\nnewmtl stone\nKa 0 0 0\nKd ${r} ${g} ${b}\nKs 0 0 0\nNs 10\nd 1\nillum 1\n`;
+    ? `# Flint gem material\nnewmtl stone\nKa 0 0 0\nKd ${r} ${g} ${b}\nKs ${state.shine.toFixed(3)} ${state.shine.toFixed(3)} ${state.shine.toFixed(3)}\nNs ${Math.round(10 + state.shine * 900 * (1 - state.frost * 0.7))}\nNi 1.55\nd ${clamp(op, 0.08, 1).toFixed(3)}\nTr ${(1 - clamp(op, 0.08, 1)).toFixed(3)}\nillum 4\n`
+    : `# Flint stone material\nnewmtl stone\nKa 0 0 0\nKd ${r} ${g} ${b}\nKs 0 0 0\nNs 10\nd 1\nillum 1\n`;
   return { obj, mtl };
 }
 const CRC_T = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();

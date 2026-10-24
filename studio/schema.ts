@@ -78,7 +78,7 @@ const project = defineType({
     defineField({ name: "title", type: "string", validation: (r) => r.required() }),
     defineField({ name: "subtitle", type: "string", description: "One line under the title on the card." }),
     defineField({ name: "slug", type: "slug", options: { source: "title" }, validation: (r) => r.required(),
-      description: "The project's ID in links (#slug). Keep kpm and knapper as they are: the compare slider and video attach by slug." }),
+      description: "The project's ID in links (#slug). Keep kpm and flint as they are: the compare slider and video attach by slug." }),
     defineField({ name: "order", type: "number", description: "Position in the gallery, smallest first. Testimonials share the same numbering." }),
     defineField({ name: "categories", type: "array", of: [{ type: "string" }], options: { list: CATEGORY_OPTIONS, layout: "grid" } }),
     defineField({ name: "wide", title: "Wide card", type: "boolean", initialValue: false }),
