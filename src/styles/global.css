@@ -8,7 +8,7 @@
   --grid:#ECECEC;
   --sel:#0D99FF; /* Figma's selection blue: only the selection box, handles and size label */
   --display:"Timeless Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
-  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --mono:"Timeless Sans","Helvetica Neue",Helvetica,Arial,sans-serif; /* small labels use the same Grotesk */
   /* Layout grid: the content width is split into --cols square cells (12 on phones, 24 wider).
      src/scripts/grid.js measures the cell; spacing and sizes below are whole cells, and block
      heights are rounded up to whole cells, so edges and text sit on the background grid. */
