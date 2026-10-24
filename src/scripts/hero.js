@@ -45,15 +45,15 @@
     if (reduce) { live.textContent = full; return; }
     bio.classList.add("editing");
     render("Text", false);
-    later(() => render("Text", true), 650);
-    later(() => render("", false), 1250);
-    let t = 1450;
+    later(() => render("Text", true), 320);
+    later(() => render("", false), 620);
+    let t = 700;
     for (let i = 1; i <= full.length; i++) {
       const ch = full[i - 1];
-      t += ch === " " ? 34 : /[.,]/.test(ch) ? 120 : 18 + Math.random() * 26;
+      t += ch === " " ? 18 : /[.,]/.test(ch) ? 70 : 8 + Math.random() * 12;
       later(() => render(full.slice(0, i), false), t);
     }
-    later(() => { bio.classList.remove("editing"); live.textContent = full; }, t + 1100);
+    later(() => { bio.classList.remove("editing"); live.textContent = full; }, t + 350);
   };
   const resetBio = () => { timers.forEach(clearTimeout); timers = []; if (live) { live.textContent = ""; bio.classList.remove("editing"); } };
 
@@ -68,30 +68,31 @@
     const t0 = performance.now();
     const h0 = handle();
     const from = { x: h0.x + 90, y: h0.y + 70 };
+    let bioStarted = false;
     const frame = (now) => {
       const t = now - t0;
-      if (t < 450) {                                   // cursor fades in
-        place(from.x, from.y, 5, 3, clamp(t / 300));
-      } else if (t < 1100) {                           // glide to the corner handle
-        const p = ease(clamp((t - 450) / 650)), h = handle();
+      // The bio starts while the name is still growing, so the two overlap
+      if (!bioStarted && t >= 1350) { bioStarted = true; typeBio(); }
+      if (t >= 1900) sel.classList.add("done");        // name becomes plain text
+      if (t < 250) {                                   // cursor appears
+        place(from.x, from.y, 5, 3, clamp(t / 200));
+      } else if (t < 700) {                            // glide to the corner handle
+        const p = ease(clamp((t - 250) / 450)), h = handle();
         place(from.x + (h.x - from.x) * p, from.y + (h.y - from.y) * p, 5, 3, 1);
-      } else if (t < 1250) {                           // grab
+      } else if (t < 800) {                            // grab
         cur.classList.add("dragging");
         const h = handle(); place(h.x, h.y, 12, 12, 1);
-      } else if (t < 2550) {                           // drag the corner out to full size
-        setK(START + (1 - START) * ease(clamp((t - 1250) / 1300)));
+      } else if (t < 1700) {                           // drag the corner out to full size
+        setK(START + (1 - START) * ease(clamp((t - 800) / 900)));
         showDims();
         const h = handle(); place(h.x, h.y, 12, 12, 1);
-      } else if (t < 3300) {                           // let go and move away
+      } else if (t < 2150) {                           // let go and move away
         setK(1); showDims();
         cur.classList.remove("dragging");
-        const p = ease(clamp((t - 2550) / 750)), h = handle();
-        place(h.x + 40 * p, h.y + 26 * p, 5, 3, 1 - clamp((t - 2850) / 450));
-      } else if (t < 3350) {
-        place(0, 0, 0, 0, 0);                            // the selection lets go about 0.8s after full size
+        const p = ease(clamp((t - 1700) / 450)), h = handle();
+        place(h.x + 40 * p, h.y + 26 * p, 5, 3, 1 - clamp((t - 1850) / 300));
       } else {
-        sel.classList.add("done");
-        typeBio();
+        place(0, 0, 0, 0, 0);
         return;
       }
       raf = requestAnimationFrame(frame);

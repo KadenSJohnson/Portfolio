@@ -42,9 +42,7 @@ a{color:inherit}
 .name-stage{position:relative;height:calc(var(--F) * 1.02 + 6px)}
 .name{font:700 var(--F)/1 var(--display);letter-spacing:-.04em;white-space:nowrap}
 .sel{--k:.3;position:relative;display:inline-block;font-size:calc(var(--k) * 1em);padding:0 .03em .02em;outline:1.5px solid var(--sel)}
-.hd{position:absolute;width:9px;height:9px;background:#FFFFFF;border:1.5px solid var(--sel);transition:opacity .45s ease}
-.sel{transition:outline-color .45s ease}
-.dims{transition:opacity .45s ease}
+.hd{position:absolute;width:9px;height:9px;background:#FFFFFF;border:1.5px solid var(--sel);}
 .sel.done{outline-color:transparent}.sel.done .hd,.sel.done .dims{opacity:0}
 .hd.tl{top:-5px;left:-5px}.hd.tr{top:-5px;right:-5px}.hd.bl{bottom:-5px;left:-5px}.hd.br{bottom:-5px;right:-5px}
 .dims{position:absolute;z-index:2;top:calc(100% + 9px);left:50%;transform:translateX(-50%);padding:3px 6px;border-radius:3px;background:var(--sel);color:#FFFFFF;
@@ -54,7 +52,7 @@ a{color:inherit}
 .cursor .resize{display:none}
 .cursor.dragging .arrow{display:none}.cursor.dragging .resize{display:block}
 @media (prefers-reduced-motion:reduce){.sel{--k:1;outline-color:transparent}.sel .hd,.sel .dims{opacity:0}}
-.bio{position:relative;display:grid;outline:1.5px solid transparent;outline-offset:5px;transition:outline-color .45s ease;max-width:44ch;margin-top:clamp(14px,1.8vw,22px);font:400 clamp(18px,1.9vw,23px)/1.45 var(--display);color:var(--sub);text-wrap:pretty}
+.bio{position:relative;display:grid;outline:1.5px solid transparent;outline-offset:5px;max-width:44ch;margin-top:clamp(14px,1.8vw,22px);font:400 clamp(18px,1.9vw,23px)/1.45 var(--display);color:var(--sub);text-wrap:pretty}
 /* The bio is "typed" into a Figma text box: placeholder "Text", select it, delete, type */
 .bio>span{grid-area:1/1}
 .bio-ghost{visibility:hidden}
