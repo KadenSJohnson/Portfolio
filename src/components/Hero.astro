@@ -1,0 +1,25 @@
+---
+// The name, shown as a selected text layer in Figma. src/scripts/hero.js starts it small and drags
+// the bottom-right handle out to full size; with reduced motion it just appears at full size.
+import type { Settings } from "../lib/content";
+interface Props { settings: Settings }
+const { settings: s } = Astro.props;
+---
+<noscript><style>.sel{--k:1}.cursor{display:none}</style></noscript>
+<section class="hero" aria-labelledby="name">
+  <div class="name-stage" data-name-stage>
+    <h1 class="name" id="name">
+      <span class="sel" data-sel>
+        Kaden Johnson
+        <i class="hd tl" aria-hidden="true"></i><i class="hd tr" aria-hidden="true"></i><i class="hd bl" aria-hidden="true"></i><i class="hd br" aria-hidden="true"></i>
+        <span class="dims" aria-hidden="true" data-dims></span>
+      </span>
+    </h1>
+    <span class="cursor" aria-hidden="true" data-cursor>
+      <svg class="arrow" viewBox="0 0 24 24"><path d="M5 3l14 8.5-6.2 1.3L9.6 19z" fill="#0C0C0C" stroke="#FFFFFF" stroke-width="1.5" stroke-linejoin="round" /></svg>
+      <svg class="resize" viewBox="0 0 24 24"><path d="M5 5h7l-2.6 2.6 7 7L19 12v7h-7l2.6-2.6-7-7L5 12z" fill="#0C0C0C" stroke="#FFFFFF" stroke-width="1.4" stroke-linejoin="round" /></svg>
+    </span>
+  </div>
+  <p class="bio">{s.bio}</p>
+  <p class="where"><span data-clock>Springville, Utah</span></p>
+</section>

@@ -1,7 +1,7 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import MatMarks from "../components/MatMarks.astro";
-import Intro from "../components/Intro.astro";
+import TopBar from "../components/TopBar.astro";
+import Hero from "../components/Hero.astro";
 import Filters from "../components/Filters.astro";
 import WorkCard from "../components/WorkCard.astro";
 import QuoteCard from "../components/QuoteCard.astro";
@@ -20,24 +20,28 @@ const gallery = [
 const objs = { kiwi: kiwiObj, rock: rockObj };
 ---
 <Layout title="Kaden Johnson · Portfolio" description="Kaden Johnson is a UX/UI designer in Springville, Utah, working across websites, product, and internal tools.">
-  <div class="mat" id="mat">
-    <MatMarks />
-    <div class="page">
-      <Intro settings={settings} />
-      <Filters projects={projects} />
-      <main class="gallery" id="work">
+  <div class="page">
+    <TopBar settings={settings} />
+    <Hero settings={settings} />
+    <section id="work" aria-labelledby="work-label">
+      <div class="work-head">
+        <h2 class="label" id="work-label">Selected work</h2>
+        <Filters projects={projects} />
+      </div>
+      <div class="gallery">
         {gallery.map((g) => (g.kind === "work" ? <WorkCard item={g.p} /> : <QuoteCard item={g.t} />))}
-        <ContactCard settings={settings} />
-      </main>
-      <footer class="foot">
-        <span>© 2026 Kaden Johnson</span>
-        <span>{settings.email}</span>
-      </footer>
-    </div>
+      </div>
+    </section>
+    <ContactCard settings={settings} />
+    <footer class="foot">
+      <span>Designed and coded by Kaden Johnson</span>
+      <span>© 2026</span>
+    </footer>
   </div>
   <Lightbox />
   {Object.entries(objs).map(([k, src]) => <script type="text/plain" id={`obj-${k}`} is:inline set:html={src}></script>)}
   <script>
     import "../scripts/app.js";
+    import "../scripts/hero.js";
   </script>
 </Layout>

@@ -19,35 +19,10 @@ import { Model3D } from "./model3d.js";
   };
   realize(document);
 
-  /* Ruler numbers, one per inch, along the top and left edges of the mat */
-  const mat = document.getElementById("mat");
-  const rx = document.getElementById("ruler-x");
-  const ry = document.getElementById("ruler-y");
-  const IN = 96;
-  const fill = (el, length, axis) => {
-    const n = Math.floor(length / IN);
-    if (el.childElementCount === n) return;
-    const frag = document.createDocumentFragment();
-    for (let i = 1; i <= n; i++) {
-      const s = document.createElement("span");
-      s.textContent = i;
-      s.style[axis === "x" ? "left" : "top"] = i * IN + "px";
-      frag.appendChild(s);
-    }
-    el.replaceChildren(frag);
-  };
-  const rulers = () => {
-    fill(rx, rx.parentElement.clientWidth, "x");
-    fill(ry, ry.parentElement.clientHeight, "y");
-  };
-  rulers();
-  if ("ResizeObserver" in window) new ResizeObserver(rulers).observe(mat);
-  else window.addEventListener("resize", rulers);
-
-  /* Clock in the intro card */
+  /* Local time under the intro */
   const fmt = new Intl.DateTimeFormat("en-US", { hour: "numeric", minute: "2-digit", timeZone: "America/Denver" });
   const clocks = document.querySelectorAll("[data-clock]");
-  const tick = () => { const t = "Springville, UT · " + fmt.format(new Date()) + " MT"; clocks.forEach((c) => { c.textContent = t; }); };
+  const tick = () => { const t = "Springville, Utah · " + fmt.format(new Date()) + " MT"; clocks.forEach((c) => { c.textContent = t; }); };
   tick();
   setInterval(tick, 15000);
 
@@ -75,7 +50,7 @@ import { Model3D } from "./model3d.js";
         const el = document.getElementById("email-text");
         const r = document.createRange(); r.selectNodeContents(el);
         const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
-        b.textContent = "Selected";
+        b.textContent = "Selected"; setTimeout(() => { b.textContent = "Copy email"; }, 2400);
       };
       try { navigator.clipboard.writeText(text).then(done, fallback); } catch (e) { fallback(); }
     });

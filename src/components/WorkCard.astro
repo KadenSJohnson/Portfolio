@@ -10,10 +10,8 @@ import RichText from "./RichText.astro";
 interface Props { item: Project }
 const { item: it } = Astro.props;
 const f = FEATURES[it.id] || {};
-const metal = it.material === "metal";
 ---
-<article class={`obj ${it.material}${it.wide ? " wide" : ""}`} data-cat={it.categories.join(" ")} data-id={it.id} style={`--r:${it.tilt}deg`}>
-  {metal && <><i class="screw s1"></i><i class="screw s2"></i><i class="screw s3"></i><i class="screw s4"></i></>}
+<article class={`obj${it.wide ? " wide" : ""}`} data-cat={it.categories.join(" ")} data-id={it.id}>
   <div class="obj-img">
     {f.ba ? <BeforeAfter ba={f.ba} /> : f.model ? <ModelView model={f.model} /> : <Ph src={it.imageFile} image={it.image} label={it.imageLabel} ratio={it.imageRatio || "4/3"} />}
   </div>
