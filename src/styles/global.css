@@ -14,7 +14,7 @@
      heights are rounded up to whole cells, so edges and text sit on the background grid. */
   --cols:12; --cell:29.17px; --gut:max(20px,env(safe-area-inset-left,0px));
   --F:calc(var(--cell) * 1.3); /* the name's final size: 1.3 cells on phones (fits inside the card), 3 wider */
-  --lh:var(--cell);          /* bio line height: 1 cell on phones, half a cell wider */
+  --lh:calc(var(--cell) * .8); /* bio line height: 0.8 cell on phones, half a cell wider */
   --gap:clamp(20px,3vw,36px);
   color-scheme:light;
 }
@@ -71,7 +71,7 @@ a{color:inherit}
 .cursor .resize{display:none}
 .cursor.dragging .arrow{display:none}.cursor.dragging .resize{display:block}
 @media (prefers-reduced-motion:reduce){.sel{--k:1;outline-color:transparent}.sel .hd,.sel .dims{opacity:0}}
-.bio{position:relative;display:grid;outline:1.5px solid transparent;outline-offset:5px;max-width:44ch;margin-top:var(--cell);font:400 clamp(16px,1.75vw,21px)/var(--lh) var(--display);color:var(--sub);text-wrap:pretty}
+.bio{position:relative;display:grid;outline:1.5px solid transparent;outline-offset:5px;max-width:44ch;margin-top:calc(var(--cell) / 2);font:400 clamp(16px,1.75vw,21px)/var(--lh) var(--display);color:var(--sub);text-wrap:pretty}
 /* The bio is "typed" into a Figma text box: placeholder "Text", select it, delete, type */
 .bio>span{grid-area:1/1}
 .bio-ghost{visibility:hidden}
@@ -81,7 +81,7 @@ a{color:inherit}
 .bio.editing .caret{display:inline-block}
 @keyframes caret{50%{opacity:0}}
 .bio b{color:var(--ink);font-weight:600}
-.where{margin-top:var(--lh);font:500 13px/var(--lh) var(--mono);color:var(--mu);font-variant-numeric:tabular-nums}
+.where{margin-top:calc(var(--cell) / 4);font:500 13px/var(--lh) var(--mono);color:var(--mu);font-variant-numeric:tabular-nums}
 
 /* ---------- Work ---------- */
 .work-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 20px;margin-bottom:var(--cell);padding:calc(var(--cell) / 2)}
