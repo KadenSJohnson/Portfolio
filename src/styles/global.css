@@ -4,6 +4,7 @@
    Each project opens in a lightbox sheet. */
 :root{
   --bg:#FFFFFF; --ink:#0C0C0C; --sub:#5C5C5C; --mu:#8A8A8A; --line:#E8E8E8; --tile:#F3F3F3;
+  --grid:#ECECEC; --grid-soft:#F6F6F6;
   --sel:#0D99FF; /* Figma's selection blue: only the selection box, handles and size label */
   --display:"Inter Tight","Helvetica Neue",Helvetica,Arial,sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
@@ -14,7 +15,14 @@
 *,*::before,*::after{box-sizing:border-box}
 [hidden]{display:none!important}
 html{-webkit-text-size-adjust:100%}
-body{background:var(--bg);color:var(--ink);font:400 16px/1.5 var(--display);-webkit-font-smoothing:antialiased}
+body{color:var(--ink);font:400 16px/1.5 var(--display);-webkit-font-smoothing:antialiased;
+  /* light grey grid like a design canvas: 96px squares with a faint 24px sub-grid */
+  background-color:var(--bg);
+  background-image:
+    linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px),
+    linear-gradient(var(--grid-soft) 1px,transparent 1px),linear-gradient(90deg,var(--grid-soft) 1px,transparent 1px);
+  background-size:96px 96px,96px 96px,24px 24px,24px 24px;
+  background-position:50% -1px,50% 0,50% -1px,50% 0}
 h1,h2,h3,p,figure,blockquote,dl,dd,ul{margin:0}
 ul{padding:0;list-style:none}
 a{color:inherit}
