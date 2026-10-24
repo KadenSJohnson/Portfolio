@@ -20,11 +20,12 @@ const gallery = [
 const objs = { kiwi: kiwiObj, rock: rockObj };
 ---
 <Layout title="Kaden Johnson · Portfolio" description="Kaden Johnson is a UX/UI designer in Salt Lake City, Utah, working across websites, product, and internal tools.">
+  <div class="canvas">
   <div class="page">
     <TopBar settings={settings} />
     <Hero settings={settings} />
     <section id="work" aria-labelledby="work-label">
-      <div class="work-head">
+      <div class="work-head" data-snap>
         <h2 class="label" id="work-label">Selected work</h2>
         <Filters projects={projects} />
       </div>
@@ -38,10 +39,12 @@ const objs = { kiwi: kiwiObj, rock: rockObj };
       <span>© 2026</span>
     </footer>
   </div>
+  </div>
   <Lightbox />
   {Object.entries(objs).map(([k, src]) => <script type="text/plain" id={`obj-${k}`} is:inline set:html={src}></script>)}
   <script>
     import "../scripts/app.js";
     import "../scripts/hero.js";
+    import "../scripts/grid.js";
   </script>
 </Layout>

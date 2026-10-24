@@ -3,7 +3,7 @@ import type { Settings } from "../lib/content";
 interface Props { settings: Settings }
 const { settings: s } = Astro.props;
 ---
-<section class="contact" id="say-hi" aria-labelledby="contact-h">
+<section class="contact" id="say-hi" aria-labelledby="contact-h" data-snap>
   <h2 id="contact-h">{s.contactHeading}</h2>
   <p class="c-lede">{s.contactLede}</p>
   <div class="c-row">

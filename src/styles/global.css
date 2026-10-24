@@ -8,30 +8,35 @@
   --sel:#0D99FF; /* Figma's selection blue: only the selection box, handles and size label */
   --display:"Inter Tight","Helvetica Neue",Helvetica,Arial,sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
-  --F:min(12.4vw,150px); /* the name's final size */
+  /* Layout grid: the content width is split into --cols square cells (12 on phones, 24 wider).
+     src/scripts/grid.js measures the cell; spacing and sizes below are whole cells, and block
+     heights are rounded up to whole cells, so edges and text sit on the background grid. */
+  --cols:12; --cell:29.17px; --gut:max(20px,env(safe-area-inset-left,0px));
+  --F:calc(var(--cell) * 1.5); /* the name's final size: 1.5 cells on phones, 3 wider */
+  --lh:var(--cell);          /* bio line height: 1 cell on phones, half a cell wider */
   --gap:clamp(20px,3vw,36px);
   color-scheme:light;
 }
 *,*::before,*::after{box-sizing:border-box}
 [hidden]{display:none!important}
 html{-webkit-text-size-adjust:100%}
-body{color:var(--ink);font:400 16px/1.5 var(--display);-webkit-font-smoothing:antialiased;
-  /* light grey grid like a design canvas: one even set of 72px squares */
-  background-color:var(--bg);
-  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
-  background-size:72px 72px;
-  background-position:50% -1px}
+body{color:var(--ink);font:400 16px/1.5 var(--display);-webkit-font-smoothing:antialiased;background:var(--bg)}
 h1,h2,h3,p,figure,blockquote,dl,dd,ul{margin:0}
 ul{padding:0;list-style:none}
 a{color:inherit}
 :focus-visible{outline:2px solid var(--ink);outline-offset:3px;border-radius:6px}
 .sr{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 
-.page{max-width:1200px;margin-inline:auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px));padding-bottom:40px}
-@media (min-width:720px){.page{padding-left:max(40px,env(safe-area-inset-left,0px));padding-right:max(40px,env(safe-area-inset-right,0px))}}
+.page{position:relative;max-width:1200px;margin-inline:auto;padding-left:var(--gut);padding-right:var(--gut);padding-bottom:calc(var(--cell) * 2)}
+/* The background grid, offset (--gx, set by grid.js) so a line runs along the content's left edge */
+.canvas{min-height:100vh;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:var(--cell) var(--cell);background-position:var(--gx,var(--gut)) 0}
+@media (min-width:720px){:root{--cols:24;--F:calc(var(--cell) * 3);--lh:calc(var(--cell) / 2);--gut:max(40px,env(safe-area-inset-left,0px))}}
 
 /* ---------- Top bar ---------- */
-.top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-block:20px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;height:calc(var(--cell) * 2)}
+@media (min-width:720px){.top{height:calc(var(--cell) * 2)}}
 .brand{display:flex;align-items:center;gap:10px;text-decoration:none;font:600 15px/1.2 var(--display);white-space:nowrap}
 .brand span{color:var(--mu);font-weight:500}
 .top nav{display:flex;align-items:center;gap:4px 20px;font:500 15px/1 var(--display)}
@@ -44,10 +49,10 @@ a{color:inherit}
 @media (max-width:639px){.brand span,.top nav .opt{display:none}}
 
 /* ---------- Hero: the name, selected like a text layer in Figma ---------- */
-.hero{padding-block:clamp(40px,7vw,96px) clamp(48px,6vw,80px)}
-.name-stage{position:relative;height:calc(var(--F) * 1.02 + 6px)}
+.hero{padding-block:calc(var(--cell) * 2)}
+.name-stage{position:relative;height:var(--F)}
 .name{font:700 var(--F)/1 var(--display);letter-spacing:-.04em;white-space:nowrap}
-.sel{--k:.3;position:relative;display:inline-block;font-size:calc(var(--k) * 1em);padding:0 .03em .02em;outline:1.5px solid var(--sel)}
+.sel{--k:.3;position:relative;display:inline-block;font-size:calc(var(--k) * 1em);padding:0 .03em;outline:1.5px solid var(--sel)}
 .hd{position:absolute;width:9px;height:9px;background:#FFFFFF;border:1.5px solid var(--sel);}
 .sel.done{outline-color:transparent}.sel.done .hd,.sel.done .dims{opacity:0}
 .hd.tl{top:-5px;left:-5px}.hd.tr{top:-5px;right:-5px}.hd.bl{bottom:-5px;left:-5px}.hd.br{bottom:-5px;right:-5px}
@@ -58,7 +63,7 @@ a{color:inherit}
 .cursor .resize{display:none}
 .cursor.dragging .arrow{display:none}.cursor.dragging .resize{display:block}
 @media (prefers-reduced-motion:reduce){.sel{--k:1;outline-color:transparent}.sel .hd,.sel .dims{opacity:0}}
-.bio{position:relative;display:grid;outline:1.5px solid transparent;outline-offset:5px;max-width:44ch;margin-top:clamp(14px,1.8vw,22px);font:400 clamp(18px,1.9vw,23px)/1.45 var(--display);color:var(--sub);text-wrap:pretty}
+.bio{position:relative;display:grid;outline:1.5px solid transparent;outline-offset:5px;max-width:44ch;margin-top:var(--cell);font:400 clamp(16px,1.75vw,21px)/var(--lh) var(--display);color:var(--sub);text-wrap:pretty}
 /* The bio is "typed" into a Figma text box: placeholder "Text", select it, delete, type */
 .bio>span{grid-area:1/1}
 .bio-ghost{visibility:hidden}
@@ -68,10 +73,10 @@ a{color:inherit}
 .bio.editing .caret{display:inline-block}
 @keyframes caret{50%{opacity:0}}
 .bio b{color:var(--ink);font-weight:600}
-.where{margin-top:14px;font:500 13px/1.4 var(--mono);color:var(--mu);font-variant-numeric:tabular-nums}
+.where{margin-top:var(--lh);font:500 13px/var(--lh) var(--mono);color:var(--mu);font-variant-numeric:tabular-nums}
 
 /* ---------- Work ---------- */
-.work-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 20px;margin-bottom:clamp(20px,2.6vw,32px)}
+.work-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 20px;margin-bottom:var(--cell)}
 .label{font:500 13px/1 var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--mu)}
 .filters{display:flex;flex-wrap:wrap;gap:8px}
 .chip{display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:4px 14px 4px 6px;border:1px solid var(--line);border-radius:999px;cursor:pointer;
@@ -87,7 +92,8 @@ a{color:inherit}
 .filter-pick svg{position:absolute;right:18px;top:50%;width:16px;height:16px;margin-top:-8px;pointer-events:none;color:var(--ink)}
 @media (max-width:639px){.filters{width:100%}.filters .chip{display:none}.filter-pick{display:block;width:100%}}
 
-.gallery{display:grid;gap:clamp(56px,7vw,104px) clamp(24px,3.6vw,52px);grid-template-columns:minmax(0,1fr);align-items:start;grid-auto-flow:row dense}
+.gallery{display:grid;gap:calc(var(--cell) * 2);grid-template-columns:minmax(0,1fr);align-items:stretch;grid-auto-flow:row dense}
+@media (min-width:720px){.gallery{gap:calc(var(--cell) * 2)}}
 @media (min-width:720px){.gallery{grid-template-columns:repeat(2,minmax(0,1fr))}.gallery .wide{grid-column:span 2}}
 
 .obj{position:relative;padding:10px 10px 20px;border:1px solid var(--line);border-radius:22px;background:#FFFFFF;transition:border-color .2s}
@@ -137,7 +143,7 @@ a{color:inherit}
 .lb-hero .ph.is-real img,.figs .ph.is-real img{height:auto;max-height:78vh;object-fit:contain}
 
 /* ---------- Contact + footer ---------- */
-.contact{display:grid;gap:16px;margin-top:clamp(72px,9vw,128px);padding-top:clamp(36px,4vw,56px);border-top:1px solid var(--line)}
+.contact{display:grid;align-content:start;gap:16px;margin-top:calc(var(--cell) * 2);padding-top:var(--cell);border-top:1px solid var(--grid)}
 .contact h2{font:700 clamp(44px,7vw,88px)/.95 var(--display);letter-spacing:-.05em}
 .c-lede{font:400 clamp(18px,1.9vw,22px)/1.4 var(--display);color:var(--sub)}
 .c-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin-top:6px}
@@ -145,7 +151,7 @@ a{color:inherit}
 .c-links{display:flex;flex-wrap:wrap;gap:4px 22px;font:500 15px/1 var(--display)}
 .c-links a{display:inline-block;padding-block:12px;text-decoration:underline;text-underline-offset:4px;text-decoration-color:#C4C4C4}
 .c-links a:hover{text-decoration-color:var(--ink)}
-.foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;margin-top:clamp(56px,7vw,96px);padding-top:20px;border-top:1px solid var(--line);font:500 12px/1.4 var(--mono);color:var(--mu)}
+.foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin-top:calc(var(--cell) * 2);min-height:calc(var(--cell) * 2);border-top:1px solid var(--grid);font:500 12px/1.4 var(--mono);color:var(--mu)}
 
 /* Before / after slider */
 .ba{position:relative;aspect-ratio:16/9;overflow:hidden;background:var(--tile);user-select:none}
@@ -220,7 +226,10 @@ a{color:inherit}
 .pull{margin:4px 0 0;padding:18px 20px;border-left:4px solid var(--ink);background:var(--tile);border-radius:0 12px 12px 0;font:600 19px/1.45 var(--display)}
 .pull cite{display:block;margin-top:8px;font:500 13px/1 var(--mono);font-style:normal;color:var(--sub)}
 .ext{font-weight:600;text-decoration:underline;text-underline-offset:4px}
-@media (max-width:639px){.lb{width:calc(100vw - 16px);max-height:calc(100dvh - 16px)}.sheet{max-height:calc(100dvh - 16px)}}
+@media (max-width:639px){.lb{width:calc(100vw - 16px);max-height:calc(100dvh - 16px)}.sheet{max-height:calc(100dvh - 16px);padding-bottom:88px}
+  .lb-bar{justify-content:flex-end;background:#FFFFFF;backdrop-filter:none} /* a backdrop filter would trap the fixed arrows inside the bar */
+  .lb-nav{position:fixed;z-index:4;right:calc(20px + env(safe-area-inset-right,0px));bottom:calc(20px + env(safe-area-inset-bottom,0px))}
+  .lb-nav .lb-btn{width:52px;height:52px;background:#FFFFFF;box-shadow:0 0 0 1px var(--line),0 6px 18px rgba(0,0,0,.16)}}
 
 
 /* Full-screen image viewer inside the lightbox */
