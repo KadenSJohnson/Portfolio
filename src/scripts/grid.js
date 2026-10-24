@@ -19,6 +19,10 @@
     const blocks = Array.from(document.querySelectorAll("[data-snap], .gallery > .obj"));
     // Measure natural heights first (cards stop stretching while measured), then round up
     if (gallery) gallery.style.alignItems = "start";
+    const media = Array.from(document.querySelectorAll(".gallery > .obj > .obj-img"));
+    media.forEach((m) => { m.style.height = ""; });
+    const mh = media.map((m) => m.getBoundingClientRect().height);
+    media.forEach((m, i) => { if (mh[i]) m.style.height = Math.max(2, Math.round(mh[i] / cell)) * cell + "px"; });
     blocks.forEach((el) => { el.style.minHeight = ""; });
     const heights = blocks.map((el) => el.getBoundingClientRect().height);
     blocks.forEach((el, i) => {
