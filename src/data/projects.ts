@@ -32,11 +32,12 @@ export interface Compare {
   full?: { before: [string, number, number]; after: [string, number, number] }; links?: [string, string][];
 }
 export interface ModelInfo { key: string; what: string; yaw: number; pitch: number; color?: string }
-export const FEATURES: Record<string, { ba?: Compare; model?: ModelInfo }> = {
+export interface VideoInfo { src: string; poster: string; label: string }
+export const FEATURES: Record<string, { ba?: Compare; model?: ModelInfo; video?: VideoInfo }> = {
   kpm: { ba: { before: "kpm-site-2024-10.webp", after: "kpm-site-now.webp", beforeLabel: "October 2024", afterLabel: "Now",
     // Full-length homepage screenshots (1440px wide) for the side-by-side compare in the lightbox
     full: { before: ["kpm-site-2024-10-full.webp", 1440, 6666], after: ["kpm-site-now-full.webp", 1440, 4332] },
     links: [["Visit the live site", "https://www.kpmanalytics.com/"], ["View the October 2024 archive", "https://web.archive.org/web/20241001071259/https://www.kpmanalytics.com/"]] } },
   "low-poly-kiwi": { model: { key: "kiwi", what: "half a kiwi", yaw: -0.6, pitch: 0.72 } },
-  "knapped-rock": { model: { key: "rock", what: "a knapped stone", yaw: -0.6, pitch: 0.35, color: "#7C8AA0" } },
+  "stone-materials": { video: { src: "/video/stone-materials.mp4", poster: "stone-materials-poster.jpg", label: "A low poly stone turning as its material changes" } },
 };

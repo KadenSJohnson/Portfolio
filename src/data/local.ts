@@ -121,8 +121,9 @@ export const projects: Project[] = [
   { id: "wolf-article", order: 90, title: "[Project title]", subtitle: TBD, categories: ["uxui"], material: "paper", tilt: -0.7, imageFile: "Shots-create-mockups-12.png", imageLabel: "Wolf article on a phone", body: simple(TBD) },
   { id: "app-icon-slot", order: 110, title: "[Add App Icon work]", subtitle: TBD, categories: ["app"], material: "metal", tilt: -1.0, imageFile: null, imageLabel: "App icon", imageRatio: "1/1", body: simple(TBD) },
   { id: "surf-watch", order: 130, title: "[Project title]", subtitle: TBD, categories: ["uxui"], material: "paper", tilt: 1.2, imageFile: "Shots-create-mockups-11.png", imageLabel: "Surf report on a watch", body: simple(TBD) },
+  { id: "stone-materials", order: 145, title: "Stone Material Study", subtitle: TBD, categories: ["3d"], material: "paper", tilt: 0, imageFile: null, imageLabel: "Low poly stone turning through different materials", imageRatio: "1/1",
+    body: [lead(TBD), note("Add a short description: what you made it with, what you were exploring with the materials, and how long it took.")] },
   { id: "low-poly-kiwi", order: 140, title: "Low Poly Kiwi", subtitle: TBD, categories: ["3d"], material: "acrylic", tilt: -0.6, imageFile: null, imageLabel: "Low poly kiwi", imageRatio: "1/1", body: model(TBD) },
-  { id: "knapped-rock", order: 150, title: "Knapped Rock", subtitle: TBD, categories: ["3d"], material: "metal", tilt: 0.9, imageFile: null, imageLabel: "Knapped rock", imageRatio: "1/1", body: model(TBD) },
 ];
 
 export const testimonials: Testimonial[] = [

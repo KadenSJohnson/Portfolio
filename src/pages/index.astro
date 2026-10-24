@@ -9,7 +9,6 @@ import ContactCard from "../components/ContactCard.astro";
 import Lightbox from "../components/Lightbox.astro";
 import { getContent } from "../lib/content";
 import kiwiObj from "../models/kiwi.obj?raw";
-import rockObj from "../models/rock.obj?raw";
 
 const { settings, projects, testimonials } = await getContent();
 // Projects and testimonials share one gallery, ordered by their "order" number
@@ -17,7 +16,7 @@ const gallery = [
   ...projects.map((p) => ({ kind: "work" as const, order: p.order ?? 0, p })),
   ...testimonials.map((t) => ({ kind: "quote" as const, order: t.order ?? 0, t })),
 ].sort((a, b) => a.order - b.order);
-const objs = { kiwi: kiwiObj, rock: rockObj };
+const objs = { kiwi: kiwiObj };
 ---
 <Layout title="Kaden Johnson · Portfolio" description="Kaden Johnson is a UX/UI designer in Salt Lake City, Utah, working across websites, product, and internal tools.">
   <div class="canvas">
