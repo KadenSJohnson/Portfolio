@@ -10,7 +10,7 @@
   const play = async (card) => {
     if (card.dataset.played) return;
     card.dataset.played = "1";
-    const bubbles = Array.from(card.querySelectorAll(".im-bubble"));
+    const bubbles = Array.from(card.querySelectorAll(".im-msgs .im-bubble"));
     await wait(350);
     for (const b of bubbles) {
       const len = b.querySelector(".im-text").textContent.length;
@@ -20,6 +20,51 @@
       b.classList.add("in");
       await wait(450);
     }
+    await reply(card);
+  };
+
+  // Kaden types a reply: the keyboard slides up, keys light up as each letter is typed,
+  // then send, the keyboard drops and the blue bubble arrives
+  const reply = async (card) => {
+    const me = card.querySelector(".im-bubble.me");
+    const screen = card.querySelector(".im-screen");
+    const kb = card.querySelector(".im-kb");
+    const typed = card.querySelector(".im-typed");
+    const send = card.querySelector(".im-send");
+    const status = card.querySelector(".im-status");
+    if (!me || !kb) return;
+    const text = me.dataset.reply || me.textContent;
+    await wait(700);
+    screen.style.setProperty("--kbh", kb.offsetHeight + "px");
+    screen.classList.add("kb");
+    await wait(450);
+    const press = async (key, hold = 85) => {
+      if (!key) return;
+      key.classList.add("down");
+      await wait(hold);
+      key.classList.remove("down");
+    };
+    for (const ch of text) {
+      const lower = ch.toLowerCase();
+      if (ch !== lower) await press(kb.querySelector('[data-k="shift"]'), 70);
+      const key = kb.querySelector(`[data-k="${lower === " " ? " " : lower}"]`);
+      key && key.classList.add("down");
+      typed.textContent += ch;
+      send.classList.add("on");
+      await wait(80);
+      key && key.classList.remove("down");
+      await wait(40 + Math.random() * 70);
+    }
+    await wait(350);
+    send.classList.add("down");
+    await wait(140);
+    send.classList.remove("down", "on");
+    typed.textContent = "";
+    screen.classList.remove("kb");
+    await wait(180);
+    me.classList.add("in");
+    await wait(700);
+    status && status.classList.add("in");
   };
 
   if (!reduce && "IntersectionObserver" in window) {

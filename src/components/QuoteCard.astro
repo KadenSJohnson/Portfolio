@@ -22,6 +22,9 @@ for (const s of sentences) {
   else bubbles.push(s);
 }
 const id = `contact-${q.id}`;
+// Kaden's reply, typed on the keyboard (letters and spaces only, like a quick text)
+const reply = `Thank you so much ${first}`;
+const rows = ["qwertyuiop", "asdfghjkl", "zxcvbnm"];
 ---
 <figure class="obj quote imsg" data-cat="widget" data-imsg>
   <div class="im-screen">
@@ -39,8 +42,23 @@ const id = `contact-${q.id}`;
           <p class="im-bubble"><span class="im-dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="im-text">{b}</span></p>
         ))}
       </blockquote>
+      <p class="im-bubble me" aria-hidden="true" data-reply={reply}><span class="im-text">{reply}</span></p>
+      <p class="im-status" aria-hidden="true">Delivered</p>
     </div>
-    <div class="im-input" aria-hidden="true"><span>iMessage</span></div>
+    <div class="im-input" aria-hidden="true">
+      <span class="im-field"><span class="im-typed"></span><span class="im-ph">iMessage</span></span>
+      <span class="im-send"><svg viewBox="0 0 16 16"><path d="M8 13V3M3.5 7.5 8 3l4.5 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg></span>
+    </div>
+    <div class="im-kb" aria-hidden="true">
+      {rows.map((r, i) => (
+        <div class={`im-row r${i}`}>
+          {i === 2 && <span class="k sp" data-k="shift"><svg viewBox="0 0 16 16"><path d="M8 2.5 2.5 8.5H5.5V13h5V8.5h3z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" /></svg></span>}
+          {[...r].map((c) => <span class="k" data-k={c} data-c={c}>{c}</span>)}
+          {i === 2 && <span class="k sp" data-k="del"><svg viewBox="0 0 20 16"><path d="M6.5 2.5h11v11h-11L2 8z M10 6l4 4M14 6l-4 4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" /></svg></span>}
+        </div>
+      ))}
+      <div class="im-row r3"><span class="k sp">123</span><span class="k space" data-k=" ">space</span><span class="k sp ret">return</span></div>
+    </div>
     <div class="im-card" id={id} role="dialog" aria-modal="false" aria-label={`Contact: ${q.name}`} hidden>
       <div class="im-card-bar"><button class="im-done" type="button">Done</button></div>
       {photo ? <img class="im-av big" src={photo} alt="" loading="lazy" /> : <span class="im-av im-ini big">{q.name.split(" ").map((p) => p[0]).join("")}</span>}
