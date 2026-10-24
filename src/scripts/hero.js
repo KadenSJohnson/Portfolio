@@ -8,6 +8,9 @@
   const dims = stage.querySelector("[data-dims]");
   const cur = stage.querySelector("[data-cursor]");
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const bio = document.querySelector("[data-bio]");
+  const live = bio && bio.querySelector("[data-bio-live]");
+  const full = bio ? bio.querySelector(".bio-ghost").textContent.trim() : "";
   const START = 0.3;
 
   const setK = (k) => sel.style.setProperty("--k", k.toFixed(4));
@@ -27,10 +30,38 @@
   const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
   const clamp = (t) => Math.max(0, Math.min(1, t));
 
+  // Bio: a new Figma text layer that says "Text", gets selected, deleted, then typed out
+  let timers = [];
+  const later = (fn, ms) => timers.push(setTimeout(fn, ms));
+  const render = (text, marked) => {
+    live.textContent = "";
+    if (marked) { const m = document.createElement("mark"); m.textContent = text; live.append(m); }
+    else live.append(document.createTextNode(text));
+    const c = document.createElement("span"); c.className = "caret"; live.append(c);
+  };
+  const typeBio = () => {
+    if (!live) return;
+    timers.forEach(clearTimeout); timers = [];
+    if (reduce) { live.textContent = full; return; }
+    bio.classList.add("editing");
+    render("Text", false);
+    later(() => render("Text", true), 650);
+    later(() => render("", false), 1250);
+    let t = 1450;
+    for (let i = 1; i <= full.length; i++) {
+      const ch = full[i - 1];
+      t += ch === " " ? 34 : /[.,]/.test(ch) ? 120 : 18 + Math.random() * 26;
+      later(() => render(full.slice(0, i), false), t);
+    }
+    later(() => { bio.classList.remove("editing"); live.textContent = full; }, t + 1100);
+  };
+  const resetBio = () => { timers.forEach(clearTimeout); timers = []; if (live) { live.textContent = ""; bio.classList.remove("editing"); } };
+
   let raf = 0;
   const play = () => {
     cancelAnimationFrame(raf);
-    if (reduce) { setK(1); showDims(); sel.classList.add("done"); return; }
+    if (reduce) { setK(1); showDims(); sel.classList.add("done"); typeBio(); return; }
+    resetBio();
     sel.classList.remove("done");
     setK(START); showDims();
     cur.classList.remove("dragging");
@@ -60,6 +91,7 @@
         place(0, 0, 0, 0, 0);                            // the selection lets go about 0.8s after full size
       } else {
         sel.classList.add("done");
+        typeBio();
         return;
       }
       raf = requestAnimationFrame(frame);

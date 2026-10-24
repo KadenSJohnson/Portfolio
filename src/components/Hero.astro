@@ -1,11 +1,12 @@
 ---
 // The name, shown as a selected text layer in Figma. src/scripts/hero.js starts it small and drags
-// the bottom-right handle out to full size; with reduced motion it just appears at full size.
+// the bottom-right handle out to full size, then the bio is typed into a Figma text box.
+// With reduced motion both just appear.
 import type { Settings } from "../lib/content";
 interface Props { settings: Settings }
 const { settings: s } = Astro.props;
 ---
-<noscript><style>.sel{--k:1;outline-color:transparent}.hd,.dims,.cursor{display:none}</style></noscript>
+<noscript><style>.sel{--k:1;outline-color:transparent}.hd,.dims,.cursor{display:none}.bio-ghost{visibility:visible}</style></noscript>
 <section class="hero" aria-labelledby="name">
   <div class="name-stage" data-name-stage>
     <h1 class="name" id="name">
@@ -20,6 +21,10 @@ const { settings: s } = Astro.props;
       <svg class="resize" viewBox="0 0 24 24"><path d="M5 5h7l-2.6 2.6 7 7L19 12v7h-7l2.6-2.6-7-7L5 12z" fill="#0C0C0C" stroke="#FFFFFF" stroke-width="1.4" stroke-linejoin="round" /></svg>
     </span>
   </div>
-  <p class="bio">{s.bio}</p>
+  <p class="bio" data-bio>
+    <span class="sr">{s.bio}</span>
+    <span class="bio-ghost" aria-hidden="true">{s.bio}</span>
+    <span class="bio-live" aria-hidden="true" data-bio-live></span>
+  </p>
   <p class="where"><span data-clock>Salt Lake City, Utah</span></p>
 </section>
