@@ -1,14 +1,57 @@
 ---
+// A testimonial as an iOS Messages thread: the person "texts" their quote (typing dots, then
+// bubbles) when the card scrolls into view. Tapping their photo opens a contact card with
+// where they work. src/scripts/messages.js runs the animation and the contact sheet.
 import { img } from "../data/projects";
 import { imageUrl, type Testimonial } from "../lib/content";
 interface Props { item: Testimonial }
 const { item: q } = Astro.props;
 const path = (f: string) => `/images/${img(f)}`;
 const logo = imageUrl(q.logo, q.logoFile, path, 400);
-const photo = imageUrl(q.photo, q.photoFile, path, 160);
+const photo = imageUrl(q.photo, q.photoFile, path, 200);
+// "Role, Company" → role and company
+const cut = q.role.lastIndexOf(",");
+const role = cut > 0 ? q.role.slice(0, cut).trim() : q.role;
+const company = cut > 0 ? q.role.slice(cut + 1).trim() : "";
+const first = q.name.split(" ")[0];
+// One bubble per sentence (short sentences are joined), at most three
+const sentences = q.quote.match(/[^.!?]+[.!?]+["”’]?|[^.!?]+$/g)?.map((s) => s.trim()).filter(Boolean) || [q.quote];
+const bubbles: string[] = [];
+for (const s of sentences) {
+  if (bubbles.length && (bubbles[bubbles.length - 1].length < 40 || bubbles.length >= 3)) bubbles[bubbles.length - 1] += " " + s;
+  else bubbles.push(s);
+}
+const id = `contact-${q.id}`;
 ---
-<figure class="obj quote" data-cat="widget">
-  {logo && <img class="q-logo" src={logo} alt="" loading="lazy" />}
-  <blockquote><p>“{q.quote}”</p></blockquote>
-  <figcaption>{photo && <img class="init" src={photo} alt="" loading="lazy" />}<span><b>{q.name}</b><span>{q.role}</span></span></figcaption>
+<figure class="obj quote imsg" data-cat="widget" data-imsg>
+  <div class="im-screen">
+    <div class="im-head">
+      <span class="im-back" aria-hidden="true"><svg viewBox="0 0 12 20"><path d="M10 2 2 10l8 8" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" /></svg></span>
+      <button class="im-who" type="button" aria-haspopup="dialog" aria-controls={id} aria-label={`${q.name}: view contact info`}>
+        {photo ? <img class="im-av" src={photo} alt="" loading="lazy" /> : <span class="im-av im-ini">{q.name.split(" ").map((p) => p[0]).join("")}</span>}
+        <span class="im-name">{first}<svg viewBox="0 0 8 12" aria-hidden="true"><path d="M2 1.5 6.5 6 2 10.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg></span>
+      </button>
+    </div>
+    <div class="im-thread">
+      <p class="im-time" aria-hidden="true">Today 9:41 AM</p>
+      <blockquote class="im-msgs">
+        {bubbles.map((b) => (
+          <p class="im-bubble"><span class="im-dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="im-text">{b}</span></p>
+        ))}
+      </blockquote>
+    </div>
+    <div class="im-input" aria-hidden="true"><span>iMessage</span></div>
+    <div class="im-card" id={id} role="dialog" aria-modal="false" aria-label={`Contact: ${q.name}`} hidden>
+      <div class="im-card-bar"><button class="im-done" type="button">Done</button></div>
+      {photo ? <img class="im-av big" src={photo} alt="" loading="lazy" /> : <span class="im-av im-ini big">{q.name.split(" ").map((p) => p[0]).join("")}</span>}
+      <p class="im-card-name">{q.name}</p>
+      <p class="im-card-role">{role}</p>
+      <dl class="im-rows">
+        {company && <div><dt>Company</dt><dd>{logo && <img class="im-logo" src={logo} alt="" loading="lazy" />}{company}</dd></div>}
+        <div><dt>Title</dt><dd>{role}</dd></div>
+        <div><dt>Worked with</dt><dd>Kaden Johnson</dd></div>
+      </dl>
+    </div>
+  </div>
+  <figcaption class="sr">{q.name}, {q.role}</figcaption>
 </figure>
