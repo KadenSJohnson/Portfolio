@@ -23,8 +23,8 @@ for (const s of sentences) {
 }
 const id = `contact-${q.id}`;
 // Kaden opens by asking for the testimonial and replies with thanks; both are typed on the keyboard
-const ask = `Hey ${first}, would you be up for writing a quick testimonial about working with me?`;
-const reply = `Thank you so much ${first}!`;
+const ask = "Hey, can you give me a quote I can use for a testimonial?";
+const reply = "Thank you!";
 const rows = ["qwertyuiop", "asdfghjkl", "zxcvbnm"];
 ---
 <figure class="obj quote imsg" data-cat="widget" data-imsg>
@@ -47,10 +47,10 @@ const rows = ["qwertyuiop", "asdfghjkl", "zxcvbnm"];
       <p class="im-bubble me reply" aria-hidden="true" data-type={reply}><span class="im-text">{reply}</span></p>
       <p class="im-status" aria-hidden="true">Delivered</p>
     </div>
-    <div class="im-input" aria-hidden="true">
+    <div class="im-input" aria-hidden="true"><div class="im-bar">
       <span class="im-field"><span class="im-typed"></span><span class="im-ph">iMessage</span></span>
       <span class="im-send"><svg viewBox="0 0 16 16"><path d="M8 13V3M3.5 7.5 8 3l4.5 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg></span>
-    </div>
+    </div></div>
     <div class="im-kb" aria-hidden="true">
       {rows.map((r, i) => (
         <div class={`im-row r${i}`}>
