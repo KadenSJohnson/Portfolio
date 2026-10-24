@@ -20,7 +20,7 @@
 *,*::before,*::after{box-sizing:border-box}
 [hidden]{display:none!important}
 html{-webkit-text-size-adjust:100%}
-body{color:var(--ink);font:400 16px/1.5 var(--display);-webkit-font-smoothing:antialiased;background:var(--bg)}
+body{margin:0;color:var(--ink);font:400 16px/1.5 var(--display);-webkit-font-smoothing:antialiased;background:var(--bg)}
 h1,h2,h3,p,figure,blockquote,dl,dd,ul{margin:0}
 ul{padding:0;list-style:none}
 a{color:inherit}
@@ -28,6 +28,11 @@ a{color:inherit}
 .sr{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 
 .page{position:relative;max-width:1200px;margin-inline:auto;padding-left:var(--gut);padding-right:var(--gut);padding-bottom:calc(var(--cell) * 2)}
+/* Once grid.js has measured: the content is exactly cols × cell wide, starting on a grid line */
+.gridded .page{width:var(--content);max-width:none;margin-left:var(--gx);margin-right:0;padding-left:0;padding-right:0}
+/* Cards on the grid: white, with their top and left edge drawn on the grid line they start on;
+   their right and bottom edges end exactly on the next grid lines, which then read as the border */
+.gcard,.obj{background:#FFFFFF;box-shadow:inset 1px 1px 0 var(--grid);padding-top:1px;padding-left:1px}
 /* The background grid, offset (--gx, set by grid.js) so a line runs along the content's left edge */
 .canvas{min-height:100vh;
   background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
@@ -35,7 +40,7 @@ a{color:inherit}
 @media (min-width:720px){:root{--cols:24;--F:calc(var(--cell) * 3);--lh:calc(var(--cell) / 2);--gut:max(40px,env(safe-area-inset-left,0px))}}
 
 /* ---------- Top bar ---------- */
-.top{display:flex;align-items:center;justify-content:space-between;gap:16px;height:calc(var(--cell) * 2)}
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;height:calc(var(--cell) * 2);padding-inline:calc(var(--cell) / 2)}
 @media (min-width:720px){.top{height:calc(var(--cell) * 2)}}
 .brand{display:flex;align-items:center;gap:10px;text-decoration:none;font:600 15px/1.2 var(--display);white-space:nowrap}
 .brand span{color:var(--mu);font-weight:500}
@@ -51,7 +56,7 @@ a{color:inherit}
 
 /* ---------- Hero: the name, selected like a text layer in Figma ---------- */
 .hero{padding-block:calc(var(--cell) * 2)}
-.hero-card{padding:var(--cell);border:1px solid var(--grid);background:#FFFFFF}
+.hero-card{padding:var(--cell)}
 .name-stage{position:relative;height:var(--F)}
 .name{font:700 var(--F)/1 var(--display);letter-spacing:-.04em;white-space:nowrap}
 .sel{--k:.3;position:relative;display:inline-block;font-size:calc(var(--k) * 1em);padding:0 .03em;outline:1.5px solid var(--sel)}
@@ -78,7 +83,7 @@ a{color:inherit}
 .where{margin-top:var(--lh);font:500 13px/var(--lh) var(--mono);color:var(--mu);font-variant-numeric:tabular-nums}
 
 /* ---------- Work ---------- */
-.work-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 20px;margin-bottom:var(--cell)}
+.work-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 20px;margin-bottom:var(--cell);padding:calc(var(--cell) / 2)}
 .label{font:500 13px/1 var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--mu)}
 .filters{display:flex;flex-wrap:wrap;gap:8px}
 .chip{display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:4px 14px 4px 6px;border:1px solid var(--line);border-radius:999px;cursor:pointer;
@@ -98,9 +103,9 @@ a{color:inherit}
 @media (min-width:720px){.gallery{gap:calc(var(--cell) * 2)}}
 @media (min-width:720px){.gallery{grid-template-columns:repeat(2,minmax(0,1fr))}.gallery .wide{grid-column:span 2}}
 
-.obj{position:relative;display:flex;flex-direction:column;border:1px solid var(--grid);background:#FFFFFF;transition:border-color .2s}
-.obj:has(.hit:hover){border-color:#D6D6D6}
-.obj-img{position:relative;overflow:hidden;background:var(--tile);isolation:isolate;border-bottom:1px solid var(--grid)}
+.obj{position:relative;display:flex;flex-direction:column}
+
+.obj-img{position:relative;overflow:hidden;background:var(--tile);isolation:isolate}
 .obj-img>*{height:100%}
 .obj-img .ph img,.obj-img .ba{transition:transform .5s cubic-bezier(.2,.8,.2,1)}
 .obj:has(.hit:hover) .obj-img .ph img{transform:scale(1.025)}
@@ -111,7 +116,7 @@ a{color:inherit}
 .ph-tag b{font:700 12px/1.2 var(--display)}
 .ph.is-real{padding:0;background:none}
 .ph img{display:block;width:100%;height:100%;object-fit:cover}
-.obj-cap{display:grid;align-content:start;gap:4px;padding:calc(var(--cell) / 2)}
+.obj-cap{display:grid;align-content:start;gap:4px;padding:calc(var(--cell) / 2);border-top:1px solid var(--grid)}
 .obj-title{font:600 clamp(18px,1.6vw,21px)/1.2 var(--display);letter-spacing:-.02em;text-wrap:balance}
 .obj-sub{font:400 15px/1.4 var(--display);color:var(--sub)}
 .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
@@ -161,7 +166,7 @@ a{color:inherit}
 .model-wrap:not(.ready) canvas{opacity:0}
 
 /* ---------- Contact + footer ---------- */
-.contact{display:grid;align-content:start;gap:16px;margin-top:calc(var(--cell) * 2);padding:var(--cell);border:1px solid var(--grid);background:#FFFFFF}
+.contact{display:grid;align-content:start;gap:16px;margin-top:calc(var(--cell) * 2);padding:var(--cell)}
 .contact h2{font:700 clamp(44px,7vw,88px)/.95 var(--display);letter-spacing:-.05em}
 .c-lede{font:400 clamp(18px,1.9vw,22px)/1.4 var(--display);color:var(--sub)}
 .c-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin-top:6px}
@@ -169,7 +174,7 @@ a{color:inherit}
 .c-links{display:flex;flex-wrap:wrap;gap:4px 22px;font:500 15px/1 var(--display)}
 .c-links a{display:inline-block;padding-block:12px;text-decoration:underline;text-underline-offset:4px;text-decoration-color:#C4C4C4}
 .c-links a:hover{text-decoration-color:var(--ink)}
-.foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin-top:calc(var(--cell) * 2);min-height:calc(var(--cell) * 2);border-top:1px solid var(--grid);font:500 12px/1.4 var(--mono);color:var(--mu)}
+.foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin-top:calc(var(--cell) * 2);min-height:calc(var(--cell) * 2);padding:0 calc(var(--cell) / 2);font:500 12px/1.4 var(--mono);color:var(--mu)}
 
 /* Before / after slider */
 .ba{position:relative;aspect-ratio:16/9;overflow:hidden;background:var(--tile);user-select:none}
