@@ -121,9 +121,20 @@ export const projects: Project[] = [
   { id: "wolf-article", order: 90, title: "[Project title]", subtitle: TBD, categories: ["uxui"], material: "paper", tilt: -0.7, imageFile: "Shots-create-mockups-12.png", imageLabel: "Wolf article on a phone", body: simple(TBD) },
   { id: "app-icon-slot", order: 110, title: "[Add App Icon work]", subtitle: TBD, categories: ["app"], material: "metal", tilt: -1.0, imageFile: null, imageLabel: "App icon", imageRatio: "1/1", body: simple(TBD) },
   { id: "surf-watch", order: 130, title: "[Project title]", subtitle: TBD, categories: ["uxui"], material: "paper", tilt: 1.2, imageFile: "Shots-create-mockups-11.png", imageLabel: "Surf report on a watch", body: simple(TBD) },
-  { id: "stone-materials", order: 145, title: "Stone Material Study", subtitle: TBD, categories: ["3d"], material: "paper", tilt: 0, imageFile: null, imageLabel: "Low poly stone turning through different materials", imageRatio: "1/1",
-    body: [lead(TBD), note("Add a short description: what you made it with, what you were exploring with the materials, and how long it took.")] },
-  { id: "low-poly-kiwi", order: 140, title: "Low Poly Kiwi", subtitle: TBD, categories: ["3d"], material: "acrylic", tilt: -0.6, imageFile: null, imageLabel: "Low poly kiwi", imageRatio: "1/1", body: model(TBD) },
+  { id: "knapper", order: 145, title: "Knapper", subtitle: "A personal tool for chipping low poly rocks and gems", categories: ["tools"], material: "paper", tilt: 0, imageFile: null, imageLabel: "A low poly stone made in Knapper", imageRatio: "1/1",
+    body: [
+      meta([["Role", "Designer and developer"], ["Type", "Personal tool"], ["Built with", "HTML, JavaScript, SVG"], ["Exports", "SVG, PNG, OBJ"]]),
+      lead("I kept needing low poly rocks for illustrations and 3D scenes, and modeling each one by hand was slow. So I built a small tool that lets me knap them the way you would a real stone."),
+      link("Open Knapper", "/tools/knapper/"),
+      h("How it works"),
+      p("Every rock starts as a block. A seed number cuts natural fractures into it, so the same seed always gives the same stone. Click an edge and a chip flies off; drag to turn the stone and work on another side."),
+      p("Sliders set the size, thickness, number of fractures and how big each hammer strike is. Undo takes back one chip at a time, and Shuffle shows six more stones with the same settings."),
+      h("Stone or gem"),
+      p("Stone mode gives flat, illustrated faces with an outline. Gem mode adds transparency, frost, shine and a little chromatic aberration on the bright edges, so the same shape can become a polished crystal."),
+      h("Made to fit my workflow"),
+      p("The tool is one HTML file with no libraries. Everything is drawn as SVG, so a stone can be copied straight into Figma, saved as an SVG or a 2048px PNG, or exported as an OBJ model for Blender."),
+      note("Draft text: edit it to tell the story in your own words."),
+    ] },
 ];
 
 export const testimonials: Testimonial[] = [

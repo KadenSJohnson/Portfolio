@@ -1,11 +1,11 @@
 // Portfolio content: categories, gallery items (work, quotes, contact) and image file names.
 
-export type CatKey = "uxui" | "icon" | "app" | "3d" | "other";
+export type CatKey = "uxui" | "icon" | "app" | "tools" | "other";
 export const CATS: Record<CatKey, { name: string; color: string; icon: string }> = {
   uxui: { name: "UX/UI Design", color: "yellow", icon: "i-uxui" },
   icon: { name: "Icon Design", color: "red", icon: "i-icon" },
   app: { name: "App Icon", color: "blue", icon: "i-app" },
-  "3d": { name: "3D Design", color: "green", icon: "i-3d" },
+  tools: { name: "Tools", color: "green", icon: "i-tools" },
   other: { name: "Other Design", color: "orange", icon: "i-other" },
 };
 
@@ -38,6 +38,5 @@ export const FEATURES: Record<string, { ba?: Compare; model?: ModelInfo; video?:
     // Full-length homepage screenshots (1440px wide) for the side-by-side compare in the lightbox
     full: { before: ["kpm-site-2024-10-full.webp", 1440, 6666], after: ["kpm-site-now-full.webp", 1440, 4332] },
     links: [["Visit the live site", "https://www.kpmanalytics.com/"], ["View the October 2024 archive", "https://web.archive.org/web/20241001071259/https://www.kpmanalytics.com/"]] } },
-  "low-poly-kiwi": { model: { key: "kiwi", what: "half a kiwi", yaw: -0.6, pitch: 0.72 } },
-  "stone-materials": { video: { src: "/video/stone-materials.mp4", poster: "stone-materials-poster.jpg", label: "A low poly stone turning as its material changes" } },
+  knapper: { video: { src: "/video/stone-materials.mp4", poster: "stone-materials-poster.jpg", label: "A stone made in Knapper turning as its material changes" } },
 };

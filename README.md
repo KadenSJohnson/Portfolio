@@ -25,7 +25,7 @@ Netlify rebuilds it: a Sanity webhook that calls a Netlify build hook does that 
   overwrites documents that already exist.
 
 The KPM before/after compare and the 3D models are built in code and attach to the projects with
-the slugs `kpm`, `low-poly-kiwi` and `knapped-rock`, so keep those slugs as they are.
+the slugs `kpm` and `knapper`, so keep those slugs as they are.
 
 ## Where things live
 
