@@ -148,6 +148,8 @@ import { Model3D } from "./model3d.js";
     subEl.textContent = tpl.dataset.sub;
     const card = document.querySelector('.obj[data-id="' + id + '"] .tags');
     tagsEl.innerHTML = card ? card.innerHTML : "";
+    const barTags = document.getElementById("lb-bar-tags");
+    if (barTags) barTags.innerHTML = tagsEl.innerHTML;
     lbDisposers.forEach((off) => off()); lbDisposers = [];
     content.replaceChildren(tpl.content.cloneNode(true));
     realize(content);
