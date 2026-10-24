@@ -19,6 +19,22 @@ import { Model3D } from "./model3d.js";
   };
   realize(document);
 
+  /* Loading placeholders: each image box shimmers until its image(s) arrive */
+  const skeleton = (root) => {
+    root.querySelectorAll(".ph.is-real, .ba, .ba-layer").forEach((box) => {
+      const imgs = Array.from(box.querySelectorAll(":scope > img, :scope > .ba-layer > img, :scope img")).filter((im) => box.classList.contains("ba") ? im.parentElement === box : true);
+      const pending = imgs.filter((im) => !(im.complete && im.naturalWidth));
+      if (!pending.length) { box.classList.add("loaded"); return; }
+      let left = pending.length;
+      pending.forEach((im) => {
+        const done = () => { if (--left <= 0) box.classList.add("loaded"); };
+        im.addEventListener("load", done, { once: true });
+        im.addEventListener("error", done, { once: true });
+      });
+    });
+  };
+  skeleton(document);
+
   /* Local time under the intro */
   const fmt = new Intl.DateTimeFormat("en-US", { hour: "numeric", minute: "2-digit", timeZone: "America/Denver" });
   const clocks = document.querySelectorAll("[data-clock]");
@@ -69,6 +85,7 @@ import { Model3D } from "./model3d.js";
       Model3D.load(key, src, color ? null : "/model-" + key + ".png", color).then(() => {
         const big = cv.hasAttribute("data-interactive");
         const off = Model3D.mount(cv, { key, interactive: big, yaw: Number(cv.dataset.yaw || -0.6), pitch: Number(cv.dataset.pitch || 0.3), dist: big ? 4.2 : 4.4 });
+        requestAnimationFrame(() => cv.closest("[data-model-wrap]")?.classList.add("ready"));
         if (list) list.push(off);
       });
     });
@@ -153,6 +170,7 @@ import { Model3D } from "./model3d.js";
     lbDisposers.forEach((off) => off()); lbDisposers = [];
     content.replaceChildren(tpl.content.cloneNode(true));
     realize(content);
+    skeleton(content);
     content.querySelectorAll(".ph.is-real img").forEach((im) => { im.tabIndex = 0; im.setAttribute("role", "button"); im.setAttribute("aria-label", "View larger: " + (im.alt || "image")); });
     mountModels(content, lbDisposers);
     setupBA(content, lbDisposers);

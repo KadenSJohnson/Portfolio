@@ -3,13 +3,22 @@
 import { img } from "../data/projects";
 import { imageUrl } from "../lib/content";
 import type { SanityImage } from "../data/local";
+import sizes from "../data/image-sizes.json";
+// ratio "natural" uses the image's own shape (known ahead of time) so its space is reserved before it loads
 interface Props { src?: string | null; image?: SanityImage; label: string; ratio?: string; alt?: string }
-const { src, image, label, ratio = "4/3", alt } = Astro.props;
+const { src, image, label, alt } = Astro.props;
 const url = imageUrl(image, src, (f) => `/images/${img(f)}`);
+const dims = (() => {
+  const m = image?.asset?._ref?.match(/-(\d+)x(\d+)-/);
+  if (m) return [Number(m[1]), Number(m[2])];
+  const f = img(src);
+  return f ? (sizes as Record<string, number[]>)[f] : undefined;
+})();
+const ratio = Astro.props.ratio === "natural" ? (dims ? `${dims[0]}/${dims[1]}` : "16/10") : Astro.props.ratio || "4/3";
 ---
 {url ? (
   <div class="ph is-real" style={`aspect-ratio:${ratio}`}>
-    <img src={url} alt={alt || label} loading="lazy" decoding="async" />
+    <img src={url} alt={alt || label} loading="lazy" decoding="async" width={dims?.[0]} height={dims?.[1]} />
   </div>
 ) : (
   <div class="ph empty" style={`aspect-ratio:${ratio}`}>

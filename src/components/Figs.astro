@@ -5,5 +5,5 @@ interface Props { items: { imageFile?: string; image?: SanityImage; label: strin
 const { items, cols = 2 } = Astro.props;
 ---
 <div class={`figs c${cols}`}>
-  {items.map((f) => <figure><Ph src={f.imageFile} image={f.image} label={f.label} ratio="16/10" /><figcaption>{f.label}</figcaption></figure>)}
+  {items.map((f) => <figure><Ph src={f.imageFile} image={f.image} label={f.label} ratio="natural" /><figcaption>{f.label}</figcaption></figure>)}
 </div>
