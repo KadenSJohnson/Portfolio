@@ -100,11 +100,27 @@
     raf = requestAnimationFrame(frame);
   };
 
-  addEventListener("resize", showDims);
+  // Optical alignment: shift the name so the K's stem lines up with the first letter of the bio
+  // (measures each letter's ink with canvas, since fonts leave a little space before a glyph)
+  const ctx = document.createElement("canvas").getContext("2d");
+  const inkLeft = (el, ch) => {
+    const cs = getComputedStyle(el);
+    ctx.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+    return -ctx.measureText(ch).actualBoundingBoxLeft;
+  };
+  const align = () => {
+    const nameEl = stage.querySelector(".name");
+    const F = parseFloat(getComputedStyle(nameEl).fontSize);
+    const k = inkLeft(nameEl, "K") + 0.03 * F;            // .sel padding + the K's side bearing, at full size
+    const b = bio ? inkLeft(bio, (full || "U").trim()[0]) : 0;
+    sel.style.setProperty("--kshift", k.toFixed(2) + "px");
+    sel.style.setProperty("--bshift", b.toFixed(2) + "px");
+  };
+  addEventListener("resize", () => { align(); showDims(); });
   sel.addEventListener("click", play);
   sel.style.cursor = "pointer";
   // Start once the web font is in, so the box measures the real text
-  const go = () => setTimeout(play, 250);
+  const go = () => { align(); setTimeout(play, 250); };
   if (document.fonts && document.fonts.ready) Promise.race([document.fonts.ready, new Promise((r) => setTimeout(r, 1500))]).then(go);
   else go();
   showDims();

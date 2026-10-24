@@ -60,7 +60,7 @@ a{color:inherit}
 .hero-card{padding:var(--cell)}
 .name-stage{position:relative;height:var(--F)}
 .name{font:700 var(--F)/1 var(--display);letter-spacing:-.04em;white-space:nowrap}
-.sel{--k:.3;position:relative;display:inline-block;font-size:calc(var(--k) * 1em);padding:0 .03em;outline:1.5px solid var(--sel)}
+.sel{--k:.3;position:relative;display:inline-block;font-size:calc(var(--k) * 1em);padding:0 .03em;margin-left:calc(var(--bshift,0px) - var(--k) * var(--kshift,0px));outline:1.5px solid var(--sel)}
 .hd{position:absolute;width:9px;height:9px;background:#FFFFFF;border:1.5px solid var(--sel);}
 .sel.done{outline-color:transparent}.sel.done .hd,.sel.done .dims{opacity:0}
 .hd.tl{top:-5px;left:-5px}.hd.tr{top:-5px;right:-5px}.hd.bl{bottom:-5px;left:-5px}.hd.br{bottom:-5px;right:-5px}
