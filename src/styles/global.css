@@ -81,7 +81,7 @@ a{color:inherit}
 .filter-pick svg{position:absolute;right:18px;top:50%;width:16px;height:16px;margin-top:-8px;pointer-events:none;color:var(--ink)}
 @media (max-width:639px){.filters{width:100%}.filters .chip{display:none}.filter-pick{display:block;width:100%}}
 
-.gallery{display:grid;gap:clamp(36px,4vw,56px) var(--gap);grid-template-columns:minmax(0,1fr);align-items:start;grid-auto-flow:row dense}
+.gallery{display:grid;gap:clamp(56px,7vw,104px) clamp(24px,3.6vw,52px);grid-template-columns:minmax(0,1fr);align-items:start;grid-auto-flow:row dense}
 @media (min-width:720px){.gallery{grid-template-columns:repeat(2,minmax(0,1fr))}.gallery .wide{grid-column:span 2}}
 
 .obj{position:relative}
