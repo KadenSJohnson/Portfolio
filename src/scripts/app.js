@@ -169,6 +169,13 @@ import { Model3D } from "./model3d.js";
     if (barTags) barTags.innerHTML = tagsEl.innerHTML;
     lbDisposers.forEach((off) => off()); lbDisposers = [];
     content.replaceChildren(tpl.content.cloneNode(true));
+    // Copies from a <template> don't start on their own (Safari especially), so start each clip here
+    content.querySelectorAll("video").forEach((v) => {
+      v.muted = true; v.defaultMuted = true; v.playsInline = true; v.loop = true;
+      const go = () => { const p = v.play(); if (p && p.catch) p.catch(() => {}); };
+      go();
+      if (v.readyState < 2) v.addEventListener("canplay", go, { once: true });
+    });
     realize(content);
     skeleton(content);
     content.querySelectorAll(".ph.is-real img").forEach((im) => { im.tabIndex = 0; im.setAttribute("role", "button"); im.setAttribute("aria-label", "View larger: " + (im.alt || "image")); });
