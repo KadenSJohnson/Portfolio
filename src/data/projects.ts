@@ -32,11 +32,11 @@ export interface Compare {
   full?: { before: [string, number, number]; after: [string, number, number] }; links?: [string, string][];
 }
 export interface ModelInfo { key: string; what: string; yaw: number; pitch: number; color?: string }
-export interface VideoInfo { src: string; poster: string; label: string }
+export interface VideoInfo { src: string; poster: string; label: string; fit?: "contain" }
 export const FEATURES: Record<string, { ba?: Compare; model?: ModelInfo; video?: VideoInfo }> = {
   kpm: { ba: { before: "kpm-site-2024-10.webp", after: "kpm-site-now.webp", beforeLabel: "October 2024", afterLabel: "Now",
     // Full-length homepage screenshots (1440px wide) for the side-by-side compare in the lightbox
     full: { before: ["kpm-site-2024-10-full.webp", 1440, 6666], after: ["kpm-site-now-full.webp", 1440, 4332] },
     links: [["Visit the live site", "https://www.kpmanalytics.com/"], ["View the October 2024 archive", "https://web.archive.org/web/20241001071259/https://www.kpmanalytics.com/"]] } },
-  flint: { video: { src: "/video/flint.mp4", poster: "flint-poster.jpg", label: "A stone made in Flint turning as its material changes" } },
+  flint: { video: { src: "/video/flint-ui.mp4", poster: "flint-ui-poster.jpg", label: "Using Flint on a phone: chipping a stone, switching to gem and shuffling", fit: "contain" } },
 };

@@ -221,6 +221,9 @@ a{color:inherit}
 .vid-wrap{position:relative;aspect-ratio:1/1;background:#FFFFFF}
 .vid-wrap video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 .lb-hero .vid-wrap video{object-fit:contain}
+.vid-wrap.contain{background:var(--tile)}
+.vid-wrap.contain video{object-fit:contain;inset:auto;top:var(--cell);left:var(--cell);width:calc(100% - var(--cell) * 2);height:calc(100% - var(--cell) * 2)}
+.figs .vid-wrap{max-height:78vh}
 
 /* ---------- 3D model ---------- */
 .model-wrap{position:relative;aspect-ratio:1/1;background:radial-gradient(50% 12% at 50% 86%,rgba(0,0,0,.14),transparent 70%),var(--tile)}

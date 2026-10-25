@@ -4,6 +4,6 @@ import type { VideoInfo } from "../data/projects";
 interface Props { video: VideoInfo }
 const { video } = Astro.props;
 ---
-<div class="vid-wrap">
+<div class={`vid-wrap${video.fit === "contain" ? " contain" : ""}`}>
   <video src={video.src} poster={`/images/${video.poster}`} autoplay muted loop playsinline preload="metadata" aria-label={video.label}></video>
 </div>

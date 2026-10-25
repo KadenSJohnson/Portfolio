@@ -131,6 +131,7 @@ export const projects: Project[] = [
       p("Sliders set the size, thickness, number of fractures and how big each hammer strike is. Undo takes back one chip at a time, and Shuffle shows six more stones with the same settings."),
       h("Stone or gem"),
       p("Stone mode gives flat, illustrated faces with an outline. Gem mode adds transparency, frost, shine and a little chromatic aberration on the bright edges, so the same shape can become a polished crystal."),
+      figs([["flint.mp4", "Stones made in Flint, turning as the material changes"]], 1),
       h("Made to fit my workflow"),
       p("The tool is one HTML file with no libraries. Everything is drawn as SVG, so a stone can be copied straight into Figma, saved as an SVG or a 2048px PNG, or exported as an OBJ model for Blender."),
       note("Draft text: edit it to tell the story in your own words."),
