@@ -33,7 +33,8 @@ if (gallery && !reduce && "IntersectionObserver" in window && Element.prototype.
       entries.filter((e) => e.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top || a.boundingClientRect.left - b.boundingClientRect.left)
         .forEach((e) => { io.unobserve(e.target); drop(e.target, i++ * 90); });
     }, { rootMargin: "0px 0px -6% 0px", threshold: 0.12 });
-    gallery.querySelectorAll(":scope > .obj").forEach((c) => io.observe(c));
+    // The first card is already in place; the rest drop in
+    gallery.querySelectorAll(":scope > .obj").forEach((c, i) => (i ? io.observe(c) : c.classList.add("shown")));
   });
 } else {
   root.classList.remove("anim");
