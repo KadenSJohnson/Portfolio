@@ -36,7 +36,7 @@ a{color:inherit}
    their right and bottom edges end exactly on the next grid lines, which then read as the border */
 .gcard,.obj{background:#FFFFFF;box-shadow:inset 1px 1px 0 var(--grid);padding-top:1px;padding-left:1px}
 /* The background grid, offset (--gx, set by grid.js) so a line runs along the content's left edge */
-.canvas{min-height:100vh;
+.canvas{min-height:100vh;overflow-x:hidden;overflow-x:clip;
   background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
   background-size:var(--cell) var(--cell);background-position:var(--gx,var(--gut)) 0}
 @media (min-width:720px){:root{--cols:24;--F:calc(var(--cell) * 3);--lh:calc(var(--cell) / 2);--gut:max(40px,env(safe-area-inset-left,0px))}}
@@ -85,7 +85,7 @@ a{color:inherit}
 .bio b{color:var(--ink);font-weight:600}
 .where{position:relative;width:max-content;max-width:100%;opacity:0;outline:1.5px solid transparent;outline-offset:2px;margin-top:calc(var(--cell) / 4);font:500 13px/var(--lh) var(--mono);color:var(--mu);font-variant-numeric:tabular-nums}
 /* The location is dragged in from off screen by a second, "multiplayer" Figma cursor */
-body{overflow-x:clip}
+
 .where.moving{outline-color:#9747FF}
 .mp{position:absolute;left:62%;top:30%;display:none;pointer-events:none;transition:transform .45s cubic-bezier(.2,.8,.2,1),opacity .3s .1s}
 .mp svg{display:block;width:20px;height:20px}
