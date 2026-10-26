@@ -83,7 +83,7 @@ a{color:inherit}
 .editing .caret{display:inline-block}
 @keyframes caret{50%{opacity:0}}
 .bio b{color:var(--ink);font-weight:600}
-.where{position:relative;width:max-content;max-width:100%;opacity:0;outline:1.5px solid transparent;outline-offset:2px;margin-top:calc(var(--cell) / 4);font:500 13px/var(--lh) var(--mono);color:var(--mu);font-variant-numeric:tabular-nums}
+.where{position:relative;width:max-content;max-width:100%;white-space:nowrap;opacity:0;outline:1.5px solid transparent;outline-offset:2px;margin-top:calc(var(--cell) / 4);font:500 13px/var(--lh) var(--mono);color:var(--mu);font-variant-numeric:tabular-nums}
 /* The location is dragged in from off screen by a second, "multiplayer" Figma cursor */
 
 .where.moving{outline-color:#9747FF}
