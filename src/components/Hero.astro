@@ -6,7 +6,7 @@ import type { Settings } from "../lib/content";
 interface Props { settings: Settings }
 const { settings: s } = Astro.props;
 ---
-<noscript><style>.sel{--k:1;outline-color:transparent}.hd,.dims,.cursor{display:none}.bio-ghost{visibility:visible}</style></noscript>
+<noscript><style>.sel{--k:1;outline-color:transparent}.hd,.dims,.cursor{display:none}.bio-ghost{visibility:visible}.where>.bio-live{display:none}</style></noscript>
 <section class="hero" aria-labelledby="name">
   <div class="hero-card gcard" data-snap>
   <div class="name-stage" data-name-stage>
@@ -27,6 +27,10 @@ const { settings: s } = Astro.props;
     <span class="bio-ghost" aria-hidden="true">{s.bio}</span>
     <span class="bio-live" aria-hidden="true" data-bio-live></span>
   </p>
-  <p class="where"><span data-clock>Salt Lake City, Utah</span></p>
+  <p class="where" data-where>
+    <span class="sr" data-clock>Salt Lake City, Utah</span>
+    <span class="bio-ghost" aria-hidden="true" data-clock>Salt Lake City, Utah</span>
+    <span class="bio-live" aria-hidden="true" data-bio-live></span>
+  </p>
   </div>
 </section>

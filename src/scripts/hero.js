@@ -8,9 +8,6 @@
   const dims = stage.querySelector("[data-dims]");
   const cur = stage.querySelector("[data-cursor]");
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const bio = document.querySelector("[data-bio]");
-  const live = bio && bio.querySelector("[data-bio-live]");
-  const full = bio ? bio.querySelector(".bio-ghost").textContent.trim() : "";
   const START = 0.3;
 
   const setK = (k) => sel.style.setProperty("--k", k.toFixed(4));
@@ -30,32 +27,42 @@
   const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
   const clamp = (t) => Math.max(0, Math.min(1, t));
 
-  // Bio: a new Figma text layer that says "Text", gets selected, deleted, then typed out
-  let timers = [];
-  const later = (fn, ms) => timers.push(setTimeout(fn, ms));
-  const render = (text, marked) => {
-    live.textContent = "";
-    if (marked) { const m = document.createElement("mark"); m.textContent = text; live.append(m); }
-    else live.append(document.createTextNode(text));
-    const c = document.createElement("span"); c.className = "caret"; live.append(c);
-  };
-  const typeBio = () => {
-    if (!live) return;
-    timers.forEach(clearTimeout); timers = [];
-    if (reduce) { live.textContent = full; return; }
-    bio.classList.add("editing");
-    render("Text", false);
-    later(() => render("Text", true), 320);
-    later(() => render("", false), 620);
-    let t = 700;
-    for (let i = 1; i <= full.length; i++) {
-      const ch = full[i - 1];
-      t += ch === " " ? 18 : /[.,]/.test(ch) ? 70 : 8 + Math.random() * 12;
-      later(() => render(full.slice(0, i), false), t);
-    }
-    later(() => { bio.classList.remove("editing"); live.textContent = full; }, t + 350);
-  };
-  const resetBio = () => { timers.forEach(clearTimeout); timers = []; if (live) { live.textContent = ""; bio.classList.remove("editing"); } };
+  // Bio and location: each is a new Figma text layer that says "Text", gets selected,
+  // deleted, then typed out. Both run at the same time.
+  const boxes = ["[data-bio]", "[data-where]"].map((q) => document.querySelector(q)).filter(Boolean).map((el) => {
+    let timers = [];
+    const live = el.querySelector("[data-bio-live]");
+    const ghost = el.querySelector(".bio-ghost");
+    const later = (fn, ms) => timers.push(setTimeout(fn, ms));
+    const render = (text, marked) => {
+      live.textContent = "";
+      if (marked) { const m = document.createElement("mark"); m.textContent = text; live.append(m); }
+      else live.append(document.createTextNode(text));
+      const c = document.createElement("span"); c.className = "caret"; live.append(c);
+    };
+    const reset = () => { timers.forEach(clearTimeout); timers = []; live.textContent = ""; el.classList.remove("editing", "typed"); };
+    const type = () => {
+      reset();
+      // Once typed, the real text shows (so the clock can keep updating)
+      const done = () => { live.textContent = ""; el.classList.remove("editing"); el.classList.add("typed"); };
+      if (reduce) { done(); return; }
+      const full = ghost.textContent.trim();
+      el.classList.add("editing");
+      render("Text", false);
+      later(() => render("Text", true), 320);
+      later(() => render("", false), 620);
+      let t = 700;
+      for (let i = 1; i <= full.length; i++) {
+        const ch = full[i - 1];
+        t += ch === " " ? 18 : /[.,·]/.test(ch) ? 70 : 8 + Math.random() * 12;
+        later(() => render(full.slice(0, i), false), t);
+      }
+      later(done, t + 350);
+    };
+    return { type, reset };
+  });
+  const typeBio = () => boxes.forEach((b) => b.type());
+  const resetBio = () => boxes.forEach((b) => b.reset());
 
   let raf = 0;
   const play = () => {
@@ -71,8 +78,8 @@
     let bioStarted = false;
     const frame = (now) => {
       const t = now - t0;
-      // The bio starts while the name is still growing, so the two overlap
-      if (!bioStarted && t >= 1350) { bioStarted = true; typeBio(); }
+      // The bio and location start as the cursor grabs the handle, so they overlap the drag
+      if (!bioStarted && t >= 650) { bioStarted = true; typeBio(); }
       if (t >= 1900) sel.classList.add("done");        // name becomes plain text
       if (t < 250) {                                   // cursor appears
         place(from.x, from.y, 5, 3, clamp(t / 200));
