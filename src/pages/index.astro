@@ -41,6 +41,7 @@ const objs: Record<string, string> = {};
   <Lightbox />
   {Object.entries(objs).map(([k, src]) => <script type="text/plain" id={`obj-${k}`} is:inline set:html={src}></script>)}
   <script>
+    import "../scripts/reveal.js";
     import "../scripts/app.js";
     import "../scripts/hero.js";
     import "../scripts/grid.js";

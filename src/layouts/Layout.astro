@@ -14,6 +14,15 @@ const { title, description } = Astro.props;
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <link rel="preload" href="/fonts/TimelessSansVF.woff" as="font" type="font/woff" crossorigin />
+    <script is:inline>
+      (function () {
+        var r = document.documentElement;
+        r.classList.add("js");
+        if (!matchMedia("(prefers-reduced-motion: reduce)").matches) r.classList.add("anim");
+        // Never leave the cover up if the page script fails
+        setTimeout(function () { r.classList.add("ready"); }, 3000);
+      })();
+    </script>
     <style is:global>
       :root { color-scheme: light; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
       body { margin: 0; font: 14px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
@@ -22,6 +31,7 @@ const { title, description } = Astro.props;
     </style>
   </head>
   <body>
+    <div class="cover" aria-hidden="true"></div>
     <Sprite />
     <slot />
   </body>
