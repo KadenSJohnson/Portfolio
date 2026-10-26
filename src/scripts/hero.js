@@ -27,9 +27,8 @@
   const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
   const clamp = (t) => Math.max(0, Math.min(1, t));
 
-  // Bio and location: each is a new Figma text layer that says "Text", gets selected,
-  // deleted, then typed out. Both run at the same time.
-  const boxes = ["[data-bio]", "[data-where]"].map((q) => document.querySelector(q)).filter(Boolean).map((el) => {
+  // Bio: a new Figma text layer that says "Text", gets selected, deleted, then typed out
+  const boxes = ["[data-bio]"].map((q) => document.querySelector(q)).filter(Boolean).map((el) => {
     let timers = [];
     const live = el.querySelector("[data-bio-live]");
     const ghost = el.querySelector(".bio-ghost");
@@ -64,11 +63,41 @@
   const typeBio = () => boxes.forEach((b) => b.type());
   const resetBio = () => boxes.forEach((b) => b.reset());
 
+  // Location: a second ("multiplayer") cursor drags the finished text layer in from off screen
+  const where = document.querySelector("[data-where]");
+  let whereAnim = null, whereT = 0;
+  const dragWhere = () => {
+    if (!where) return;
+    if (whereAnim) whereAnim.cancel();
+    clearTimeout(whereT);
+    where.classList.remove("leaving");
+    where.style.opacity = "1";
+    if (reduce || !where.animate) { where.classList.remove("moving"); return; }
+    where.classList.add("moving");
+    const r = where.getBoundingClientRect();
+    const dx = innerWidth - r.left + 40;
+    whereAnim = where.animate(
+      [{ transform: `translate(${dx}px, 18px)` }, { transform: "translate(0, 0)" }],
+      { duration: 1250, easing: "cubic-bezier(.25,.75,.25,1)", fill: "backwards" }
+    );
+    whereAnim.onfinish = () => {
+      // let go: the selection clears and the cursor drifts away
+      whereT = setTimeout(() => { where.classList.remove("moving"); where.classList.add("leaving"); }, 120);
+    };
+  };
+  // Park it off screen until its turn
+  const parkWhere = () => {
+    if (!where || reduce || !where.animate) { if (where) where.style.opacity = "1"; return; }
+    if (whereAnim) whereAnim.cancel();
+    where.classList.remove("moving", "leaving");
+    where.style.opacity = "0";
+  };
+
   let raf = 0;
   const play = () => {
     cancelAnimationFrame(raf);
-    if (reduce) { setK(1); showDims(); sel.classList.add("done"); typeBio(); return; }
-    resetBio();
+    if (reduce) { setK(1); showDims(); sel.classList.add("done"); typeBio(); dragWhere(); return; }
+    resetBio(); parkWhere();
     sel.classList.remove("done");
     setK(START); showDims();
     cur.classList.remove("dragging");
@@ -78,8 +107,8 @@
     let bioStarted = false;
     const frame = (now) => {
       const t = now - t0;
-      // The bio and location start as the cursor grabs the handle, so they overlap the drag
-      if (!bioStarted && t >= 650) { bioStarted = true; typeBio(); }
+      // The bio and location start as the cursor grabs the name's handle, so they overlap the drag
+      if (!bioStarted && t >= 650) { bioStarted = true; typeBio(); dragWhere(); }
       if (t >= 1900) sel.classList.add("done");        // name becomes plain text
       if (t < 250) {                                   // cursor appears
         place(from.x, from.y, 5, 3, clamp(t / 200));

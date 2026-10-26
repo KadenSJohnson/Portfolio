@@ -74,16 +74,24 @@ a{color:inherit}
 @media (prefers-reduced-motion:reduce){.sel{--k:1;outline-color:transparent}.sel .hd,.sel .dims{opacity:0}}
 .bio{position:relative;display:grid;outline:1.5px solid transparent;outline-offset:3px;max-width:44ch;margin-top:calc(var(--cell) / 2);font:400 var(--bio-fs)/var(--lh) var(--display);color:var(--sub);text-wrap:pretty}
 /* The bio is "typed" into a Figma text box: placeholder "Text", select it, delete, type */
-.bio>span,.where>span{grid-area:1/1}
+.bio>span{grid-area:1/1}
 .bio-ghost{visibility:hidden}
 .typed>.bio-ghost{visibility:visible}
-.bio.editing,.where.editing{outline-color:var(--sel)}
+.bio.editing{outline-color:var(--sel)}
 .bio-live mark{background:rgba(13,153,255,.28);color:inherit}
 .caret{display:none;width:1.5px;height:1.1em;margin-left:1px;background:var(--ink);vertical-align:-.18em;animation:caret 1s steps(1) infinite}
 .editing .caret{display:inline-block}
 @keyframes caret{50%{opacity:0}}
 .bio b{color:var(--ink);font-weight:600}
-.where{position:relative;display:grid;width:max-content;max-width:100%;outline:1.5px solid transparent;outline-offset:2px;margin-top:calc(var(--cell) / 4);font:500 13px/var(--lh) var(--mono);color:var(--mu);font-variant-numeric:tabular-nums}
+.where{position:relative;width:max-content;max-width:100%;opacity:0;outline:1.5px solid transparent;outline-offset:2px;margin-top:calc(var(--cell) / 4);font:500 13px/var(--lh) var(--mono);color:var(--mu);font-variant-numeric:tabular-nums}
+/* The location is dragged in from off screen by a second, "multiplayer" Figma cursor */
+body{overflow-x:clip}
+.where.moving{outline-color:#9747FF}
+.mp{position:absolute;left:62%;top:30%;display:none;pointer-events:none;transition:transform .45s cubic-bezier(.2,.8,.2,1),opacity .3s .1s}
+.mp svg{display:block;width:20px;height:20px}
+.mp b{position:absolute;left:14px;top:17px;padding:2px 6px;border-radius:4px;background:#9747FF;color:#FFFFFF;font:600 11px/1.3 var(--display);white-space:nowrap}
+.where.moving .mp,.where.leaving .mp{display:block}
+.where.leaving .mp{transform:translate(36px,22px);opacity:0}
 
 /* ---------- Work ---------- */
 .work-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 20px;margin-bottom:var(--cell);padding:calc(var(--cell) / 2)}
