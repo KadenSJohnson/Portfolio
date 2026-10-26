@@ -22,10 +22,10 @@ if (gallery && !reduce && "IntersectionObserver" in window && Element.prototype.
     slot.animate([{ opacity: 0 }, { opacity: 1, offset: 0.12 }, { opacity: 1, offset: 0.82 }, { opacity: 0 }],
       { duration: DUR + 600, delay, fill: "both" }).onfinish = () => slot.remove();
     card.animate([
-      { opacity: 0, transform: "translate(0, -18px)", boxShadow: "inset 1px 1px 0 #ECECEC, 0 16px 30px -12px rgba(0,0,0,.24)" },
-      { opacity: 1, offset: 0.3 },
+      { opacity: 0, transform: "translate(0, 18px)", boxShadow: "inset 1px 1px 0 #ECECEC, 0 16px 30px -12px rgba(0,0,0,.24)" },
+      { opacity: 1, offset: 0.55 },
       { opacity: 1, transform: "translate(0, 0)", boxShadow: "inset 1px 1px 0 #ECECEC, 0 0 0 0 rgba(0,0,0,0)" },
-    ], { duration: DUR, delay: delay + 60, easing: "cubic-bezier(.2,.75,.25,1)", fill: "backwards" });
+    ], { duration: DUR, delay: delay + 60, easing: "cubic-bezier(.45,0,.2,1)", fill: "backwards" });
   };
   window.siteReady.then(() => {
     const io = new IntersectionObserver((entries) => {
