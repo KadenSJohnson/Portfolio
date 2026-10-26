@@ -12,15 +12,15 @@ window.siteReady = Promise.race([Promise.all([loaded, fonts]), new Promise((r) =
 
 const gallery = document.querySelector(".gallery");
 if (gallery && !reduce && "IntersectionObserver" in window && Element.prototype.animate) {
-  const DUR = 560;
+  const DUR = 680;
   const drop = (card, delay) => {
     card.classList.add("shown");
     const slot = document.createElement("div");
     slot.className = "slot";
     slot.style.cssText = `top:${card.offsetTop}px;left:${card.offsetLeft}px;width:${card.offsetWidth}px;height:${card.offsetHeight}px`;
     gallery.append(slot);
-    slot.animate([{ opacity: 0 }, { opacity: 1, offset: 0.12 }, { opacity: 1, offset: 0.72 }, { opacity: 0 }],
-      { duration: DUR + 220, delay, fill: "both" }).onfinish = () => slot.remove();
+    slot.animate([{ opacity: 0 }, { opacity: 1, offset: 0.12 }, { opacity: 1, offset: 0.82 }, { opacity: 0 }],
+      { duration: DUR + 600, delay, fill: "both" }).onfinish = () => slot.remove();
     card.animate([
       { opacity: 0, transform: "translate(0, -18px)", boxShadow: "inset 1px 1px 0 #ECECEC, 0 16px 30px -12px rgba(0,0,0,.24)" },
       { opacity: 1, offset: 0.3 },
