@@ -22,7 +22,7 @@ if (gallery && !reduce && "IntersectionObserver" in window && Element.prototype.
     slot.animate([{ opacity: 0 }, { opacity: 1, offset: 0.12 }, { opacity: 1, offset: 0.72 }, { opacity: 0 }],
       { duration: DUR + 160, delay, fill: "both" }).onfinish = () => slot.remove();
     card.animate([
-      { opacity: 0, transform: "translate(14px, -16px) scale(1.02)", boxShadow: "inset 1px 1px 0 #ECECEC, 0 16px 30px -12px rgba(0,0,0,.24)" },
+      { opacity: 0, transform: "translate(-14px, -16px) scale(1.02)", boxShadow: "inset 1px 1px 0 #ECECEC, 0 16px 30px -12px rgba(0,0,0,.24)" },
       { opacity: 1, offset: 0.3 },
       { opacity: 1, transform: "translate(0, 0) scale(1)", boxShadow: "inset 1px 1px 0 #ECECEC, 0 0 0 0 rgba(0,0,0,0)" },
     ], { duration: DUR, delay: delay + 60, easing: "cubic-bezier(.2,.75,.25,1)", fill: "backwards" });
