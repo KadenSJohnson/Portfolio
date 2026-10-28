@@ -5,7 +5,7 @@
 @font-face{font-family:"Timeless Sans";src:url("/fonts/TimelessSansVF.woff") format("woff");font-weight:300 800;font-style:normal;font-display:swap}
 :root{
   --bg:#FFFFFF; --ink:#0C0C0C; --sub:#5C5C5C; --mu:#8A8A8A; --line:#E8E8E8; --tile:#F3F3F3;
-  --grid:#ECECEC;
+  --grid:#EAE4DE; --dot:#D9CFC5;
   --sel:#0D99FF; /* Figma's selection blue: only the selection box, handles and size label */
   --display:"Timeless Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
   --mono:"Timeless Sans","Helvetica Neue",Helvetica,Arial,sans-serif; /* small labels use the same Grotesk */
@@ -34,10 +34,10 @@ a{color:inherit}
 .gridded .page{width:var(--content);max-width:none;margin-left:var(--gx);margin-right:0;padding-left:0;padding-right:0}
 /* Cards on the grid: white, with their top and left edge drawn on the grid line they start on;
    their right and bottom edges end exactly on the next grid lines, which then read as the border */
-.gcard,.obj{background:#FFFFFF;box-shadow:inset 1px 1px 0 var(--grid);padding-top:1px;padding-left:1px}
+.gcard,.obj{background:#FFFFFF;box-shadow:inset 1px 1px 0 var(--grid),1px 1px 0 var(--grid);padding-top:1px;padding-left:1px}
 /* The background grid, offset (--gx, set by grid.js) so a line runs along the content's left edge */
 .canvas{min-height:100vh;overflow-x:hidden;overflow-x:clip;
-  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-image:var(--grid-img,linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px));
   background-size:var(--cell) var(--cell);background-position:var(--gx,var(--gut)) 0}
 @media (min-width:720px){:root{--cols:24;--F:calc(var(--cell) * 3);--lh:calc(var(--cell) / 2);--gut:max(40px,env(safe-area-inset-left,0px))}}
 

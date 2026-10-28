@@ -7,6 +7,20 @@
   if (!page) return;
   const root = document.documentElement;
   let raf = 0;
+  // Dotted grid: one cell drawn as an SVG tile with 1px dots along its top and left edges.
+  // The dot spacing is picked to divide the cell evenly, so the dots line up across tiles.
+  let lastCell = 0;
+  const dots = (cell) => {
+    if (cell === lastCell) return;
+    lastCell = cell;
+    const color = (getComputedStyle(root).getPropertyValue("--dot") || "#D6CCC1").trim();
+    let step = 3;
+    for (const s of [3, 4, 5, 2]) if (cell % s === 0) { step = s; break; }
+    let r = "";
+    for (let p = 0; p < cell; p += step) r += `<rect x="${p}" y="0" width="1" height="1"/>` + (p ? `<rect x="0" y="${p}" width="1" height="1"/>` : "");
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${cell}" height="${cell}" shape-rendering="crispEdges" fill="${color}">${r}</svg>`;
+    root.style.setProperty("--grid-img", `url("data:image/svg+xml,${encodeURIComponent(svg)}")`);
+  };
 
   const snap = () => {
     raf = 0;
@@ -18,6 +32,7 @@
     const cell = Math.max(8, Math.floor((Math.min(1200, vw) - 2 * gut) / cols));
     const content = cell * cols;
     root.style.setProperty("--cell", cell + "px");
+    dots(cell);
     root.style.setProperty("--content", content + "px");
     root.style.setProperty("--gx", Math.floor((vw - content) / 2) + "px");
     root.classList.add("gridded");
