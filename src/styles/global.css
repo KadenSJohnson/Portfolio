@@ -39,7 +39,7 @@ a{color:inherit}
    right and bottom redraws the grid line that forms the card's edge under the glow. */
 .gcard{position:relative;z-index:0}
 .gcard::before,.obj::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
-  box-shadow:1px 1px 0 var(--grid),0 0 calc(var(--cell) * .6) calc(var(--cell) * .7) #FFFFFF}
+  box-shadow:1px 1px 0 var(--grid),0 0 calc(var(--cell) * .8) calc(var(--cell) * .15) #FFFFFF,0 0 calc(var(--cell) * 2) 0 rgba(255,255,255,.85)}
 /* The background grid, offset (--gx, set by grid.js) so a line runs along the content's left edge */
 .canvas{min-height:100vh;overflow-x:hidden;overflow-x:clip;
   background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
