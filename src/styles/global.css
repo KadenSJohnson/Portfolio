@@ -35,6 +35,11 @@ a{color:inherit}
 /* Cards on the grid: white, with their top and left edge drawn on the grid line they start on;
    their right and bottom edges end exactly on the next grid lines, which then read as the border */
 .gcard,.obj{background:#FFFFFF;box-shadow:inset 1px 1px 0 var(--grid);padding-top:1px;padding-left:1px}
+/* A soft white glow behind each card fades the grid out around it. The 1px line at the
+   right and bottom redraws the grid line that forms the card's edge under the glow. */
+.gcard{position:relative;z-index:0}
+.gcard::before,.obj::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  box-shadow:1px 1px 0 var(--grid),0 0 calc(var(--cell) * 1.25) calc(var(--cell) * .25) #FFFFFF}
 /* The background grid, offset (--gx, set by grid.js) so a line runs along the content's left edge */
 .canvas{min-height:100vh;overflow-x:hidden;overflow-x:clip;
   background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
