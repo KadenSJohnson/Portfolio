@@ -1,6 +1,5 @@
-// One-time copy of src/data/local.ts into Sanity. Runs at the start of the build only when
-// SANITY_WRITE_TOKEN is set (add it in Netlify, build once, then delete it). It only creates
-// documents that don't exist yet, so it never overwrites anything edited in the Studio.
+// Content maintenance for Sanity. Runs at the start of the build only when SANITY_WRITE_TOKEN is set.
+// The first copy of src/data/local.ts into Sanity is done; this no longer creates documents.
 import { createClient } from "@sanity/client";
 import { SANITY } from "../sanity.project.mjs";
 
@@ -18,8 +17,7 @@ const drop = (o) => Object.fromEntries(Object.entries(o).filter(([k]) => !OLD.in
 
 const tx = client.transaction();
 // The first copy into Sanity is done. Documents are no longer created here, so anything deleted in
-// the Studio stays deleted. One-time cleanup: the three projects Kaden deleted that a build re-created.
-for (const id of ["project-surf-watch", "project-vela", "project-wolf-article"]) tx.delete(id);
+// the Studio stays deleted.
 // Clear the old layout fields from documents that already have them (shows as "Unknown fields" in the Studio)
 const stale = await client.fetch(`*[_type in ["project", "testimonial"] && (defined(material) || defined(tilt) || defined(wide))]._id`);
 for (const id of stale) tx.patch(id, (p) => p.unset(OLD));
