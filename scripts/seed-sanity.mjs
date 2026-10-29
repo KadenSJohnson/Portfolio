@@ -56,3 +56,22 @@ try {
   console.error("[seed] Couldn't write to Sanity:", e.message);
   process.exit(1);
 }
+
+// One-time text edits Kaden asked for on his first nitpick. Only applied if the document hasn't
+// changed since (so newer Studio edits are never overwritten).
+try {
+  const k = (b, c) => `body1[_key=="${b}"].children[_key=="${c}"].text`;
+  await client.patch("redline-first-nitpick").ifRevisionId("ch2T2psbOVz0YMDQMYjft6").set({
+    title: "Amazon iOS app loading",
+    heading1: "Amazon's iOS app launching drives me crazy.",
+    heading2: "For Reference Here Is a normal example of an app launch. ",
+    [k("1pvi4owy", "shbnru65")]: "iOS apps first zoom into their icon. ",
+    [k("7fab612b4aa0", "34a37568c990")]: " which apple says to keep nearly identical to the app’s first screen so users don’t experience flashing. ",
+    [k("22e9c9108964", "ec077ca24ace")]: "until it jumps and gives you another flash as it goes back to an Amazon logo",
+    [k("c6b180543a82", "28904355ddc4")]: "The fact is amazon is large enough that and their iOS app generates them enough money that this shouldn’t be a thing. ",
+    body2: [],
+  }).commit();
+  console.log("[seed] Applied text edits to the first nitpick.");
+} catch (e) {
+  console.log("[seed] Skipped the first nitpick text edits:", e.message);
+}
