@@ -5,17 +5,26 @@ import type { Block } from "../lib/content";
 import RichBlock from "./RichBlock.astro";
 interface Props { blocks: Block[] }
 const blocks = Astro.props.blocks || [];
-type Group = { h?: string; items: Block[] };
+type Item = Block | { _type: "list"; kind: string; items: Block[] };
+type Group = { h?: string; items: Item[] };
 const groups: Group[] = [{ items: [] }];
 for (const b of blocks) {
-  if (b._type === "block" && b.style === "h3") groups.push({ h: b.children.map((c) => c.text).join(""), items: [] });
-  else groups[groups.length - 1].items.push(b);
+  if (b._type === "block" && b.style === "h3") { groups.push({ h: b.children.map((c) => c.text).join(""), items: [] }); continue; }
+  const items = groups[groups.length - 1].items;
+  const li = (b as any).listItem as string | undefined;
+  // consecutive list items become one bulleted or numbered list
+  if (li) {
+    const last = items[items.length - 1] as any;
+    if (last && last._type === "list" && last.kind === li) last.items.push(b);
+    else items.push({ _type: "list", kind: li, items: [b] });
+  } else items.push(b);
 }
 ---
-{groups.map((g) =>
-  g.h ? (
-    <section class="lb-sec"><h3>{g.h}</h3>{g.items.map((b) => <RichBlock block={b} />)}</section>
-  ) : (
-    g.items.map((b) => <RichBlock block={b} />)
-  )
-)}
+{groups.map((g) => {
+  const body = g.items.map((i: any) => i._type === "list"
+    ? (i.kind === "number"
+        ? <ol class="rt-list">{i.items.map((b: Block) => <RichBlock block={b} li />)}</ol>
+        : <ul class="rt-list">{i.items.map((b: Block) => <RichBlock block={b} li />)}</ul>)
+    : <RichBlock block={i} />);
+  return g.h ? <section class="lb-sec"><h3>{g.h}</h3>{body}</section> : body;
+})}

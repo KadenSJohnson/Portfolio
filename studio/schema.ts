@@ -126,9 +126,15 @@ const redline = defineType({
       defineField({ name: "x", type: "number" }), defineField({ name: "y", type: "number" }),
       defineField({ name: "w", title: "Width", type: "number" }), defineField({ name: "h", title: "Height", type: "number" }),
     ] }),
-    defineField({ name: "problem", title: "What I noticed", type: "text", rows: 3 }),
-    defineField({ name: "why", title: "Why it matters", type: "text", rows: 2 }),
-    defineField({ name: "fix", title: "How I'd fix it", type: "text", rows: 2 }),
+    ...[1, 2, 3].flatMap((n) => [
+      defineField({ name: `heading${n}`, title: `Title ${n}`, type: "string" }),
+      defineField({ name: `body${n}`, title: `Text ${n}`, type: "array", of: [defineArrayMember({
+        type: "block", styles: [{ title: "Normal", value: "normal" }],
+        lists: [{ title: "Bullets", value: "bullet" }, { title: "Numbers", value: "number" }],
+        marks: { decorators: [{ title: "Bold", value: "strong" }, { title: "Italic", value: "em" }],
+          annotations: [{ name: "link", type: "object", title: "Link", fields: [defineField({ name: "href", type: "url", title: "URL" })] }] },
+      })] }),
+    ]),
     defineField({ name: "fixImageUpload", title: "Fix: image", type: "image", description: "Optional sketch or mockup of your fix." }),
     defineField({ name: "fixVideoUpload", title: "Fix: video", type: "file", options: { accept: "video/mp4,video/quicktime" } }),
     defineField({ name: "videoFile", title: "Video file on the site", type: "string", hidden: true }),

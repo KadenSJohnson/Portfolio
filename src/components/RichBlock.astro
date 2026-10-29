@@ -5,8 +5,9 @@ import Meta from "./Meta.astro";
 import Stats from "./Stats.astro";
 import Figs from "./Figs.astro";
 import ProblemSolution from "./ProblemSolution.astro";
-interface Props { block: Block }
+interface Props { block: Block; li?: boolean }
 const b = Astro.props.block;
+const Tag = Astro.props.li ? "li" : "p";
 type Piece = { text: string; strong: boolean; em: boolean; href?: string };
 let pieces: Piece[] = [];
 let cls: string | undefined;
@@ -20,13 +21,13 @@ if (b._type === "block") {
 }
 ---
 {b._type === "block" && (
-  <p class={cls}>
+  <Tag class={cls}>
     {pieces.map((pc) =>
       pc.href ? (
         <a class="ext" href={pc.href} target="_blank" rel="noopener">{pc.strong ? <strong>{pc.text}</strong> : pc.em ? <em>{pc.text}</em> : pc.text}</a>
       ) : pc.strong ? <strong>{pc.text}</strong> : pc.em ? <em>{pc.text}</em> : pc.text
     )}
-  </p>
+  </Tag>
 )}
 {b._type === "metaTable" && <Meta rows={b.rows || []} />}
 {b._type === "stats" && <Stats items={b.items || []} />}

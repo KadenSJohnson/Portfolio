@@ -119,8 +119,9 @@ a{color:inherit}
 .gallery{display:grid;gap:calc(var(--cell) * 2);grid-template-columns:minmax(0,1fr);align-items:stretch;grid-auto-flow:row dense}
 @media (min-width:720px){.gallery{gap:calc(var(--cell) * 2)}}
 @media (min-width:720px){.gallery{grid-template-columns:repeat(2,minmax(0,1fr))}}
-/* Wide screens: 28 grid columns so three cards (8 cells each) and two 2-cell gaps fit exactly */
-@media (min-width:1200px){:root{--cols:28;--F:calc(var(--cell) * 2.25)}.gallery{grid-template-columns:repeat(3,minmax(0,1fr))}}
+/* Wide screens: tighter, so more work shows in the first screen. 29 grid columns: three cards
+   of 9 cells with 1-cell gaps fit exactly. */
+@media (min-width:1200px){:root{--cols:29;--F:calc(var(--cell) * 2)}.gallery{grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--cell)}.hero{padding-block:var(--cell)}}
 
 .obj{position:relative;display:flex;flex-direction:column}
 
@@ -471,4 +472,6 @@ a{color:inherit}
 .mark{position:absolute;z-index:3;outline:1.5px solid var(--sel);pointer-events:none}
 .dev-crop .mark{outline-width:calc(1.5px / var(--zoom))}
 .dev-crop .mark .hd{transform:scale(calc(1 / var(--zoom)))}
-@media (min-width:1200px){.rl-list{grid-template-columns:repeat(3,minmax(0,1fr))}.rl .rl-media{height:calc(var(--cell) * 8 - 1px)}}
+@media (min-width:1200px){.rl-list{grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--cell)}.rl .rl-media{height:calc(var(--cell) * 9 - 1px)}.rl-head{margin-block:var(--cell)}}
+.rt-list{margin:0;padding-left:1.2em;display:grid;gap:6px}
+.lb-body .rt-list li{font:400 17px/1.6 var(--display);max-width:68ch}

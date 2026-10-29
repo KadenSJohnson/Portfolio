@@ -32,6 +32,34 @@ tx.createIfNotExists({ _id: "redline-first-nitpick", _type: "redline", title: "F
 const stale = await client.fetch(`*[_type in ["project", "testimonial"] && (defined(material) || defined(tilt) || defined(wide))]._id`);
 for (const id of stale) tx.patch(id, (p) => p.unset(OLD));
 if (stale.length) console.log(`[seed] Removing old layout fields from ${stale.length} documents.`);
+// Nitpicks moved from three fixed text fields (problem / why / fix) to three free titles with rich
+// text. Carry over anything already written, under the old headings, so nothing is lost.
+const key = () => Math.random().toString(36).slice(2, 10);
+const toBlocks = (t) => (t ? [{ _type: "block", _key: key(), style: "normal", markDefs: [], children: [{ _type: "span", _key: key(), text: t, marks: [] }] }] : undefined);
+const migrate = (d) => {
+  if (d._type !== "redline" || !(d.problem || d.why || d.fix)) return null;
+  const set = {};
+  [["problem", "What I noticed"], ["why", "Why it matters"], ["fix", "How I'd fix it"]].forEach(([f, h], i) => {
+    if (d[f]) { set[`heading${i + 1}`] = h; set[`body${i + 1}`] = toBlocks(d[f]); }
+  });
+  return set;
+};
+const allNitpicks = await client.fetch(`*[_type == "redline"]`);
+for (const d of allNitpicks) {
+  const set = migrate(d);
+  if (set) { tx.patch(d._id, (p) => p.set(set).unset(["problem", "why", "fix"])); console.log(`[seed] Moved nitpick text into titles + rich text: ${d._id}`); }
+}
+// One-time: publish every draft (Kaden asked for his Studio changes to be published)
+const drafts = await client.fetch(`*[_id in path("drafts.**")]`);
+for (const d of drafts) {
+  const { _rev, _createdAt, _updatedAt, ...rest } = d;
+  let doc = { ...rest, _id: d._id.replace(/^drafts\./, "") };
+  const set = migrate(doc);
+  if (set) { const { problem, why, fix, ...keep } = doc; doc = { ...keep, ...set }; }
+  tx.createOrReplace(doc);
+  tx.delete(d._id);
+  console.log(`[seed] Published draft: ${doc._id}`);
+}
 try {
   await tx.commit();
   console.log(`[seed] Copied site text, ${projects.length} projects and ${testimonials.length} testimonials into Sanity (existing documents were left alone).`);
