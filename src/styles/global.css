@@ -470,7 +470,7 @@ a{color:inherit}
 .dev-crop .mark{outline-width:calc(1.5px / var(--zoom))}
 .dev-crop .mark .hd{transform:scale(calc(1 / var(--zoom)))}
 
-/* ---------- Nitpicks as a magazine (test layout, /nitpicks/book) ---------- */
+/* ---------- Nitpicks as a magazine (/nitpicks) ---------- */
 .bk-wrap{display:grid;gap:var(--cell);margin-top:calc(var(--cell) * 2);padding:var(--cell) calc(var(--cell) / 2);overflow:hidden}
 @media (min-width:720px){.bk-wrap{padding:calc(var(--cell) * 2) var(--cell)}}
 .bk-stage{position:relative;width:100%;perspective:2200px;touch-action:pan-y}
@@ -487,6 +487,10 @@ a{color:inherit}
 .bk-leaf.turned{transform:rotateY(-180deg)}
 .bk-face.back{transform:rotateY(180deg)}
 .instant .bk-leaf{transition:none}
+.bk-leaf.dragging{transition:none}
+.bk-stage{cursor:grab;user-select:none;-webkit-user-select:none}
+.bk-stage .bk-toc button{cursor:pointer}
+.bk-stage img{-webkit-user-drag:none;user-select:none}
 /* gutter shading: right-hand pages darken toward their left edge, left-hand pages toward their right */
 .bk-wide .bk-face.front::after,.bk-wide .bk-face.base.right::after{content:"";position:absolute;inset:0 auto 0 0;width:12%;pointer-events:none;background:linear-gradient(to right,rgba(60,40,20,.14),rgba(60,40,20,0))}
 .bk-wide .bk-face.back::after,.bk-wide .bk-face.base.left::after{content:"";position:absolute;inset:0 0 0 auto;width:12%;pointer-events:none;background:linear-gradient(to left,rgba(60,40,20,.14),rgba(60,40,20,0))}

@@ -112,15 +112,52 @@
     if (e.key === "ArrowRight") go(at + 1);
     if (e.key === "ArrowLeft") go(at - 1);
   });
-  // Swipe
-  let sx = null, sy = 0;
-  stage.addEventListener("pointerdown", (e) => { sx = e.clientX; sy = e.clientY; });
-  stage.addEventListener("pointerup", (e) => {
-    if (sx === null) return;
-    const dx = e.clientX - sx, dy = e.clientY - sy;
-    sx = null;
-    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.2) go(at + (dx < 0 ? 1 : -1));
+  // Drag to turn: the page follows your finger (or mouse) around the spine. Let go past about a
+  // third of the way, or with a quick flick, and it finishes turning; otherwise it falls back.
+  let drag = null;
+  const angleOf = (l) => (l.classList.contains("turned") ? -180 : 0);
+  stage.addEventListener("pointerdown", (e) => {
+    if (e.button !== 0 || (e.target.closest && e.target.closest("button, a"))) return;
+    drag = { x: e.clientX, y: e.clientY, t: performance.now(), id: e.pointerId, leaf: null, dir: 0, w: 1, p: 0 };
   });
+  stage.addEventListener("pointermove", (e) => {
+    if (!drag || e.pointerId !== drag.id) return;
+    const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+    if (!drag.leaf) {
+      if (Math.abs(dx) < 8) return;
+      if (Math.abs(dy) > Math.abs(dx)) { drag = null; return; } // a scroll, not a page turn
+      drag.dir = dx < 0 ? 1 : -1;
+      const k = drag.dir > 0 ? at : at - 1;
+      if (k < 0 || k >= leaves.length) { drag = null; return; }
+      drag.leaf = leaves[k];
+      drag.w = mode === "wide" ? stage.clientWidth / 2 : stage.clientWidth;
+      drag.leaf.classList.add("moving", "dragging");
+      drag.leaf.style.zIndex = 200;
+      try { stage.setPointerCapture(e.pointerId); } catch (err) {}
+    }
+    // progress 0..1 along the turn, from how far the finger has travelled
+    const p = Math.max(0, Math.min(1, (-dx * drag.dir) / (drag.w * (mode === "wide" ? 1.6 : 1))));
+    drag.p = p;
+    const deg = drag.dir > 0 ? -180 * p : -180 + 180 * p;
+    drag.leaf.style.transform = `rotateY(${deg.toFixed(2)}deg)`;
+    e.preventDefault();
+  });
+  const release = (e) => {
+    if (!drag || (e && e.pointerId !== drag.id)) return;
+    const d = drag; drag = null;
+    if (!d.leaf) return;
+    const speed = Math.abs(e ? e.clientX - d.x : 0) / Math.max(1, performance.now() - d.t); // px per ms
+    const commit = d.p > 0.33 || (speed > 0.6 && d.p > 0.05);
+    const l = d.leaf;
+    l.classList.remove("dragging");
+    l.style.transform = "";
+    if (commit) { l.classList.toggle("turned", d.dir > 0); at += d.dir; label(); }
+    const done = () => { l.classList.remove("moving"); layer(); };
+    l.addEventListener("transitionend", done, { once: true });
+    setTimeout(done, 1000);
+  };
+  stage.addEventListener("pointerup", release);
+  stage.addEventListener("pointercancel", release);
   WIDE.addEventListener("change", build);
   build();
 })();
