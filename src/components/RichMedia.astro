@@ -4,12 +4,24 @@ import Device from "./Device.astro";
 import { imageUrl } from "../lib/content";
 interface Props { block: any }
 const b = Astro.props.block;
+const isRow = b._type === "rtGallery";
+const row = isRow ? (b.images || []).map((im: any) => ({ key: im._key, src: imageUrl(im, null, (f) => f, 1400), alt: im.alt || "" })).filter((x: any) => x.src) : [];
 const isVideo = b._type === "rtVideo";
-const src = isVideo ? b.url : imageUrl(b.image, null, (f) => f, 2000);
+const src = isRow ? null : isVideo ? b.url : imageUrl(b.image, null, (f) => f, 2000);
 const frame = b.frame && b.frame !== "none" ? b.frame : null;
 const alt = b.alt || b.caption || "";
 ---
-{src && (
+{isRow && row.length > 0 && (
+  <figure class={`rt-media rt-row${b.frame === "none" ? "" : " framed"}`} style={`--n:${row.length}`}>
+    <div class="rt-row-in">
+      {row.map((x: any) => b.frame === "none"
+        ? <img src={x.src} alt={x.alt} loading="lazy" decoding="async" />
+        : <Device r={{ id: x.key, date: "", app: "", title: "", device: "phone", image: x.src, alt: x.alt } as any} />)}
+    </div>
+    {b.caption && <figcaption>{b.caption}</figcaption>}
+  </figure>
+)}
+{!isRow && src && (
   <figure class={`rt-media${frame ? " framed" : ""}`}>
     {frame
       ? <div class={`rt-dev is-${frame}`}><Device r={{ id: b._key, date: "", app: "", title: "", device: frame, video: isVideo ? src : undefined, image: isVideo ? undefined : src, alt } as any} /></div>

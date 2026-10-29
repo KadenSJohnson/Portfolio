@@ -13,7 +13,8 @@ export type Block =
   | { _type: "pullQuote"; _key: string; text: string; cite: string }
   | { _type: "problemSolution"; _key: string; problem: string; solution: string }
   | { _type: "rtImage"; _key: string; image?: SanityImage; frame?: "none" | "phone" | "desktop"; caption?: string; alt?: string }
-  | { _type: "rtVideo"; _key: string; url?: string; frame?: "none" | "phone" | "desktop"; caption?: string };
+  | { _type: "rtVideo"; _key: string; url?: string; frame?: "none" | "phone" | "desktop"; caption?: string }
+  | { _type: "rtGallery"; _key: string; images?: (SanityImage & { _key: string; alt?: string })[]; frame?: "none" | "phone"; caption?: string };
 export type SanityImage = { asset?: { _ref: string } };
 
 let n = 0;

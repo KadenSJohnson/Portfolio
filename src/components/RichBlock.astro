@@ -35,4 +35,4 @@ if (b._type === "block") {
 {b._type === "figures" && <Figs items={b.items || []} cols={b.cols || 2} />}
 {b._type === "pullQuote" && <blockquote class="pull">{b.text}<cite>{b.cite}</cite></blockquote>}
 {b._type === "problemSolution" && <ProblemSolution problem={b.problem} solution={b.solution} />}
-{(b._type === "rtImage" || b._type === "rtVideo") && <RichMedia block={b} />}
+{(b._type === "rtImage" || b._type === "rtVideo" || b._type === "rtGallery") && <RichMedia block={b} />}

@@ -121,6 +121,13 @@ const MEDIA = [
     defineField({ name: "file", title: "Video", type: "file", options: { accept: "video/mp4,video/quicktime,video/webm" }, description: "MP4 plays in every browser. iPhone .mov files may not play in Chrome." }),
     FRAME, defineField({ name: "caption", type: "string" }),
   ], preview: { select: { title: "caption" }, prepare: ({ title }) => ({ title: title || "Video" }) } }),
+  defineArrayMember({ type: "object", name: "rtGallery", title: "Images side by side", fields: [
+    defineField({ name: "images", type: "array", description: "Two to four images, shown in a row.", validation: (r) => r.max(4),
+      of: [defineArrayMember({ type: "image", fields: [defineField({ name: "alt", title: "Describe the image", type: "string" })] })] }),
+    defineField({ name: "frame", title: "Frame", type: "string", initialValue: "phone",
+      options: { list: [{ title: "None", value: "none" }, { title: "iPhone", value: "phone" }], layout: "radio", direction: "horizontal" } }),
+    defineField({ name: "caption", type: "string" }),
+  ], preview: { select: { title: "caption", media: "images.0" }, prepare: ({ title, media }) => ({ title: title || "Images side by side", media }) } }),
 ];
 
 const redline = defineType({
