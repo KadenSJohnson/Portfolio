@@ -11,16 +11,23 @@ if (!SANITY.projectId || !token) {
 }
 const { settings, projects, testimonials } = await import("../src/data/local.ts");
 const strip = (o) => Object.fromEntries(Object.entries(o).filter(([, v]) => v !== null && v !== undefined));
-const client = createClient({ projectId: SANITY.projectId, dataset: SANITY.dataset, apiVersion: SANITY.apiVersion, token, useCdn: false });
+const client = createClient({ projectId: SANITY.projectId, dataset: SANITY.dataset, apiVersion: SANITY.apiVersion, token, useCdn: false, perspective: "raw" });
+// Old layout fields the Studio doesn't show any more
+const OLD = ["material", "tilt", "wide"];
+const drop = (o) => Object.fromEntries(Object.entries(o).filter(([k]) => !OLD.includes(k)));
 
 const tx = client.transaction();
 tx.createIfNotExists({ _id: "siteSettings", _type: "siteSettings", ...settings });
 for (const { id, ...p } of projects) {
-  tx.createIfNotExists(strip({ _id: `project-${id}`, _type: "project", slug: { _type: "slug", current: id }, ...p }));
+  tx.createIfNotExists(strip({ _id: `project-${id}`, _type: "project", slug: { _type: "slug", current: id }, ...drop(p) }));
 }
 for (const { id, ...t } of testimonials) {
-  tx.createIfNotExists(strip({ _id: `testimonial-${id}`, _type: "testimonial", ...t }));
+  tx.createIfNotExists(strip({ _id: `testimonial-${id}`, _type: "testimonial", ...drop(t) }));
 }
+// Clear the old layout fields from documents that already have them (shows as "Unknown fields" in the Studio)
+const stale = await client.fetch(`*[_type in ["project", "testimonial"] && (defined(material) || defined(tilt) || defined(wide))]._id`);
+for (const id of stale) tx.patch(id, (p) => p.unset(OLD));
+if (stale.length) console.log(`[seed] Removing old layout fields from ${stale.length} documents.`);
 try {
   await tx.commit();
   console.log(`[seed] Copied site text, ${projects.length} projects and ${testimonials.length} testimonials into Sanity (existing documents were left alone).`);

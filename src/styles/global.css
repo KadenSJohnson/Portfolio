@@ -120,7 +120,7 @@ a{color:inherit}
 @media (min-width:720px){.gallery{gap:calc(var(--cell) * 2)}}
 @media (min-width:720px){.gallery{grid-template-columns:repeat(2,minmax(0,1fr))}}
 /* Wide screens: 28 grid columns so three cards (8 cells each) and two 2-cell gaps fit exactly */
-@media (min-width:1200px){:root{--cols:28}.gallery{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (min-width:1200px){:root{--cols:28;--F:calc(var(--cell) * 2.25)}.gallery{grid-template-columns:repeat(3,minmax(0,1fr))}}
 
 .obj{position:relative;display:flex;flex-direction:column}
 

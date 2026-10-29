@@ -81,7 +81,6 @@ const project = defineType({
       description: "The project's ID in links (#slug). Keep kpm and flint as they are: the compare slider and video attach by slug." }),
     defineField({ name: "order", type: "number", description: "Position in the gallery, smallest first. Testimonials share the same numbering." }),
     defineField({ name: "categories", type: "array", of: [{ type: "string" }], options: { list: CATEGORY_OPTIONS, layout: "grid" } }),
-    defineField({ name: "wide", title: "Wide card", type: "boolean", initialValue: false }),
     defineField({ name: "image", title: "Card image", type: "image", options: { hotspot: true } }),
     imageFileField("imageFile", "Card image file"),
     defineField({ name: "imageLabel", title: "Image description", type: "string", description: "Alt text, and the label when there's no image yet." }),
