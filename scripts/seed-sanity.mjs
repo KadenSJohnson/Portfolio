@@ -49,17 +49,6 @@ for (const d of allNitpicks) {
   const set = migrate(d);
   if (set) { tx.patch(d._id, (p) => p.set(set).unset(["problem", "why", "fix"])); console.log(`[seed] Moved nitpick text into titles + rich text: ${d._id}`); }
 }
-// One-time: publish every draft (Kaden asked for his Studio changes to be published)
-const drafts = await client.fetch(`*[_id in path("drafts.**")]`);
-for (const d of drafts) {
-  const { _rev, _createdAt, _updatedAt, ...rest } = d;
-  let doc = { ...rest, _id: d._id.replace(/^drafts\./, "") };
-  const set = migrate(doc);
-  if (set) { const { problem, why, fix, ...keep } = doc; doc = { ...keep, ...set }; }
-  tx.createOrReplace(doc);
-  tx.delete(d._id);
-  console.log(`[seed] Published draft: ${doc._id}`);
-}
 try {
   await tx.commit();
   console.log(`[seed] Copied site text, ${projects.length} projects and ${testimonials.length} testimonials into Sanity (existing documents were left alone).`);
