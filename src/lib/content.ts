@@ -16,7 +16,7 @@ const QUERY = `{
   },
   "redlines": *[_type == "redline"] | order(date desc){
     "id": coalesce(slug.current, _id), date, app, title, device, "video": coalesce(videoUpload.asset->url, videoFile), "image": imageFile, "imageAsset": image,
-    poster, alt, focus, zoom, mark, heading1, "body1": body1[]{..., _type == "rtVideo" => {"url": file.asset->url}}, heading2, "body2": body2[]{..., _type == "rtVideo" => {"url": file.asset->url}}, heading3, "body3": body3[]{..., _type == "rtVideo" => {"url": file.asset->url}}, "fixImageAsset": fixImageUpload, "fixVideo": fixVideoUpload.asset->url
+    "poster": select(defined(videoUpload.asset) => null, poster), alt, focus, zoom, mark, heading1, "body1": body1[]{..., _type == "rtVideo" => {"url": file.asset->url}}, heading2, "body2": body2[]{..., _type == "rtVideo" => {"url": file.asset->url}}, heading3, "body3": body3[]{..., _type == "rtVideo" => {"url": file.asset->url}}, "fixImageAsset": fixImageUpload, "fixVideo": fixVideoUpload.asset->url
   }
 }`;
 
