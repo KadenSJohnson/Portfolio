@@ -387,6 +387,56 @@ a{color:inherit}
 .js .cover{display:block;position:fixed;inset:0;z-index:1000;background:#FFFFFF;pointer-events:none;transition:opacity .45s ease,visibility 0s .45s}
 .js.ready .cover{opacity:0;visibility:hidden}
 .anim .gallery>.obj:not(.shown):not(:first-child){opacity:0}
+.anim .rl-list>.rl:not(.shown):not(:first-child){opacity:0}
 .gallery{position:relative}
 .slot{position:absolute;pointer-events:none;background:rgba(13,153,255,.06);outline:1.5px solid var(--sel);outline-offset:-1px;z-index:0}
 .gallery>.obj{z-index:1}
+
+/* ---------- Redlines: notes on problems in other software ---------- */
+.rl-promo{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:6px 16px;margin-top:calc(var(--cell) * 2);padding:var(--cell);text-decoration:none}
+.rl-promo .label{grid-column:1/-1}
+.rl-promo-t{font:600 clamp(20px,2.2vw,28px)/1.2 var(--display);letter-spacing:-.02em;text-wrap:balance}
+.rl-promo-go{display:grid;place-items:center;width:44px;height:44px;border-radius:999px;background:var(--ink);color:#FFFFFF}
+.rl-promo-go svg{width:20px;height:20px}
+.rl-promo:hover .rl-promo-go{background:#2A2A2A}
+
+.rl-head{display:grid;gap:10px;margin-block:calc(var(--cell) * 2);padding:var(--cell)}
+.rl-head h1{max-width:20ch;font:700 clamp(30px,4.6vw,56px)/1.02 var(--display);letter-spacing:-.04em;text-wrap:balance}
+.rl-count{font:500 13px/1 var(--mono);color:var(--mu)}
+.rl-list{position:relative;display:grid;gap:calc(var(--cell) * 2)}
+.rl{display:grid;grid-template-columns:minmax(0,1fr)}
+@media (min-width:720px){.rl{grid-template-columns:calc(var(--cell) * 15 - 1px) minmax(0,1fr)}}
+.rl-media{position:relative;display:grid;place-items:center;height:calc(var(--cell) * 15 - 1px);overflow:hidden;background:var(--tile)}
+.rl-media.is-desktop{height:calc(var(--cell) * 9 - 1px)}
+.rl-media.is-crop{height:calc(var(--cell) * 12 - 1px)} /* square, so a selection box lands on the same spot at every size */
+@media (min-width:720px){.rl-media,.rl-media.is-desktop,.rl-media.is-crop{height:calc(var(--cell) * 15 - 1px)}}
+.rl-text{display:grid;align-content:start;gap:12px;padding:calc(var(--cell) / 2) calc(var(--cell) / 2) var(--cell)}
+@media (min-width:720px){.rl-text{padding:var(--cell)}}
+.rl-meta{display:flex;flex-wrap:wrap;gap:4px 12px;font:500 13px/1.3 var(--mono);color:var(--mu)}
+.rl-meta span{color:var(--sub);font-weight:600}
+.rl-title{font:650 clamp(20px,2vw,26px)/1.2 var(--display);letter-spacing:-.02em;text-wrap:balance}
+.rl-parts{display:grid;gap:14px;margin:4px 0 0}
+.rl-parts dt{font:500 12px/1 var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--mu)}
+.rl-parts dd{margin:6px 0 0;font:400 16px/1.45 var(--display);color:var(--sub);max-width:52ch}
+
+/* Device frames: drawn in CSS. The screen inside is where the clip or screenshot sits. */
+.dev .scr{position:relative;overflow:hidden;background:#FFFFFF}
+.dev .frame{position:absolute;inset:0}
+.dev .scr img,.dev .scr video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top center;display:block}
+.dev-phone{height:calc(100% - var(--cell) * 2);aspect-ratio:9/19.5}
+.dev-phone .dev-body{height:100%;padding:3.2%;border-radius:15% / 7%;background:#0C0C0C;box-shadow:0 0 0 1.5px #3A3A3A inset,0 18px 40px -18px rgba(0,0,0,.35)}
+.dev-phone .scr{height:100%;border-radius:12.5% / 5.8%}
+.dev-phone .scr::after{content:"";position:absolute;z-index:2;top:1.7%;left:50%;width:31%;height:3.6%;transform:translateX(-50%);border-radius:999px;background:#0C0C0C}
+.dev-desktop{width:calc(100% - var(--cell) * 2)}
+.dev-desktop .dev-body{margin-inline:7%;padding:2.2% 2.2% 3%;border-radius:12px 12px 0 0;background:#0C0C0C;box-shadow:0 0 0 1.5px #3A3A3A inset}
+.dev-desktop .scr{aspect-ratio:16/10}
+.dev-base{position:relative;height:clamp(9px,1.4vw,14px);border-radius:0 0 14px 14px / 0 0 10px 10px;background:linear-gradient(#E4E4E4,#B8B8B8);box-shadow:0 14px 30px -16px rgba(0,0,0,.35)}
+.dev-base::before{content:"";position:absolute;top:0;left:50%;width:15%;height:45%;transform:translateX(-50%);border-radius:0 0 6px 6px;background:#A8A8A8}
+.dev-crop{position:absolute;inset:0}
+.dev-crop .dev-body,.dev-crop .scr{height:100%}
+.dev-crop .frame{transform:scale(var(--zoom));transform-origin:var(--focus)}
+.dev-crop .scr img,.dev-crop .scr video{object-position:var(--focus)}
+/* Selection box over the problem (in the crop, it scales with the zoom) */
+.mark{position:absolute;z-index:3;outline:1.5px solid var(--sel);pointer-events:none}
+.dev-crop .mark{outline-width:calc(1.5px / var(--zoom))}
+.dev-crop .mark .hd{transform:scale(calc(1 / var(--zoom)))}

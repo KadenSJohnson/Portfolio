@@ -2,9 +2,9 @@
 // otherwise from src/data/local.ts. A Sanity error never breaks the build; it falls back to local.
 import { SANITY } from "../../sanity.project.mjs";
 import * as local from "../data/local";
-import type { Project, Settings, Testimonial, SanityImage } from "../data/local";
+import type { Project, Settings, Testimonial, Redline, SanityImage } from "../data/local";
 
-export type { Project, Settings, Testimonial, Block } from "../data/local";
+export type { Project, Settings, Testimonial, Redline, Block } from "../data/local";
 
 const QUERY = `{
   "settings": *[_id == "siteSettings"][0]{headline, headlineMuted, bio, email, linkedin, x, contactForm, contactHeading, contactLede},
@@ -13,18 +13,22 @@ const QUERY = `{
   },
   "testimonials": *[_type == "testimonial"] | order(order asc){
     "id": _id, order, ask, quote, name, role, photoFile, logoFile, photo, logo, tilt
+  },
+  "redlines": *[_type == "redline"] | order(date desc){
+    "id": slug.current, date, app, title, device, "video": coalesce(videoUpload.asset->url, videoFile), image: imageFile, imageAsset: image,
+    poster, alt, focus, zoom, mark, problem, why, fix
   }
 }`;
 
 const clean = <T extends object>(o: T | null | undefined) =>
   Object.fromEntries(Object.entries(o || {}).filter(([, v]) => v !== null && v !== undefined && v !== "")) as Partial<T>;
 
-let cache: Promise<{ settings: Settings; projects: Project[]; testimonials: Testimonial[]; source: string }> | null = null;
+let cache: Promise<{ settings: Settings; projects: Project[]; testimonials: Testimonial[]; redlines: Redline[]; source: string }> | null = null;
 
 export function getContent() {
   if (cache) return cache;
   cache = (async () => {
-    const fallback = { settings: local.settings, projects: local.projects, testimonials: local.testimonials, source: "local" };
+    const fallback = { settings: local.settings, projects: local.projects, testimonials: local.testimonials, redlines: local.redlines, source: "local" };
     if (!SANITY.projectId) return fallback;
     try {
       const url = `https://${SANITY.projectId}.apicdn.sanity.io/v${SANITY.apiVersion}/data/query/${SANITY.dataset}?query=${encodeURIComponent(QUERY)}&perspective=published`;
@@ -43,6 +47,7 @@ export function getContent() {
         settings: { ...local.settings, ...clean(result.settings) },
         projects,
         testimonials: (result.testimonials || []).map((t: Testimonial) => ({ ...t, tilt: t.tilt ?? 0 })),
+        redlines: (result.redlines || []).filter((r: Redline) => r.id).length ? result.redlines.filter((r: Redline) => r.id) : local.redlines,
         source: "sanity",
       };
     } catch (e) {

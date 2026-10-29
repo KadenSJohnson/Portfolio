@@ -1,0 +1,51 @@
+---
+import Layout from "../layouts/Layout.astro";
+import TopBar from "../components/TopBar.astro";
+import Device from "../components/Device.astro";
+import { getContent } from "../lib/content";
+
+const { settings, redlines } = await getContent();
+const fmt = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
+const day = (d: string) => (d ? fmt.format(new Date(d + "T00:00:00Z")) : "");
+---
+<Layout title="Redlines · Kaden Johnson" description="Small problems Kaden Johnson notices in the apps he uses, and how he'd fix them.">
+  <div class="canvas">
+  <div class="page">
+    <TopBar settings={settings} base="/" />
+    <header class="rl-head gcard" data-snap>
+      <p class="label">Redlines</p>
+      <h1>Small things I notice in the apps I use, and how I'd fix them.</h1>
+      <p class="rl-count">{redlines.length} {redlines.length === 1 ? "note" : "notes"}</p>
+    </header>
+    <div class="rl-list">
+      {redlines.map((r) => (
+        <article class="rl gcard" id={r.id} data-snap>
+          <div class={`rl-media is-${r.device}`}><Device r={r} /></div>
+          <div class="rl-text">
+            <p class="rl-meta"><span>{r.app}</span><time datetime={r.date}>{day(r.date)}</time></p>
+            <h2 class="rl-title">{r.title}</h2>
+            <dl class="rl-parts">
+              <div><dt>What I noticed</dt><dd>{r.problem}</dd></div>
+              <div><dt>Why it matters</dt><dd>{r.why}</dd></div>
+              <div><dt>How I'd fix it</dt><dd>{r.fix}</dd></div>
+            </dl>
+          </div>
+        </article>
+      ))}
+    </div>
+    <footer class="foot gcard" data-snap>
+      <a href="/">Back to the portfolio</a>
+      <span>© 2026</span>
+    </footer>
+  </div>
+  </div>
+  <script>
+    import "../scripts/reveal.js";
+    import "../scripts/grid.js";
+    // Copy email in the top bar
+    document.querySelectorAll<HTMLButtonElement>("[data-copy]").forEach((b) => b.addEventListener("click", () => {
+      const done = () => { b.textContent = "Copied"; setTimeout(() => { b.textContent = "Copy email"; }, 1600); };
+      try { navigator.clipboard.writeText(b.dataset.copy || "").then(done, () => {}); } catch (e) {}
+    }));
+  </script>
+</Layout>

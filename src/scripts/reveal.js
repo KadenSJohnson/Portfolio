@@ -10,15 +10,15 @@ const fonts = document.fonts && document.fonts.ready ? document.fonts.ready : Pr
 window.siteReady = Promise.race([Promise.all([loaded, fonts]), new Promise((r) => setTimeout(r, 1800))])
   .then(() => { root.classList.add("ready"); return new Promise((r) => setTimeout(r, 200)); });
 
-const gallery = document.querySelector(".gallery");
-if (gallery && !reduce && "IntersectionObserver" in window && Element.prototype.animate) {
+const lists = Array.from(document.querySelectorAll(".gallery, .rl-list"));
+if (lists.length && !reduce && "IntersectionObserver" in window && Element.prototype.animate) {
   const DUR = 680;
   const drop = (card, delay) => {
     card.classList.add("shown");
     const slot = document.createElement("div");
     slot.className = "slot";
     slot.style.cssText = `top:${card.offsetTop}px;left:${card.offsetLeft}px;width:${card.offsetWidth}px;height:${card.offsetHeight}px`;
-    gallery.append(slot);
+    card.parentElement.append(slot);
     slot.animate([{ opacity: 0 }, { opacity: 1, offset: 0.12 }, { opacity: 1, offset: 0.82 }, { opacity: 0 }],
       { duration: DUR + 600, delay, fill: "both" }).onfinish = () => slot.remove();
     card.animate([
@@ -34,7 +34,7 @@ if (gallery && !reduce && "IntersectionObserver" in window && Element.prototype.
         .forEach((e) => { io.unobserve(e.target); drop(e.target, i++ * 90); });
     }, { rootMargin: "0px 0px -6% 0px", threshold: 0.12 });
     // The first card is already in place; the rest drop in
-    gallery.querySelectorAll(":scope > .obj").forEach((c, i) => (i ? io.observe(c) : c.classList.add("shown")));
+    lists.forEach((list) => list.querySelectorAll(":scope > .obj, :scope > .rl").forEach((c, i) => (i ? io.observe(c) : c.classList.add("shown"))));
   });
 } else {
   root.classList.remove("anim");

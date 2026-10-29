@@ -1,0 +1,29 @@
+---
+// A redline's clip or screenshot, shown in an iPhone frame, a laptop frame, or as a close crop.
+// An optional selection box (in % of the screen) marks the problem, Figma style.
+import type { Redline } from "../lib/content";
+import { imageUrl } from "../lib/content";
+import { img } from "../data/projects";
+interface Props { r: Redline }
+const { r } = Astro.props;
+const src = imageUrl(r.imageAsset, r.image, (f) => `/images/${img(f)}`, 2000);
+const poster = r.poster ? `/images/${r.poster}` : undefined;
+const style = r.device === "crop"
+  ? `--focus:${r.focus || "50% 50%"};--zoom:${r.zoom || 1}`
+  : undefined;
+---
+<div class={`dev dev-${r.device}`}>
+  <div class="dev-body">
+    <div class="scr" style={style}><div class="frame">
+      {r.video
+        ? <video src={r.video} poster={poster} autoplay muted loop playsinline preload="metadata" aria-label={r.alt}></video>
+        : src && <img src={src} alt={r.alt} loading="lazy" decoding="async" />}
+      {r.mark && (
+        <span class="mark" aria-hidden="true" style={`left:${r.mark.x}%;top:${r.mark.y}%;width:${r.mark.w}%;height:${r.mark.h}%`}>
+          <i class="hd tl"></i><i class="hd tr"></i><i class="hd bl"></i><i class="hd br"></i>
+        </span>
+      )}
+    </div></div>
+  </div>
+  {r.device === "desktop" && <div class="dev-base" aria-hidden="true"></div>}
+</div>

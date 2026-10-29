@@ -109,6 +109,35 @@ const testimonial = defineType({
   preview: { select: { title: "name", subtitle: "quote", media: "photo" } },
 });
 
+const redline = defineType({
+  name: "redline", title: "Redline", type: "document",
+  fields: [
+    defineField({ name: "title", type: "string", description: "What went wrong, in a few words." }),
+    defineField({ name: "slug", type: "slug", options: { source: "title" } }),
+    defineField({ name: "app", title: "App or site", type: "string" }),
+    defineField({ name: "date", type: "date" }),
+    defineField({ name: "device", title: "Frame", type: "string", initialValue: "phone",
+      options: { list: [{ title: "iPhone", value: "phone" }, { title: "Laptop", value: "desktop" }, { title: "Close crop", value: "crop" }], layout: "radio" } }),
+    defineField({ name: "videoUpload", title: "Video", type: "file", options: { accept: "video/mp4,video/quicktime" }, description: "A screen recording. MP4 plays everywhere." }),
+    defineField({ name: "image", type: "image", description: "Use this instead of a video for a screenshot." }),
+    defineField({ name: "alt", title: "Describe the image or clip", type: "string" }),
+    defineField({ name: "focus", title: "Crop focus", type: "string", description: "Close crop only: where to zoom, like 50% 20% (left-right, top-bottom)." }),
+    defineField({ name: "zoom", title: "Crop zoom", type: "number", description: "Close crop only: 1 shows everything, 2 is twice as close." }),
+    defineField({ name: "mark", title: "Selection box", type: "object", description: "Optional box drawn over the problem, in % of the screen.", fields: [
+      defineField({ name: "x", type: "number" }), defineField({ name: "y", type: "number" }),
+      defineField({ name: "w", title: "Width", type: "number" }), defineField({ name: "h", title: "Height", type: "number" }),
+    ] }),
+    defineField({ name: "problem", title: "What I noticed", type: "text", rows: 3 }),
+    defineField({ name: "why", title: "Why it matters", type: "text", rows: 2 }),
+    defineField({ name: "fix", title: "How I'd fix it", type: "text", rows: 2 }),
+    defineField({ name: "videoFile", title: "Video file on the site", type: "string", hidden: true }),
+    defineField({ name: "imageFile", title: "Image file on the site", type: "string", hidden: true }),
+    defineField({ name: "poster", type: "string", hidden: true }),
+  ],
+  orderings: [{ title: "Newest first", name: "date", by: [{ field: "date", direction: "desc" }] }],
+  preview: { select: { title: "title", subtitle: "app", media: "image" } },
+});
+
 const siteSettings = defineType({
   name: "siteSettings", title: "Site text", type: "document",
   fields: [
@@ -125,7 +154,7 @@ const siteSettings = defineType({
   preview: { prepare: () => ({ title: "Site text" }) },
 });
 
-export const schemaTypes = [siteSettings, project, testimonial, metaTable, stats, figures, pullQuote, problemSolution];
+export const schemaTypes = [siteSettings, project, testimonial, redline, metaTable, stats, figures, pullQuote, problemSolution];
 
 export const structure: StructureResolver = (S) =>
   S.list().title("Portfolio").items([
@@ -133,4 +162,5 @@ export const structure: StructureResolver = (S) =>
     S.divider(),
     S.listItem().title("Projects").schemaType("project").child(S.documentTypeList("project").title("Projects").defaultOrdering([{ field: "order", direction: "asc" }])),
     S.listItem().title("Testimonials").schemaType("testimonial").child(S.documentTypeList("testimonial").title("Testimonials").defaultOrdering([{ field: "order", direction: "asc" }])),
+    S.listItem().title("Redlines").schemaType("redline").child(S.documentTypeList("redline").title("Redlines").defaultOrdering([{ field: "date", direction: "desc" }])),
   ]);
