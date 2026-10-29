@@ -9,7 +9,7 @@ export type { Project, Settings, Testimonial, Redline, Block } from "../data/loc
 const QUERY = `{
   "settings": *[_id == "siteSettings"][0]{headline, headlineMuted, bio, email, linkedin, x, contactForm, contactHeading, contactLede},
   "projects": *[_type == "project"] | order(order asc){
-    "id": slug.current, order, title, subtitle, categories, material, wide, tilt, imageFile, image, imageLabel, imageRatio, body
+    "id": slug.current, "docId": _id, order, title, subtitle, categories, imageFile, image, "coverVideo": coverVideo.asset->url, imageLabel, imageRatio, body
   },
   "testimonials": *[_type == "testimonial"] | order(order asc){
     "id": _id, order, ask, quote, name, role, photoFile, logoFile, photo, logo, tilt

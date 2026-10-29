@@ -42,6 +42,7 @@ export interface Project {
   id: string; order: number; title: string; subtitle: string; categories: CatKey[];
   material: "paper" | "metal" | "acrylic" | "stock"; wide?: boolean; tilt: number;
   imageFile?: string | null; image?: SanityImage; imageLabel: string; imageRatio?: string; body: Block[];
+  docId?: string; coverVideo?: string | null; // from Sanity
 }
 // Redlines: short notes on problems Kaden notices in other software, each with a clip or image
 // shown in a device frame (phone or desktop) or as a close crop, plus an optional selection box.
