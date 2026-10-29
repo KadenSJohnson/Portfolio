@@ -6,7 +6,8 @@ import { imageUrl } from "../lib/content";
 import { img } from "../data/projects";
 interface Props { r: Redline }
 const { r } = Astro.props;
-const src = imageUrl(r.imageAsset, r.image, (f) => `/images/${img(f)}`, 2000);
+// a full URL (e.g. an image uploaded in a nitpick's text) is used as is; a bare name is a file in public/images
+const src = imageUrl(r.imageAsset, r.image, (f) => (/^(https?:)?\/\//.test(f) || f.startsWith("/") ? f : `/images/${img(f)}`), 2000);
 const poster = r.poster ? `/images/${r.poster}` : undefined;
 const style = r.device === "crop"
   ? `--focus:${r.focus || "50% 50%"};--zoom:${r.zoom || 1}`
