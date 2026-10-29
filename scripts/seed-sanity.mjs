@@ -61,7 +61,9 @@ try {
 // changed since (so newer Studio edits are never overwritten).
 try {
   const k = (b, c) => `body1[_key=="${b}"].children[_key=="${c}"].text`;
-  await client.patch("redline-first-nitpick").ifRevisionId("ch2T2psbOVz0YMDQMYkaZY").set({
+  const cur = await client.fetch(`*[_id == "redline-first-nitpick"][0]._updatedAt`);
+  if (cur !== "2026-10-29T23:25:01Z") throw new Error("it was edited since (" + cur + ")");
+  await client.patch("redline-first-nitpick").set({
     title: "Amazon iOS app loading",
     heading1: "Amazon's iOS app launching drives me crazy.",
     heading2: "For Reference Here Is a normal example of an app launch. ",
