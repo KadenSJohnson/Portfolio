@@ -24,6 +24,10 @@ for (const { id, ...p } of projects) {
 for (const { id, ...t } of testimonials) {
   tx.createIfNotExists(strip({ _id: `testimonial-${id}`, _type: "testimonial", ...drop(t) }));
 }
+// The first nitpick: added once with its video; the text is edited in the Studio
+tx.createIfNotExists({ _id: "redline-first-nitpick", _type: "redline", title: "First nitpick", slug: { _type: "slug", current: "first-nitpick" },
+  app: "Amazon", date: "2026-10-29", device: "phone", videoFile: "/video/first-nitpick.mp4", poster: "first-nitpick-poster.jpg",
+  alt: "Screen recording on an iPhone: opening the Amazon app from the home screen" });
 // Clear the old layout fields from documents that already have them (shows as "Unknown fields" in the Studio)
 const stale = await client.fetch(`*[_type in ["project", "testimonial"] && (defined(material) || defined(tilt) || defined(wide))]._id`);
 for (const id of stale) tx.patch(id, (p) => p.unset(OLD));

@@ -157,21 +157,5 @@ export const testimonials: Testimonial[] = [
     quote: "Kaden has a great work ethic and eye for what's missing or needed. He's reliable and the kind of employee I could put on any task." },
 ];
 
-// Example entries showing the three layouts. Replace with real ones (or add them in Sanity).
-export const redlines: Redline[] = [
-  { id: "example-phone", date: "2026-10-29", app: "[App name]", title: "[What tripped me up, in a few words]", device: "phone",
-    video: "/video/flint-ui.mp4", poster: "flint-ui-poster.jpg", alt: "Screen recording on a phone",
-    problem: "[What happened, in one or two sentences. Example layout: a phone screen recording in an iPhone frame.]",
-    why: "[Who it affects and what it costs them.]",
-    fix: "[What you'd change, in a sentence or a quick sketch.]" },
-  { id: "example-desktop", date: "2026-10-28", app: "[App name]", title: "[What tripped me up, in a few words]", device: "desktop",
-    image: "kpm-site-now.webp", alt: "Screenshot on a laptop",
-    problem: "[What happened. Example layout: a desktop screenshot or recording in a laptop frame.]",
-    why: "[Who it affects and what it costs them.]",
-    fix: "[What you'd change.]" },
-  { id: "example-crop", date: "2026-10-27", app: "[App name]", title: "[What tripped me up, in a few words]", device: "crop",
-    image: "kpm-site-now-full.webp", focus: "50% 0%", zoom: 1.8, mark: { x: 36, y: 15, w: 28, h: 5 }, alt: "Close crop of a screen",
-    problem: "[What happened. Example layout: a close crop of the exact spot, with a selection box on the problem.]",
-    why: "[Who it affects and what it costs them.]",
-    fix: "[What you'd change.]" },
-];
+// Nitpicks live in Sanity. This list is only used if Sanity can't be reached.
+export const redlines: Redline[] = [];
