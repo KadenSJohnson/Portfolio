@@ -9,14 +9,14 @@ const { settings, redlines } = await getContent();
 const fmt = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
 const day = (d: string) => (d ? fmt.format(new Date(d + "T00:00:00Z")) : "");
 ---
-<Layout title="Redlines · Kaden Johnson" description="Small problems Kaden Johnson notices in the apps he uses, and how he'd fix them.">
+<Layout title="My Nitpicks · Kaden Johnson" description="Small problems Kaden Johnson notices in the apps he uses, and how he'd fix them.">
   <div class="canvas">
   <div class="page">
     <TopBar settings={settings} base="/" />
     <header class="rl-head gcard" data-snap>
-      <p class="label">Redlines</p>
+      <p class="label">My nitpicks</p>
       <h1>Small things I notice in the apps I use, and how I'd fix them.</h1>
-      <p class="rl-count">{redlines.length} {redlines.length === 1 ? "note" : "notes"}</p>
+      <p class="rl-count">{redlines.length} {redlines.length === 1 ? "nitpick" : "nitpicks"}</p>
     </header>
     <div class="rl-list">
       {redlines.map((r) => (

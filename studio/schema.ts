@@ -110,7 +110,7 @@ const testimonial = defineType({
 });
 
 const redline = defineType({
-  name: "redline", title: "Redline", type: "document",
+  name: "redline", title: "Nitpick", type: "document",
   fields: [
     defineField({ name: "title", type: "string", description: "What went wrong, in a few words." }),
     defineField({ name: "slug", type: "slug", options: { source: "title" } }),
@@ -162,5 +162,5 @@ export const structure: StructureResolver = (S) =>
     S.divider(),
     S.listItem().title("Projects").schemaType("project").child(S.documentTypeList("project").title("Projects").defaultOrdering([{ field: "order", direction: "asc" }])),
     S.listItem().title("Testimonials").schemaType("testimonial").child(S.documentTypeList("testimonial").title("Testimonials").defaultOrdering([{ field: "order", direction: "asc" }])),
-    S.listItem().title("Redlines").schemaType("redline").child(S.documentTypeList("redline").title("Redlines").defaultOrdering([{ field: "date", direction: "desc" }])),
+    S.listItem().title("Nitpicks").schemaType("redline").child(S.documentTypeList("redline").title("Nitpicks").defaultOrdering([{ field: "date", direction: "desc" }])),
   ]);
