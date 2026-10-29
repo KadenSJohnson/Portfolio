@@ -390,7 +390,7 @@ a{color:inherit}
 .anim .rl-list>.rl:not(.shown):not(:first-child){opacity:0}
 .gallery{position:relative}
 .slot{position:absolute;pointer-events:none;background:rgba(13,153,255,.06);outline:1.5px solid var(--sel);outline-offset:-1px;z-index:0}
-.gallery>.obj{z-index:1}
+.gallery>.obj,.rl-list>.rl{z-index:1}
 
 /* ---------- Redlines: notes on problems in other software ---------- */
 .rl-promo{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:6px 16px;margin-top:calc(var(--cell) * 2);padding:var(--cell);text-decoration:none}
