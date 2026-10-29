@@ -389,8 +389,7 @@ a{color:inherit}
 .cover{display:none}
 .js .cover{display:block;position:fixed;inset:0;z-index:1000;background:#FFFFFF;pointer-events:none;transition:opacity .45s ease,visibility 0s .45s}
 .js.ready .cover{opacity:0;visibility:hidden}
-.anim .gallery>.obj:not(.shown):not(:first-child){opacity:0}
-.anim .rl-list>.rl:not(.shown):not(:first-child){opacity:0}
+.anim .gallery>.obj:not(.shown),.anim .rl-list>.rl:not(.shown){opacity:0}
 .gallery{position:relative}
 .slot{position:absolute;pointer-events:none;background:rgba(13,153,255,.06);outline:1.5px solid var(--sel);outline-offset:-1px;z-index:0}
 .gallery>.obj,.rl-list>.rl{z-index:1}

@@ -33,8 +33,7 @@ if (lists.length && !reduce && "IntersectionObserver" in window && Element.proto
       entries.filter((e) => e.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top || a.boundingClientRect.left - b.boundingClientRect.left)
         .forEach((e) => { io.unobserve(e.target); drop(e.target, i++ * 90); });
     }, { rootMargin: "0px 0px -6% 0px", threshold: 0.12 });
-    // The first card is already in place; the rest drop in
-    lists.forEach((list) => list.querySelectorAll(":scope > .obj, :scope > .rl").forEach((c, i) => (i ? io.observe(c) : c.classList.add("shown"))));
+    lists.forEach((list) => list.querySelectorAll(":scope > .obj, :scope > .rl").forEach((c) => io.observe(c)));
   });
 } else {
   root.classList.remove("anim");
