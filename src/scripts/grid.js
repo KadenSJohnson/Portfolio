@@ -14,8 +14,11 @@
     if (cell === lastCell) return;
     lastCell = cell;
     const color = (getComputedStyle(root).getPropertyValue("--dot") || "#D6CCC1").trim();
-    let step = 3;
-    for (const s of [3, 4, 5, 2]) if (cell % s === 0) { step = s; break; }
+    // Dot spacing grows with the cell (about 1/8 of it), so bigger screens get visibly dotted lines.
+    // Prefer a spacing that divides the cell evenly so the dots line up across tiles.
+    const want = Math.max(3, Math.round(cell / 8));
+    let step = want;
+    for (const s of [want, want + 1, want - 1, want + 2, want - 2]) if (s >= 3 && cell % s === 0) { step = s; break; }
     let r = "";
     for (let p = 0; p < cell; p += step) r += `<rect x="${p}" y="0" width="1" height="1"/>` + (p ? `<rect x="0" y="${p}" width="1" height="1"/>` : "");
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${cell}" height="${cell}" shape-rendering="crispEdges" fill="${color}">${r}</svg>`;
