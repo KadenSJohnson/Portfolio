@@ -34,7 +34,12 @@ a{color:inherit}
 .gridded .page{width:var(--content);max-width:none;margin-left:var(--gx);margin-right:0;padding-left:0;padding-right:0}
 /* Cards on the grid: white, with their top and left edge drawn on the grid line they start on;
    their right and bottom edges end exactly on the next grid lines, which then read as the border */
-.gcard,.obj{background:#FFFFFF;box-shadow:inset 1px 1px 0 var(--grid),1px 1px 0 var(--grid);padding-top:1px;padding-left:1px}
+.gcard,.obj{position:relative;background:#FFFFFF;padding-top:1px;padding-left:1px}
+/* Card edges are dotted like the grid: the top and left dots are drawn here, on the grid line the
+   card starts on; the right and bottom edges are the page's own dotted grid lines showing past it. */
+.gcard::before,.obj::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(90deg,var(--dot) 0 1px,transparent 1px var(--dot-step,3px)) 0 0/100% 1px no-repeat,
+    repeating-linear-gradient(180deg,var(--dot) 0 1px,transparent 1px var(--dot-step,3px)) 0 0/1px 100% no-repeat}
 /* The background grid, offset (--gx, set by grid.js) so a line runs along the content's left edge */
 .canvas{min-height:100vh;overflow-x:hidden;overflow-x:clip;
   background-image:var(--grid-img,linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px));
@@ -129,7 +134,8 @@ a{color:inherit}
 /* Images fill their reserved box exactly; positioned so Safari can't size them from the file instead */
 .ph.is-real img{position:absolute;inset:0}
 .ph img{display:block;width:100%;height:100%;object-fit:cover}
-.obj-cap{display:grid;align-content:start;gap:4px;padding:calc(var(--cell) / 2);border-top:1px solid var(--grid)}
+.obj-cap{display:grid;align-content:start;gap:4px;padding:calc(var(--cell) / 2);border-top:1px solid transparent;
+  background:repeating-linear-gradient(90deg,var(--dot) 0 1px,transparent 1px var(--dot-step,3px)) -1px 0/calc(100% + 1px) 1px no-repeat border-box}
 .obj-title{font:600 clamp(18px,1.6vw,21px)/1.2 var(--display);letter-spacing:-.02em;text-wrap:balance}
 .obj-sub{font:400 15px/1.4 var(--display);color:var(--sub)}
 .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}

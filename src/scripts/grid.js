@@ -19,6 +19,7 @@
     let r = "";
     for (let p = 0; p < cell; p += step) r += `<rect x="${p}" y="0" width="1" height="1"/>` + (p ? `<rect x="0" y="${p}" width="1" height="1"/>` : "");
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${cell}" height="${cell}" shape-rendering="crispEdges" fill="${color}">${r}</svg>`;
+    root.style.setProperty("--dot-step", step + "px");
     root.style.setProperty("--grid-img", `url("data:image/svg+xml,${encodeURIComponent(svg)}")`);
   };
 
