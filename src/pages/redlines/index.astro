@@ -2,6 +2,7 @@
 import Layout from "../../layouts/Layout.astro";
 import TopBar from "../../components/TopBar.astro";
 import Device from "../../components/Device.astro";
+import Lightbox from "../../components/Lightbox.astro";
 import { getContent } from "../../lib/content";
 
 const { settings, redlines } = await getContent();
@@ -19,28 +20,38 @@ const day = (d: string) => (d ? fmt.format(new Date(d + "T00:00:00Z")) : "");
     </header>
     <div class="rl-list">
       {redlines.map((r) => (
-        <a class="rl gcard" href={`/redlines/${r.id}/`} data-snap>
+        <article class="rl gcard" data-id={r.id} data-snap>
           <div class={`rl-media is-${r.device}`}><Device r={r} /></div>
           <div class="rl-cap">
             <p class="rl-meta"><span>{r.app}</span><time datetime={r.date}>{day(r.date)}</time></p>
-            <h2 class="rl-title">{r.title}</h2>
+            <h2 class="rl-title" id={`t-${r.id}`}>{r.title}</h2>
           </div>
-        </a>
+          <button class="hit" type="button" data-open={r.id} aria-haspopup="dialog" aria-labelledby={`t-${r.id}`}></button>
+        </article>
       ))}
     </div>
+    {redlines.map((r) => (
+      <template id={`p-${r.id}`} data-title={r.title} data-sub={`${r.app} · ${day(r.date)}`}>
+        <div class="lb-hero"><div class={`rl-media is-${r.device}`}><Device r={r} /></div></div>
+        <div class="lb-body">
+          <dl class="rl-parts">
+            <div><dt>What I noticed</dt><dd>{r.problem}</dd></div>
+            <div><dt>Why it matters</dt><dd>{r.why}</dd></div>
+            <div><dt>How I'd fix it</dt><dd>{r.fix}</dd></div>
+          </dl>
+        </div>
+      </template>
+    ))}
     <footer class="foot gcard" data-snap>
       <a href="/">Back to the portfolio</a>
       <span>© 2026</span>
     </footer>
   </div>
   </div>
+  <Lightbox />
   <script>
     import "../../scripts/reveal.js";
+    import "../../scripts/app.js";
     import "../../scripts/grid.js";
-    // Copy email in the top bar
-    document.querySelectorAll<HTMLButtonElement>("[data-copy]").forEach((b) => b.addEventListener("click", () => {
-      const done = () => { b.textContent = "Copied"; setTimeout(() => { b.textContent = "Copy email"; }, 1600); };
-      try { navigator.clipboard.writeText(b.dataset.copy || "").then(done, () => {}); } catch (e) {}
-    }));
   </script>
 </Layout>

@@ -412,12 +412,14 @@ a{color:inherit}
 @media (min-width:720px){.rl .rl-media{height:calc(var(--cell) * 11 - 1px)}}
 .rl-cap{display:grid;gap:6px;padding:calc(var(--cell) / 2);border-top:1px solid transparent;
   background:repeating-linear-gradient(90deg,var(--dot) 0 1px,transparent 1px var(--dot-step,3px)) -1px 0/calc(100% + 1px) 1px no-repeat border-box}
-.rl:hover .rl-title{text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1.5px}
+.rl:has(.hit:hover) .rl-title{text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1.5px}
 .rl-meta{display:flex;flex-wrap:wrap;gap:4px 12px;font:500 13px/1.3 var(--mono);color:var(--mu)}
 .rl-meta span{color:var(--sub);font-weight:600}
 .rl-title{font:650 clamp(18px,1.7vw,22px)/1.25 var(--display);letter-spacing:-.02em;text-wrap:balance}
 .rl-title.big{font-size:clamp(24px,2.6vw,34px);line-height:1.15}
-/* Detail page: media left, text right on desktop */
+/* In the lightbox: the frame fills the hero box; a close crop stays square so its selection box lands right */
+.lb-hero .dev-crop{position:relative;inset:auto;height:100%;aspect-ratio:1/1;max-width:100%}
+/* Detail layout (kept for reference): media left, text right on desktop */
 .rl-back{display:flex;align-items:center;gap:8px;width:max-content;max-width:100%;margin-block:calc(var(--cell) * 2);padding:0 calc(var(--cell) / 2);height:calc(var(--cell) * 2);font:600 15px/1 var(--display);text-decoration:none}
 .rl-detail{display:grid;grid-template-columns:minmax(0,1fr)}
 @media (min-width:720px){.rl-detail{grid-template-columns:calc(var(--cell) * 15 - 1px) minmax(0,1fr)}}

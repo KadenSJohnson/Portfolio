@@ -90,7 +90,8 @@ import { Model3D } from "./model3d.js";
       });
     });
   };
-  mountModels(document.querySelector(".gallery"));
+  const galleryEl = document.querySelector(".gallery");
+  if (galleryEl) mountModels(galleryEl);
 
   /* Before / after sliders (works for copies cloned into the lightbox too) */
   document.addEventListener("input", (e) => {
@@ -154,7 +155,7 @@ import { Model3D } from "./model3d.js";
   const tagsEl = document.getElementById("lb-tags");
   let current = null, opener = null;
 
-  const visibleIds = () => Array.from(document.querySelectorAll(".gallery > .obj[data-id]")).filter((o) => !o.hidden).map((o) => o.dataset.id);
+  const visibleIds = () => Array.from(document.querySelectorAll(".gallery > .obj[data-id], .rl-list > .rl[data-id]")).filter((o) => !o.hidden).map((o) => o.dataset.id);
   const setHash = (h) => { try { history.replaceState(null, "", h ? "#" + h : location.pathname + location.search); } catch (e) {} };
 
   const show = (id) => {
@@ -163,7 +164,7 @@ import { Model3D } from "./model3d.js";
     current = id;
     titleEl.textContent = tpl.dataset.title;
     subEl.textContent = tpl.dataset.sub;
-    const card = document.querySelector('.obj[data-id="' + id + '"] .tags');
+    const card = document.querySelector('[data-id="' + id + '"] .tags');
     tagsEl.innerHTML = card ? card.innerHTML : "";
     const barTags = document.getElementById("lb-bar-tags");
     if (barTags) barTags.innerHTML = tagsEl.innerHTML;
