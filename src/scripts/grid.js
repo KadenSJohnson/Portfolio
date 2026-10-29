@@ -30,7 +30,8 @@
     const vw = root.clientWidth;
     const cols = parseFloat(getComputedStyle(root).getPropertyValue("--cols")) || 12;
     const gut = vw < 720 ? 20 : 40;
-    const cell = Math.max(8, Math.floor((Math.min(1200, vw) - 2 * gut) / cols));
+    const maxw = parseFloat(getComputedStyle(root).getPropertyValue("--maxw")) || 1440;
+    const cell = Math.max(8, Math.floor((Math.min(maxw, vw) - 2 * gut) / cols));
     const content = cell * cols;
     root.style.setProperty("--cell", cell + "px");
     dots(cell);
