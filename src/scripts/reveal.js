@@ -38,3 +38,28 @@ if (lists.length && !reduce && "IntersectionObserver" in window && Element.proto
 } else {
   root.classList.remove("anim");
 }
+
+// Hover (mouse and trackpad only): the card lifts out of a blue slot, the reverse of the scroll-in
+if (!reduce && matchMedia("(hover: hover) and (pointer: fine)").matches) {
+  document.querySelectorAll(".gallery > .obj, .rl-list > .rl").forEach((card) => {
+    let slot = null;
+    card.addEventListener("pointerenter", () => {
+      if (!card.classList.contains("shown") && root.classList.contains("anim")) return; // still dropping in
+      if (!slot) {
+        slot = document.createElement("div");
+        slot.className = "slot hover";
+        card.parentElement.append(slot);
+      }
+      slot.style.cssText = `top:${card.offsetTop}px;left:${card.offsetLeft}px;width:${card.offsetWidth}px;height:${card.offsetHeight}px`;
+      requestAnimationFrame(() => slot && slot.classList.add("on"));
+      card.classList.add("lifted");
+    });
+    card.addEventListener("pointerleave", () => {
+      card.classList.remove("lifted");
+      if (!slot) return;
+      const s = slot; slot = null;
+      setTimeout(() => s.classList.remove("on"), 250);   // the slot clears as the card settles
+      setTimeout(() => s.remove(), 600);
+    });
+  });
+}
