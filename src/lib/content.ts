@@ -31,7 +31,7 @@ export function getContent() {
     const fallback = { settings: local.settings, projects: local.projects, testimonials: local.testimonials, redlines: local.redlines, source: "local" };
     if (!SANITY.projectId) return fallback;
     try {
-      const url = `https://${SANITY.projectId}.apicdn.sanity.io/v${SANITY.apiVersion}/data/query/${SANITY.dataset}?query=${encodeURIComponent(QUERY)}&perspective=published`;
+      const url = `https://${SANITY.projectId}.api.sanity.io/v${SANITY.apiVersion}/data/query/${SANITY.dataset}?query=${encodeURIComponent(QUERY)}&perspective=published`;
       const res = await fetch(url);
       if (!res.ok) throw new Error(`Sanity responded ${res.status}`);
       const { result } = await res.json();
