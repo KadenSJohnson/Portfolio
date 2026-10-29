@@ -1,0 +1,92 @@
+---
+// Test layout: the nitpicks as a magazine. Desktop shows an open spread (the problem on the left,
+// the fix on the right) and pages turn in 3D; phones show one page at a time.
+import Layout from "../../layouts/Layout.astro";
+import TopBar from "../../components/TopBar.astro";
+import Device from "../../components/Device.astro";
+import { getContent } from "../../lib/content";
+import type { Redline } from "../../lib/content";
+
+const { settings, redlines } = await getContent();
+const fmt = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
+const day = (d: string) => (d ? fmt.format(new Date(d + "T00:00:00Z")) : "");
+const fixMedia = (r: Redline): Redline | null =>
+  r.fixImage || r.fixVideo || r.fixImageAsset
+    ? { ...r, image: r.fixImage, video: r.fixVideo, imageAsset: r.fixImageAsset, poster: undefined, mark: undefined, alt: `Kaden's fix for: ${r.title}` }
+    : null;
+---
+<Layout title="My Nitpicks · Kaden Johnson" description="Small problems Kaden Johnson notices in the apps he uses, and how he'd fix them.">
+  <div class="canvas">
+  <div class="page">
+    <TopBar settings={settings} base="/" />
+    <section class="bk-wrap gcard" aria-label="My nitpicks, as a magazine" data-snap>
+      <div class="bk-stage" data-book aria-live="polite"></div>
+      <nav class="bk-nav" aria-label="Pages">
+        <button class="pill light" type="button" data-bk-prev aria-label="Previous page">←</button>
+        <button class="bk-at" type="button" data-bk-goto="0"><span data-bk-at>Contents</span></button>
+        <button class="pill" type="button" data-bk-next aria-label="Next page">→</button>
+      </nav>
+    </section>
+    <footer class="foot gcard" data-snap>
+      <a href="/">Back to the portfolio</a>
+      <span>© 2026</span>
+    </footer>
+  </div>
+  </div>
+
+  <!-- Pages in reading order: left, right, left, right… book.js lays them out as spreads or single pages -->
+  <template id="bk-pages">
+    <article class="bk-pg bk-cover" data-label="Cover">
+      <p class="bk-kicker">Kaden Johnson</p>
+      <h1 class="bk-cover-t">My<br />nitpicks</h1>
+      <p class="bk-cover-l">Small things I notice in the apps I use, and how I'd fix them.</p>
+      <p class="bk-cover-n">{redlines.length} {redlines.length === 1 ? "nitpick" : "nitpicks"} inside</p>
+    </article>
+    <article class="bk-pg bk-contents" data-label="Contents">
+      <header class="bk-run"><span>Contents</span><span></span></header>
+      <ol class="bk-toc">
+        {redlines.map((r, i) => (
+          <li><button type="button" data-bk-goto={i + 1}>
+            <span class="bk-toc-n">{String(i * 2 + 3).padStart(2, "0")}</span>
+            <span class="bk-toc-t">{r.title}<small>{r.app}</small></span>
+          </button></li>
+        ))}
+      </ol>
+      <footer class="bk-num">02</footer>
+    </article>
+    {redlines.map((r, i) => {
+      const fm = fixMedia(r);
+      return (
+        <>
+          <article class="bk-pg bk-problem" data-label={r.app}>
+            <header class="bk-run"><span>The problem</span><span>{r.app}</span></header>
+            <div class={`bk-media rl-media is-${r.device}`}><Device r={r} /></div>
+            <p class="rl-meta"><span>{r.app}</span><time datetime={r.date}>{day(r.date)}</time></p>
+            <h2 class="bk-title">{r.title}</h2>
+            <div class="bk-sec"><h3>What I noticed</h3><p>{r.problem}</p></div>
+            <footer class="bk-num">{String(i * 2 + 3).padStart(2, "0")}</footer>
+          </article>
+          <article class="bk-pg bk-fixpg" data-label={r.app}>
+            <header class="bk-run"><span>The fix</span><span>{r.app}</span></header>
+            <div class="bk-sec"><h3>Why it matters</h3><p>{r.why}</p></div>
+            <div class="bk-sec"><h3>How I'd fix it</h3><p class="bk-fix">{r.fix}</p></div>
+            {fm
+              ? <div class={`bk-media rl-media is-${fm.device}`}><Device r={fm} /></div>
+              : <div class="bk-media bk-sketch"><span>Room for a sketch or mockup of the fix</span></div>}
+            <footer class="bk-num">{String(i * 2 + 4).padStart(2, "0")}</footer>
+          </article>
+        </>
+      );
+    })}
+  </template>
+
+  <script>
+    import "../../scripts/reveal.js";
+    import "../../scripts/grid.js";
+    import "../../scripts/book.js";
+    document.querySelectorAll<HTMLButtonElement>("[data-copy]").forEach((b) => b.addEventListener("click", () => {
+      const done = () => { b.textContent = "Copied"; setTimeout(() => { b.textContent = "Copy email"; }, 1600); };
+      try { navigator.clipboard.writeText(b.dataset.copy || "").then(done, () => {}); } catch (e) {}
+    }));
+  </script>
+</Layout>

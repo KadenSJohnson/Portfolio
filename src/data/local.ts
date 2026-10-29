@@ -48,6 +48,7 @@ export interface Redline {
   video?: string; image?: string; poster?: string; imageAsset?: SanityImage; alt: string;
   focus?: string; zoom?: number; mark?: { x: number; y: number; w: number; h: number };
   problem: string; why: string; fix: string;
+  fixImage?: string; fixVideo?: string; fixImageAsset?: SanityImage; // optional sketch or mockup of the fix
 }
 export interface Testimonial { id: string; order: number; ask?: string; quote: string; name: string; role: string; photoFile: string; logoFile: string; photo?: SanityImage; logo?: SanityImage; tilt: number }
 

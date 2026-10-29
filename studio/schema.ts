@@ -130,6 +130,8 @@ const redline = defineType({
     defineField({ name: "problem", title: "What I noticed", type: "text", rows: 3 }),
     defineField({ name: "why", title: "Why it matters", type: "text", rows: 2 }),
     defineField({ name: "fix", title: "How I'd fix it", type: "text", rows: 2 }),
+    defineField({ name: "fixImageUpload", title: "Fix: image", type: "image", description: "Optional sketch or mockup of your fix." }),
+    defineField({ name: "fixVideoUpload", title: "Fix: video", type: "file", options: { accept: "video/mp4,video/quicktime" } }),
     defineField({ name: "videoFile", title: "Video file on the site", type: "string", hidden: true }),
     defineField({ name: "imageFile", title: "Image file on the site", type: "string", hidden: true }),
     defineField({ name: "poster", type: "string", hidden: true }),

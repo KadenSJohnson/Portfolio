@@ -16,7 +16,7 @@ const QUERY = `{
   },
   "redlines": *[_type == "redline"] | order(date desc){
     "id": slug.current, date, app, title, device, "video": coalesce(videoUpload.asset->url, videoFile), image: imageFile, imageAsset: image,
-    poster, alt, focus, zoom, mark, problem, why, fix
+    poster, alt, focus, zoom, mark, problem, why, fix, "fixImageAsset": fixImageUpload, "fixVideo": fixVideoUpload.asset->url
   }
 }`;
 
