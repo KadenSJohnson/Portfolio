@@ -57,26 +57,3 @@ try {
   process.exit(1);
 }
 
-// One-time: regroup the first nitpick's screenshots into two side-by-side rows (text unchanged,
-// only the order). Skipped if the nitpick has been edited since.
-try {
-  const d = await client.fetch(`*[_id == "redline-first-nitpick"][0]{_updatedAt, body1}`);
-  if (d && d._updatedAt === "2026-10-29T23:36:33Z") {
-    const by = Object.fromEntries((d.body1 || []).map((b) => [b._key, b]));
-    const pic = (k) => ({ _type: "image", _key: by[k]._key, asset: by[k].image.asset, alt: by[k].alt });
-    const row = (key, ks) => ({ _type: "rtGallery", _key: key, frame: "phone", images: ks.map(pic) });
-    const body1 = [
-      by["1pvi4owy"], by["7fab612b4aa0"],
-      row("row-launch", ["0d7f60726a23", "f12dd7b79891"]),
-      by["c41ac041d6b2"], by["22e9c9108964"], by["c0c01c5b69af"],
-      row("row-loading", ["f3fdea6c3289", "b02f329782f5", "22b19a63462b"]),
-      by["c6b180543a82"],
-    ];
-    if (body1.every(Boolean)) {
-      await client.patch("redline-first-nitpick").set({ body1 }).commit();
-      console.log("[seed] Regrouped the first nitpick's screenshots into rows.");
-    }
-  }
-} catch (e) {
-  console.log("[seed] Couldn't regroup the first nitpick:", e.message);
-}
