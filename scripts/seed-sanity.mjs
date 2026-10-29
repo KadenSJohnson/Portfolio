@@ -57,3 +57,17 @@ try {
   process.exit(1);
 }
 
+// One-time: upload the slowed-down Amazon clip (converted to MP4 so it plays everywhere) as the
+// first nitpick's video. Skipped once that video is in place.
+try {
+  const fs = await import("node:fs");
+  const NAME = "amazon-launch-slow.mp4";
+  const cur = await client.fetch(`*[_id == "redline-first-nitpick"][0].videoUpload.asset->originalFilename`);
+  if (cur !== NAME) {
+    const asset = await client.assets.upload("file", fs.createReadStream(`public/video/${NAME}`), { filename: NAME, contentType: "video/mp4" });
+    await client.patch("redline-first-nitpick").set({ videoUpload: { _type: "file", asset: { _type: "reference", _ref: asset._id } } }).commit();
+    console.log("[seed] Uploaded the slowed-down video to the first nitpick.");
+  }
+} catch (e) {
+  console.log("[seed] Couldn't upload the first nitpick video:", e.message);
+}
