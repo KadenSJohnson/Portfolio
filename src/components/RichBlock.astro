@@ -5,6 +5,7 @@ import Meta from "./Meta.astro";
 import Stats from "./Stats.astro";
 import Figs from "./Figs.astro";
 import ProblemSolution from "./ProblemSolution.astro";
+import RichMedia from "./RichMedia.astro";
 interface Props { block: Block; li?: boolean }
 const b = Astro.props.block;
 const Tag = Astro.props.li ? "li" : "p";
@@ -34,3 +35,4 @@ if (b._type === "block") {
 {b._type === "figures" && <Figs items={b.items || []} cols={b.cols || 2} />}
 {b._type === "pullQuote" && <blockquote class="pull">{b.text}<cite>{b.cite}</cite></blockquote>}
 {b._type === "problemSolution" && <ProblemSolution problem={b.problem} solution={b.solution} />}
+{(b._type === "rtImage" || b._type === "rtVideo") && <RichMedia block={b} />}

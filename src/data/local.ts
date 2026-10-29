@@ -11,7 +11,9 @@ export type Block =
   | { _type: "stats"; _key: string; items: { _key: string; num: string; label: string; detail?: string }[] }
   | { _type: "figures"; _key: string; cols: 1 | 2; items: { _key: string; imageFile?: string; image?: SanityImage; label: string }[] }
   | { _type: "pullQuote"; _key: string; text: string; cite: string }
-  | { _type: "problemSolution"; _key: string; problem: string; solution: string };
+  | { _type: "problemSolution"; _key: string; problem: string; solution: string }
+  | { _type: "rtImage"; _key: string; image?: SanityImage; frame?: "none" | "phone" | "desktop"; caption?: string; alt?: string }
+  | { _type: "rtVideo"; _key: string; url?: string; frame?: "none" | "phone" | "desktop"; caption?: string };
 export type SanityImage = { asset?: { _ref: string } };
 
 let n = 0;

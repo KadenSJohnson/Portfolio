@@ -1,0 +1,21 @@
+---
+// An image or video placed between paragraphs (nitpicks), plain or in an iPhone / laptop frame
+import Device from "./Device.astro";
+import { imageUrl } from "../lib/content";
+interface Props { block: any }
+const b = Astro.props.block;
+const isVideo = b._type === "rtVideo";
+const src = isVideo ? b.url : imageUrl(b.image, null, (f) => f, 2000);
+const frame = b.frame && b.frame !== "none" ? b.frame : null;
+const alt = b.alt || b.caption || "";
+---
+{src && (
+  <figure class={`rt-media${frame ? " framed" : ""}`}>
+    {frame
+      ? <div class={`rt-dev is-${frame}`}><Device r={{ id: b._key, date: "", app: "", title: "", device: frame, video: isVideo ? src : undefined, image: isVideo ? undefined : src, alt } as any} /></div>
+      : isVideo
+        ? <video src={src} autoplay muted loop playsinline preload="metadata" aria-label={alt}></video>
+        : <img src={src} alt={alt} loading="lazy" decoding="async" />}
+    {b.caption && <figcaption>{b.caption}</figcaption>}
+  </figure>
+)}

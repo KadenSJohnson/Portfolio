@@ -108,6 +108,21 @@ const testimonial = defineType({
   preview: { select: { title: "name", subtitle: "quote", media: "photo" } },
 });
 
+// Images and videos that can sit between paragraphs in a nitpick's text, optionally in a device frame
+const FRAME = defineField({ name: "frame", title: "Frame", type: "string", initialValue: "none",
+  options: { list: [{ title: "None", value: "none" }, { title: "iPhone", value: "phone" }, { title: "Laptop", value: "desktop" }], layout: "radio", direction: "horizontal" } });
+const MEDIA = [
+  defineArrayMember({ type: "object", name: "rtImage", title: "Image", fields: [
+    defineField({ name: "image", type: "image" }),
+    defineField({ name: "alt", title: "Describe the image", type: "string" }),
+    FRAME, defineField({ name: "caption", type: "string" }),
+  ], preview: { select: { title: "caption", media: "image" }, prepare: ({ title, media }) => ({ title: title || "Image", media }) } }),
+  defineArrayMember({ type: "object", name: "rtVideo", title: "Video", fields: [
+    defineField({ name: "file", title: "Video", type: "file", options: { accept: "video/mp4,video/quicktime,video/webm" }, description: "MP4 plays in every browser. iPhone .mov files may not play in Chrome." }),
+    FRAME, defineField({ name: "caption", type: "string" }),
+  ], preview: { select: { title: "caption" }, prepare: ({ title }) => ({ title: title || "Video" }) } }),
+];
+
 const redline = defineType({
   name: "redline", title: "Nitpick", type: "document",
   fields: [
@@ -133,7 +148,7 @@ const redline = defineType({
         lists: [{ title: "Bullets", value: "bullet" }, { title: "Numbers", value: "number" }],
         marks: { decorators: [{ title: "Bold", value: "strong" }, { title: "Italic", value: "em" }],
           annotations: [{ name: "link", type: "object", title: "Link", fields: [defineField({ name: "href", type: "url", title: "URL" })] }] },
-      })] }),
+      }), ...MEDIA] }),
     ]),
     defineField({ name: "fixImageUpload", title: "Fix: image", type: "image", description: "Optional sketch or mockup of your fix." }),
     defineField({ name: "fixVideoUpload", title: "Fix: video", type: "file", options: { accept: "video/mp4,video/quicktime" } }),
