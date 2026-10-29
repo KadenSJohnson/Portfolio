@@ -9,7 +9,6 @@ export default defineConfig({
   title: "Kaden Johnson · Portfolio",
   projectId: SANITY.projectId,
   dataset: SANITY.dataset,
-  basePath: "/admin",
   plugins: [structureTool({ structure })],
   schema: {
     types: schemaTypes,
