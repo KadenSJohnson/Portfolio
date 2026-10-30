@@ -139,7 +139,7 @@
   addEventListener("resize", showDims);
   sel.addEventListener("click", play);
   sel.style.cursor = "pointer";
-  // Start once the load cover clears (the web font is in by then, so the box measures the real text)
+  // Start once the web font is in, so the box measures the real text
   const go = () => setTimeout(play, 100);
   if (window.siteReady) window.siteReady.then(go);
   else if (document.fonts && document.fonts.ready) Promise.race([document.fonts.ready, new Promise((r) => setTimeout(r, 1500))]).then(go);

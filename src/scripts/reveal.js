@@ -1,5 +1,4 @@
-/* Page load: a white cover fades away once the font and first images are in, then the hero
-   plays. Cards: as each one scrolls into view, a blue Figma "slot" appears and the card is
+/* Page load: the hero plays once the font is in. Cards: as each one scrolls into view, a blue Figma "slot" appears and the card is
    dropped into it like a component being placed, then the slot clears. Plays once per card.
    Reduced motion: no card animation. */
 const root = document.documentElement;
@@ -21,10 +20,9 @@ if ("IntersectionObserver" in window) {
 } else vids.forEach(startVideo);
 const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-const loaded = new Promise((r) => (document.readyState === "complete" ? r() : addEventListener("load", r, { once: true })));
+// Animations start once the web font is in (so text is measured right), or after 0.8s at most
 const fonts = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
-window.siteReady = Promise.race([Promise.all([loaded, fonts]), new Promise((r) => setTimeout(r, 1800))])
-  .then(() => { root.classList.add("ready"); return new Promise((r) => setTimeout(r, 200)); });
+window.siteReady = Promise.race([fonts, new Promise((r) => setTimeout(r, 800))]).then(() => { root.classList.add("ready"); });
 
 const lists = Array.from(document.querySelectorAll(".gallery, .rl-list"));
 if (lists.length && !reduce && "IntersectionObserver" in window && Element.prototype.animate) {

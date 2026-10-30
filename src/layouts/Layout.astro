@@ -19,8 +19,6 @@ const { title, description } = Astro.props;
         var r = document.documentElement;
         r.classList.add("js");
         if (!matchMedia("(prefers-reduced-motion: reduce)").matches) r.classList.add("anim");
-        // Never leave the cover up if the page script fails
-        setTimeout(function () { r.classList.add("ready"); }, 3000);
       })();
     </script>
     <style is:global>
@@ -31,7 +29,6 @@ const { title, description } = Astro.props;
     </style>
   </head>
   <body>
-    <div class="cover" aria-hidden="true"></div>
     <Sprite />
     <slot />
   </body>
