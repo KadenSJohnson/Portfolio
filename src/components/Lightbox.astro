@@ -1,13 +1,14 @@
 <dialog class="lb" id="lightbox" aria-labelledby="lb-title">
-  <div class="sheet" tabindex="-1" autofocus>
-    <div class="lb-bar">
-      <div class="lb-nav">
-        <button class="lb-btn" type="button" data-step="-1" aria-label="Previous project"><svg class="flip" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arw" /></svg></button>
-        <button class="lb-btn" type="button" data-step="1" aria-label="Next project"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arw" /></svg></button>
-      </div>
-      <div class="tags lb-bar-tags" id="lb-bar-tags" aria-hidden="true"></div>
-      <button class="lb-btn" type="button" data-close aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-close" /></svg></button>
+  <!-- Buttons sit outside the sheet so the sheet's opening animation doesn't carry them along -->
+  <div class="lb-bar">
+    <div class="lb-nav">
+      <button class="lb-btn" type="button" data-step="-1" aria-label="Previous project"><svg class="flip" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arw" /></svg></button>
+      <button class="lb-btn" type="button" data-step="1" aria-label="Next project"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arw" /></svg></button>
     </div>
+    <div class="tags lb-bar-tags" id="lb-bar-tags" aria-hidden="true"></div>
+    <button class="lb-btn" type="button" data-close aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-close" /></svg></button>
+  </div>
+  <div class="sheet" tabindex="-1" autofocus>
     <header class="lb-head">
       <div class="tags" id="lb-tags"></div>
       <h2 id="lb-title"></h2>
