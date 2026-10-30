@@ -1,0 +1,9 @@
+---
+// A looping, muted clip (plays inline on phones); the poster holds its space until it loads
+import type { VideoInfo } from "../data/projects";
+interface Props { video: VideoInfo }
+const { video } = Astro.props;
+---
+<div class={`vid-wrap${video.fit === "contain" ? " contain" : ""}`}>
+  <video data-src={video.src} poster={video.poster ? `/images/${video.poster}` : undefined} muted loop playsinline preload="none" aria-label={video.label}></video>
+</div>

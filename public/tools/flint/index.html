@@ -1,0 +1,935 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Flint: shape a 3D stone or gem by hand, then export it as SVG, PNG or OBJ.">
+<title>Flint</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=Instrument+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap">
+<style>
+/* Reset for standalone use */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+body { margin: 0; font-size: 14px; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+
+/* Layout: workbench — control rail on the left, square 3D stage on the right with its tools underneath; stacks on phones with the stage first. */
+:root {
+  --paper: #FFFFFF;
+  --panel: #FFFFFF;
+  --stage: #FFFFFF;
+  --stage-2: #F6F4F3;
+  --ink: #3A0C0B;
+  --ink-2: #6E5350;
+  --line: #ECE7E4;
+  --accent: #EDF23B;
+  --accent-ink: #26270A;
+  --chip: #F3EFED;
+  color-scheme: light;
+  --display: "Bricolage Grotesque", "Arial Black", Impact, sans-serif;
+  --body: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "DM Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --r: 14px;
+}
+.stage { border: 1px solid var(--line); }
+* { box-sizing: border-box; }
+body {
+  background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 14px; line-height: 1.45;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 20px 40px;
+}
+.wrap { max-width: 1180px; margin: 0 auto; }
+header { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px 24px; }
+h1 { font-family: var(--display); font-weight: 800; font-size: clamp(34px, 6vw, 56px); line-height: .92; letter-spacing: -0.03em; margin: 0; }
+.lede { margin: 6px 0 0; color: var(--ink-2); max-width: 50ch; }
+.pill { font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; background: var(--accent); color: var(--accent-ink); padding: 6px 12px; border-radius: 999px; white-space: nowrap; }
+
+.app { display: grid; grid-template-columns: 330px minmax(0, 1fr); gap: 20px; align-items: start; }
+@media (max-width: 860px) { .app { grid-template-columns: minmax(0, 1fr); } .stage-col { order: -1; } }
+
+.rail { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 16px; display: grid; gap: 18px; min-width: 0; }
+.group { display: grid; gap: 10px; }
+.group + .group { border-top: 1px solid var(--line); padding-top: 16px; }
+.gh { font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); margin: 0; }
+.note { font-size: 12px; color: var(--ink-2); margin: -4px 0 0; }
+.noterow { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.noterow .note { margin: 0; min-width: 0; }
+.seg { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; padding: 3px; background: var(--chip); border-radius: 999px; }
+.seg button { border: 0; background: none; border-radius: 999px; padding: 7px 10px; font: 600 13px var(--body); color: var(--ink-2); cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--panel); }
+#gemctrls > .group { padding-top: 4px; }
+[hidden] { display: none !important; }
+.ctrl { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 2px 8px; position: relative; }
+.ctrl label { font-weight: 500; }
+.lab { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.info { width: 18px; height: 18px; padding: 0; border: 0; background: none; color: var(--ink-2); cursor: help; display: inline-grid; place-items: center; border-radius: 50%; flex: none; }
+.info svg { width: 15px; height: 15px; display: block; }
+.info:hover, .info:focus-visible { color: var(--ink); }
+.tip { position: absolute; left: 0; right: 0; bottom: calc(100% + 6px); z-index: 12; background: var(--ink); color: var(--panel); font-size: 12.5px; line-height: 1.4; padding: 8px 11px; border-radius: 10px; opacity: 0; visibility: hidden; transform: translateY(4px); transition: opacity .15s, transform .15s, visibility .15s; pointer-events: none; }
+.ctrl:has(.info:hover) .tip, .ctrl:has(.info:focus) .tip { opacity: 1; visibility: visible; transform: none; }
+.num { width: 66px; text-align: right; font: 12px var(--mono); color: var(--ink-2); background: transparent; border: 1px solid transparent; border-radius: 7px; padding: 2px 6px; font-variant-numeric: tabular-nums; cursor: text; }
+.num:hover { border-color: var(--line); background: var(--paper); }
+.num:focus { color: var(--ink); background: var(--paper); border-color: var(--ink-2); outline: none; }
+@media (pointer: coarse) { .num { font-size: 16px; width: 76px; } }
+.ctrl input[type=range] { grid-column: 1 / -1; }
+
+input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 22px; background: transparent; margin: 0; cursor: pointer; }
+input[type=range]::-webkit-slider-runnable-track { height: 4px; border-radius: 4px; background: var(--line); }
+input[type=range]::-moz-range-track { height: 4px; border-radius: 4px; background: var(--line); }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--ink); border: 3px solid var(--panel); margin-top: -7px; box-shadow: 0 0 0 1px var(--ink); }
+input[type=range]::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: var(--ink); border: 3px solid var(--panel); box-shadow: 0 0 0 1px var(--ink); }
+
+.btn {
+  font: 500 13px var(--body); color: var(--ink); background: var(--chip); border: 1px solid transparent;
+  border-radius: 999px; padding: 7px 13px; cursor: pointer; white-space: nowrap;
+}
+.btn:hover:not(:disabled) { border-color: var(--ink-2); }
+.btn:disabled { opacity: .45; cursor: default; }
+.btn.primary { background: var(--ink); color: var(--panel); font-weight: 600; }
+.btn.hot { background: var(--accent); color: var(--accent-ink); }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+.seedrow { display: flex; gap: 8px; align-items: center; }
+.seedrow input[type=number] { width: 100%; min-width: 0; font: 500 14px var(--mono); color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 7px 10px; }
+
+.swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); gap: 8px; }
+.sw { display: grid; justify-items: center; gap: 4px; background: none; border: 0; padding: 4px 0; cursor: pointer; color: var(--ink-2); font: 11px var(--body); border-radius: 10px; }
+.sw i { width: 34px; height: 34px; border-radius: 50%; display: block; box-shadow: 0 0 0 1px rgba(0,0,0,.12), inset -5px -6px 0 rgba(0,0,0,.18); }
+.sw[aria-pressed="true"] { color: var(--ink); font-weight: 600; }
+.sw[aria-pressed="true"] i { box-shadow: 0 0 0 2px var(--panel), 0 0 0 4px var(--ink), inset -5px -6px 0 rgba(0,0,0,.18); }
+.custom { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--ink-2); }
+.custom input[type=color] { width: 34px; height: 34px; border: 1px solid var(--line); padding: 2px; background: var(--paper); border-radius: 10px; cursor: pointer; }
+
+.stage-col { display: grid; gap: 14px; min-width: 0; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); }
+@media (max-width: 860px) { .stage-col { position: static; } }
+.stage {
+  position: relative; border-radius: 22px; overflow: hidden; aspect-ratio: 1 / 1; width: 100%; max-width: min(100%, 72vh); margin: 0 auto;
+  background: radial-gradient(75% 70% at 50% 42%, var(--stage) 0%, var(--stage-2) 100%);
+  touch-action: none; user-select: none; -webkit-user-select: none;
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36' viewBox='0 0 36 36'%3E%3Cpath d='M5 32 L19 15' stroke='%235a250b' stroke-width='5' stroke-linecap='round'/%3E%3Cpath d='M5 32 L19 15' stroke='%23b8642c' stroke-width='3' stroke-linecap='round'/%3E%3Cpath d='M13 10 L20 4 L31 9 L33 17 L26 23 L16 19 Z' fill='%23f6ac7c' stroke='%235a250b' stroke-width='1.6' stroke-linejoin='round'/%3E%3Cpath d='M20 4 L22 12 L33 17' fill='none' stroke='%235a250b' stroke-width='1'/%3E%3C/svg%3E") 31 10, crosshair;
+}
+.stage.dragging { cursor: grabbing; }
+.stage svg { display: block; width: 100%; height: 100%; }
+.export { position: relative; }
+.menu { position: absolute; right: 0; top: calc(100% + 8px); z-index: 15; width: min(300px, calc(100vw - 32px)); background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 6px; display: grid; gap: 2px; box-shadow: 0 14px 34px -12px rgba(30, 10, 8, .35); }
+.menu button { display: grid; gap: 1px; text-align: left; background: none; border: 0; border-radius: 10px; padding: 9px 10px; cursor: pointer; color: var(--ink); font: 13px var(--body); }
+.menu button b { font-weight: 600; }
+.menu button span { color: var(--ink-2); font-size: 12px; }
+.menu button:hover, .menu button:focus-visible { background: var(--chip); }
+.knock { animation: knock .14s ease-out; }
+@keyframes knock { 30% { transform: translate(2px, 1px); } 60% { transform: translate(-1px, -1px); } }
+
+.bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
+.bar > div { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.thumbs { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
+@media (max-width: 520px) { .thumbs { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.thumb { aspect-ratio: 1; border-radius: 12px; background: var(--panel); border: 1px solid var(--line); padding: 2px; cursor: pointer; position: relative; }
+.thumb:hover { border-color: var(--ink-2); }
+.thumb svg { width: 100%; height: 100%; display: block; }
+.thumb span { position: absolute; left: 7px; bottom: 4px; font: 10px var(--mono); color: var(--ink-2); }
+.subhead { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+
+details { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 10px 14px; }
+summary { cursor: pointer; font-weight: 500; }
+textarea { width: 100%; min-height: 150px; margin-top: 10px; font: 11px/1.5 var(--mono); color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 10px; resize: vertical; }
+
+.toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translate(-50%, 20px); opacity: 0; background: var(--ink); color: var(--panel); padding: 9px 16px; border-radius: 999px; font-weight: 500; transition: .25s; pointer-events: none; z-index: 20; }
+.toast.on { opacity: 1; transform: translate(-50%, 0); }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="app">
+    <aside class="rail">
+      <div class="group">
+        <p class="gh">Material</p>
+        <div class="seg" id="material" role="group" aria-label="Material">
+          <button type="button" data-m="stone">Stone</button>
+          <button type="button" data-m="gem">Gem</button>
+        </div>
+        <div id="gemctrls"></div>
+      </div>
+      <div class="group">
+        <p class="gh">Colour</p>
+        <div class="swatches" id="swatches"></div>
+        <label class="custom"><input type="color" id="custom"> Custom colour <span id="hexlbl"></span></label>
+      </div>
+      <div id="groups"></div>
+    </aside>
+
+    <section class="stage-col">
+      <div class="stage" id="stage">
+        <div id="art"></div>
+      </div>
+      <div class="bar">
+        <div>
+          <button class="btn" id="undo">Undo chip</button>
+          <button class="btn" id="clear">Clear chips</button>
+          <button class="btn" id="resetview">Reset view</button>
+        </div>
+        <div class="export">
+          <button class="btn primary" id="exportbtn" aria-expanded="false" aria-controls="exportmenu">Export</button>
+          <div class="menu" id="exportmenu" hidden>
+            <button type="button" data-x="copy"><b>Copy SVG code</b><span>Paste into Figma, Illustrator or HTML</span></button>
+            <button type="button" data-x="svg" class="filex"><b>SVG file</b><span>Vector, transparent background</span></button>
+            <button type="button" data-x="png" class="filex"><b>PNG image</b><span>2048 px, transparent background</span></button>
+            <button type="button" data-x="obj" class="filex"><b>OBJ 3D model</b><span>.obj + .mtl in a .zip, for Blender and other 3D apps</span></button>
+          </div>
+        </div>
+      </div>
+      <div class="subhead"><p class="gh">Other rocks with these settings</p><button class="btn hot" id="more">Shuffle</button></div>
+      <div class="thumbs" id="thumbs"></div>
+      <details id="codebox" hidden>
+        <summary>SVG code for this view</summary>
+        <textarea id="code" readonly aria-label="SVG code"></textarea>
+      </details>
+    </section>
+  </div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+/* ================= settings ================= */
+const CTRL_GROUPS = [
+  { name: 'Shape', note: 'Edits keep your chips.', action: '<button type="button" class="btn hot" id="shuffleall" title="Randomize every slider (S)">Shuffle sliders</button>', ctrls: [
+    ['width', 'Width', 0.4, 1.8, 0.01],
+    ['height', 'Height', 0.4, 1.8, 0.01],
+    ['thick', 'Thickness', 0.15, 1.3, 0.01],
+    ['fractures', 'Natural fractures', 0, 40, 1],
+    ['fdepth', 'Fracture depth', 0.05, 0.7, 0.01],
+    ['faceBias', 'Flat front face', 0, 1, 0.01],
+  ]},
+  { name: 'Hammer', ctrls: [
+    ['chip', 'Chip size', 0.05, 0.5, 0.01],
+    ['chaos', 'Chip randomness', 0, 1, 0.01],
+  ]},
+  { name: 'Gem', mount: '#gemctrls', hideName: true, ctrls: [
+    ['transp', 'Transparency', 0, 1, 0.01],
+    ['frost', 'Frost', 0, 1, 0.01],
+    ['shine', 'Shine', 0, 1, 0.01],
+    ['fire', 'Chromatic aberration', 0, 1, 0.01],
+  ]},
+  { name: 'Light', ctrls: [
+    ['shadow', 'Shadow depth', 0, 1, 0.01],
+    ['stroke', 'Outline', 0.4, 4, 0.1],
+    ['light', 'Light angle', 0, 360, 1, '°'],
+  ]},
+];
+const STONES = [
+  ['Ember', '#F08A2E'], ['Peach', '#F6AC7C'], ['Ochre', '#D99A3A'], ['Sandstone', '#E3C08A'],
+  ['Sienna', '#C46A34'], ['Rose', '#D98C8C'], ['Flint', '#A8A39B'], ['Slate', '#7C8AA0'],
+  ['Jade', '#6FA884'], ['Lapis', '#4F6FB8'], ['Basalt', '#5E616A'], ['Obsidian', '#3A3540'],
+  ['Ruby', '#D3264A'], ['Emerald', '#1F9E6A'], ['Amethyst', '#9A5BD6'], ['Quartz', '#C9D8E6'],
+];
+const DEFAULTS = {
+  seed: 482, width: 1.2, height: 1.15, thick: 0.42, fractures: 26, fdepth: 0.3, faceBias: 0.6,
+  mode: 'stone', transp: 0.55, frost: 0.1, shine: 0.75, fire: 0.35,
+  chip: 0.2, chaos: 0.5, shadow: 0.6, stroke: 1.6, light: 135, color: '#F08A2E',
+  yaw: -0.38, pitch: 0.3, chips: [],
+};
+let state = { ...DEFAULTS };
+try { const s = JSON.parse(localStorage.getItem('flint-v1') || 'null'); if (s && typeof s === 'object') state = { ...state, ...s }; } catch (e) {}
+const save = () => { try { localStorage.setItem('flint-v1', JSON.stringify(state)); } catch (e) {} };
+
+/* ================= math ================= */
+function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const add = (a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
+const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+const mul = (a, s) => [a[0] * s, a[1] * s, a[2] * s];
+const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+const len = a => Math.hypot(a[0], a[1], a[2]);
+const norm = a => { const l = len(a) || 1; return [a[0] / l, a[1] / l, a[2] / l]; };
+const lerp3 = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
+const f = n => (Math.round(n * 10) / 10).toString();
+function randUnit(r) { const z = r() * 2 - 1, t = r() * Math.PI * 2, s = Math.sqrt(1 - z * z); return [s * Math.cos(t), s * Math.sin(t), z]; }
+function rotM(yaw, pitch) {
+  const cy = Math.cos(yaw), sy = Math.sin(yaw), cp = Math.cos(pitch), sp = Math.sin(pitch);
+  // Rx(pitch) * Ry(yaw)
+  return [[cy, 0, sy], [sp * sy, cp, -sp * cy], [-cp * sy, sp, cp * cy]];
+}
+const mv = (M, v) => [M[0][0] * v[0] + M[0][1] * v[1] + M[0][2] * v[2], M[1][0] * v[0] + M[1][1] * v[1] + M[1][2] * v[2], M[2][0] * v[0] + M[2][1] * v[1] + M[2][2] * v[2]];
+const mtv = (M, v) => [M[0][0] * v[0] + M[1][0] * v[1] + M[2][0] * v[2], M[0][1] * v[0] + M[1][1] * v[1] + M[2][1] * v[2], M[0][2] * v[0] + M[1][2] * v[1] + M[2][2] * v[2]];
+function rodrigues(v, k, a) { const c = Math.cos(a), s = Math.sin(a); return add(add(mul(v, c), mul(cross(k, v), s)), mul(k, dot(k, v) * (1 - c))); }
+
+/* ================= colour ================= */
+const hexToRgb = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+const rgbToHex = (r, g, b) => '#' + [r, g, b].map(v => clamp(Math.round(v), 0, 255).toString(16).padStart(2, '0')).join('');
+function hexToHsl(hex) {
+  let [r, g, b] = hexToRgb(hex).map(v => v / 255);
+  const max = Math.max(r, g, b), min = Math.min(r, g, b); let h = 0, s = 0; const l = (max + min) / 2;
+  if (max !== min) { const d = max - min; s = l > .5 ? d / (2 - max - min) : d / (max + min);
+    h = max === r ? (g - b) / d + (g < b ? 6 : 0) : max === g ? (b - r) / d + 2 : (r - g) / d + 4; h *= 60; }
+  return [h, s * 100, l * 100];
+}
+function hslHex(h, s, l) {
+  h = ((h % 360) + 360) % 360; s = clamp(s, 0, 100) / 100; l = clamp(l, 0, 100) / 100;
+  const k = n => (n + h / 30) % 12, a = s * Math.min(l, 1 - l);
+  const fn = n => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+  return rgbToHex(fn(0) * 255, fn(8) * 255, fn(4) * 255);
+}
+const mixHex = (a, b, t) => { const A = hexToRgb(a), B = hexToRgb(b); return rgbToHex(...A.map((v, i) => v + (B[i] - v) * t)); };
+function palette(base) {
+  const [h, s, l] = hexToHsl(base);
+  const dark = l < 32;
+  return {
+    light: hslHex(h + 3, s * 0.95, l + (100 - l) * 0.28),
+    face: base,
+    side: hslHex(h - 5, Math.min(s * 1.05, 100), l * 0.74),
+    sideDark: hslHex(h - 8, s, l * 0.55),
+    hatch: dark ? hslHex(h, s * 0.7, l + 26) : hslHex(h - 10, s * 0.85, Math.max(l * 0.36, 8)),
+    outline: hslHex(h - 12, s * 0.8, dark ? l * 0.35 : Math.max(l * 0.28, 6)),
+  };
+}
+function ramp(C, t) {
+  const stops = [[0, C.sideDark], [0.38, C.side], [0.72, C.face], [1, C.light]];
+  for (let i = 1; i < stops.length; i++) if (t <= stops[i][0]) {
+    const [t0, c0] = stops[i - 1], [t1, c1] = stops[i];
+    return mixHex(c0, c1, (t - t0) / (t1 - t0));
+  }
+  return C.light;
+}
+
+/* ================= convex polyhedron ================= */
+let FID = 1;
+function box(w, h, t) {
+  const a = w / 2, b = h / 2, c = t / 2, V = (x, y, z) => [x * a, y * b, z * c];
+  const F = (n, verts) => ({ n, d: dot(n, verts[0]), verts, id: FID++ });
+  return { faces: [
+    F([1, 0, 0], [V(1, -1, -1), V(1, 1, -1), V(1, 1, 1), V(1, -1, 1)]),
+    F([-1, 0, 0], [V(-1, -1, -1), V(-1, -1, 1), V(-1, 1, 1), V(-1, 1, -1)]),
+    F([0, 1, 0], [V(-1, 1, -1), V(-1, 1, 1), V(1, 1, 1), V(1, 1, -1)]),
+    F([0, -1, 0], [V(-1, -1, -1), V(1, -1, -1), V(1, -1, 1), V(-1, -1, 1)]),
+    F([0, 0, 1], [V(-1, -1, 1), V(1, -1, 1), V(1, 1, 1), V(-1, 1, 1)]),
+    F([0, 0, -1], [V(-1, -1, -1), V(-1, 1, -1), V(1, 1, -1), V(1, -1, -1)]),
+  ]};
+}
+function dedupe(pts, eps = 1e-7) {
+  const out = [];
+  for (const p of pts) if (!out.some(q => Math.abs(q[0] - p[0]) < eps && Math.abs(q[1] - p[1]) < eps && Math.abs(q[2] - p[2]) < eps)) out.push(p);
+  return out;
+}
+function orderOnPlane(pts, n) {
+  const c = pts.reduce((a, p) => add(a, p), [0, 0, 0]).map(v => v / pts.length);
+  const ref = Math.abs(n[0]) < .9 ? [1, 0, 0] : [0, 1, 0];
+  const u = norm(cross(n, ref)), v = cross(n, u);
+  return pts.map(p => { const d = sub(p, c); return [Math.atan2(dot(d, v), dot(d, u)), p]; }).sort((a, b) => a[0] - b[0]).map(x => x[1]);
+}
+// keep the half-space n·x <= d
+function cut(poly, n, d, eps = 1e-9) {
+  const faces = [], cap = [];
+  for (const fc of poly.faces) {
+    const vs = fc.verts, L = vs.length, out = [];
+    for (let i = 0; i < L; i++) {
+      const A = vs[i], B = vs[(i + 1) % L];
+      const da = dot(n, A) - d, db = dot(n, B) - d;
+      const ia = da <= eps, ib = db <= eps;
+      if (ia) out.push(A);
+      if (ia !== ib) { const P = lerp3(A, B, da / (da - db)); out.push(P); cap.push(P); }
+    }
+    const o = dedupe(out);
+    if (o.length >= 3) faces.push(o.length === vs.length && o.every((p, i) => p === vs[i]) ? fc : { ...fc, verts: o });
+  }
+  const c = dedupe(cap, 1e-6);
+  if (c.length >= 3) faces.push({ n, d, verts: orderOnPlane(c, n), id: FID++ });
+  return { faces };
+}
+function volume(poly) {
+  let v = 0;
+  for (const fc of poly.faces) {
+    const p0 = fc.verts[0]; let a = [0, 0, 0];
+    for (let i = 1; i < fc.verts.length - 1; i++) a = add(a, cross(sub(fc.verts[i], p0), sub(fc.verts[i + 1], p0)));
+    v += len(a) / 2 * dot(fc.n, p0) / 3;
+  }
+  return v;
+}
+const allVerts = poly => poly.faces.flatMap(fc => fc.verts);
+const centroid = poly => { const vs = allVerts(poly); return vs.reduce((a, p) => add(a, p), [0, 0, 0]).map(x => x / vs.length); };
+
+function makeBase(p) {
+  FID = 1;
+  const r = mulberry32(Math.imul((p.seed | 0) + 1, 2654435761) >>> 0);
+  let poly = box(p.width, p.height, p.thick);
+  for (let k = 0; k < Math.round(p.fractures); k++) {
+    let n = randUnit(r);
+    n = norm([n[0], n[1], n[2] * (1 - p.faceBias * 0.8)]);
+    const vs = allVerts(poly);
+    let hi = -Infinity, lo = Infinity; for (const v of vs) { const q = dot(n, v); hi = Math.max(hi, q); lo = Math.min(lo, q); }
+    const d = hi - p.fdepth * (hi - lo) * (0.12 + 0.5 * r());
+    const next = cut(poly, n, d);
+    if (next.faces.length >= 4) poly = next;
+  }
+  return poly;
+}
+function buildRock(p) {
+  const base = makeBase(p);
+  const radius = Math.max(...allVerts(base).map(len));
+  let poly = base;
+  for (const c of p.chips || []) {
+    const next = cut(poly, c.n, c.d);
+    if (next.faces.length >= 4 && volume(next) > 0.15 * volume(base)) poly = next;
+  }
+  return { poly, radius, baseVol: volume(base) };
+}
+
+/* ================= rendering ================= */
+const VB = 420, CX = 210, CY = 212;
+function hatchFor(fc, pts, nv, lam, p, C, S, uid) {
+  return '';
+  const steep = 1 - nv[2];
+  if (steep < 0.22) return '';
+  let d = [nv[0], -nv[1]]; const dl = Math.hypot(d[0], d[1]); if (dl < 1e-3) return '';
+  d = [d[0] / dl, d[1] / dl]; const q = [-d[1], d[0]];
+  let dmin = Infinity, dmax = -Infinity, qmin = Infinity, qmax = -Infinity;
+  for (const [x, y] of pts) { const a = x * d[0] + y * d[1], b = x * q[0] + y * q[1]; dmin = Math.min(dmin, a); dmax = Math.max(dmax, a); qmin = Math.min(qmin, b); qmax = Math.max(qmax, b); }
+  const strength = clamp((steep - 0.22) / 0.5, 0, 1) * (1 - lam * 0.55);
+  if (strength < 0.08) return '';
+  const spacing = (11.5 - 9 * p.density) / (0.45 + 0.55 * strength);
+  const k = Math.floor((qmax - qmin) / spacing);
+  if (k < 1) return '';
+  const r = mulberry32(Math.imul(fc.id, 374761393) ^ (p.seed | 0));
+  let path = '';
+  for (let j = 0; j < Math.min(k, 140); j++) {
+    const jit = r() - .5, full = r() < .58, lf = full ? 1.05 : .3 + .55 * r(), wob = (r() - .5) * .32;
+    const s = qmin + (qmax - qmin) * clamp((j + .5 + jit * .6) / k, 0, 1);
+    const a0 = dmax + 2, a1 = dmax - lf * (dmax - dmin) - 2;
+    const P0 = [d[0] * a0 + q[0] * s, d[1] * a0 + q[1] * s];
+    const P1 = [d[0] * a1 + q[0] * s, d[1] * a1 + q[1] * s];
+    const L = a0 - a1, m = (a0 + a1) / 2, off = wob * L * .25;
+    const Cc = [d[0] * m + q[0] * (s + off), d[1] * m + q[1] * (s + off)];
+    path += `M${f(P0[0])},${f(P0[1])}Q${f(Cc[0])},${f(Cc[1])} ${f(P1[0])},${f(P1[1])}`;
+  }
+  return `<path d="${path}" fill="none" stroke="${C.hatch}" stroke-width="${f(p.hatchW)}" stroke-linecap="round" clip-path="url(#${uid}${fc.id})"/>`;
+}
+function hull(points) {
+  const P = points.slice().sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+  if (P.length < 3) return P;
+  const cr = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+  const lo = [], up = [];
+  for (const p of P) { while (lo.length >= 2 && cr(lo[lo.length - 2], lo[lo.length - 1], p) <= 0) lo.pop(); lo.push(p); }
+  for (let i = P.length - 1; i >= 0; i--) { const p = P[i]; while (up.length >= 2 && cr(up[up.length - 2], up[up.length - 1], p) <= 0) up.pop(); up.push(p); }
+  return lo.slice(0, -1).concat(up.slice(0, -1));
+}
+// tv: object point -> view space; tn: object normal -> view space
+function renderPoly(poly, tv, tn, p, S, uid, collect) {
+  const C = palette(p.color);
+  const la = p.light * Math.PI / 180;
+  const Ldir = norm([Math.cos(la) * 0.78, Math.sin(la) * 0.78, 0.62]);
+  const toS = v => [CX + v[0] * S, CY - v[1] * S];
+  const P2 = pts => 'M' + pts.map(q => f(q[0]) + ',' + f(q[1])).join('L') + 'Z';
+  const sd = p.shadow ?? 0.6;
+  const front = [], backs = [], proj = [];
+  for (const fc of poly.faces) {
+    const nv = tn(fc.n);
+    if (nv[2] > 0.004) {
+      const pts = fc.verts.map(v => toS(tv(v)));
+      proj.push(...pts); front.push({ fc, nv, pts });
+      if (collect) collect.push({ fc, pts, nv });
+    } else if (nv[2] < -0.004) backs.push({ fc, nv, pts: fc.verts.map(v => toS(tv(v))) });
+  }
+  const H = hull(proj);
+  const hd = H.length ? P2(H) : '';
+  const shade = nv => {
+    const lam = Math.max(0, dot(nv, Ldir));
+    let t = clamp(0.62 * lam + 0.38 * nv[2] * nv[2], 0, 1);
+    return Math.round(clamp(0.72 + (t - 0.72) * (0.35 + sd * 1.1), 0, 1) * 12) / 12;
+  };
+
+  if (p.mode !== 'gem') {
+    let fills = '', edges = '';
+    for (const F of front) { const d = P2(F.pts); fills += `<path d="${d}" fill="${ramp(C, shade(F.nv))}"/>`; edges += d; }
+    const svg = `<g stroke-linejoin="round" stroke-linecap="round">${fills}` +
+      `<path d="${edges}" fill="none" stroke="${C.outline}" stroke-width="${f(p.stroke * .55)}"/>` +
+      `<path d="${hd}" fill="none" stroke="${C.outline}" stroke-width="${f(p.stroke * 1.4)}"/></g>`;
+    return { svg, hullPts: H, C };
+  }
+
+  /* ---------- gem: refracted interior + glassy crown + white, fiery rim ---------- */
+  const transp = p.transp ?? .55, frost = p.frost ?? .15, shine = p.shine ?? .7, fire = p.fire ?? .6;
+  const [gh, gs, gl] = hexToHsl(p.color);
+  const deep = hslHex(gh, Math.min(100, gs * 1.05), Math.max(gl * 0.2, 5));
+  const body = hslHex(gh, Math.min(100, gs * 1.1), gl * 0.75);
+  const bright = hslHex(gh, Math.min(100, gs * 1.1 + 5), Math.min(gl + 24, 82));
+  const glint = hslHex(gh, Math.min(100, gs + 10), Math.min(gl + 30, 88));
+  const iramp = t => t < 0.5 ? mixHex(deep, body, t * 2) : mixHex(body, bright, (t - 0.5) * 2);
+  // softer contrast when frosted
+  const con = (1 - frost * 0.65) * (0.75 + 0.4 * shine);
+  const n = H.length || 1;
+  const gc = [H.reduce((a2, q) => a2 + q[0], 0) / n, H.reduce((a2, q) => a2 + q[1], 0) / n];
+  const hash = (a2, b2) => { let x = Math.imul(a2 * 73856093 ^ b2 * 19349663 ^ (p.seed | 0) * 83492791, 2654435761) >>> 0; return (x % 10007) / 10007; };
+
+  // interior: the far facets seen through the front, lit by light passing through
+  const srcFaces = backs.length ? backs : front;
+  let inner = '', innerLines = '';
+  for (const F of srcFaces) {
+    const thru = Math.max(0, -dot(F.nv, Ldir));
+    const x = (thru - 0.35) * 1.6 + (hash(F.fc.id, 1) - 0.5) * 0.6;
+    const t = clamp(0.5 + Math.tanh(x * 2) * 0.5 * con, 0, 1);
+    const d = P2(F.pts);
+    inner += `<path d="${d}" fill="${iramp(t)}"/>`;
+    innerLines += d;
+  }
+
+  // crown: the near facets, glassy and see-through.
+  // Shine works like polish: each facet acts as a small mirror, so a few flash bright white
+  // while the rest stay deep and saturated. No coating over the whole gem.
+  const Hdir = norm(add(Ldir, [0, 0, 1]));
+  const baseOp = clamp(0.55 - transp * 0.6 + frost * 0.45, 0.02, 1);
+  let crown = '', flash = '', edges = '', litEdges = '', sheen = '';
+  const Ls = [Math.cos(la), -Math.sin(la)];
+  const crisp = 1 - frost * 0.7;
+  for (const F of front) {
+    const nv = F.nv, d = P2(F.pts);
+    const lamF = Math.max(0, dot(nv, Ldir));
+    const h1 = hash(F.fc.id, 5);
+    // mirror reflection of the light, sharper as shine goes up
+    const spec = Math.pow(Math.max(0, dot(nv, Hdir)), 4 + 26 * shine * crisp);
+    // facets that catch the light from the room, so the gem sparkles at many angles
+    const catchL = h1 > 1 - shine * 0.32 ? 0.55 + 0.45 * hash(F.fc.id, 6) : 0;
+    const w = clamp((spec * 1.25 + catchL * (0.4 + 0.6 * lamF)) * shine * crisp, 0, 1);
+    // polish also deepens the colour of facets that are not flashing
+    const depthT = clamp(shade(nv) * (1 - shine * 0.35), 0, 1);
+    let col = mixHex(mixHex(deep, body, 0.6), bright, depthT * 0.55);
+    col = mixHex(col, '#FFFFFF', frost * 0.3);
+    crown += `<path d="${d}" fill="${col}" fill-opacity="${f(clamp(baseOp + shine * 0.12, 0, 1))}"/>`;
+    if (w > 0.06) {
+      // flash colour: white, with a little rainbow fire on some facets
+      flash += `<path d="${d}" fill="url(#${uid}fl)" fill-opacity="${f(clamp(w * 1.15, 0, 1))}"/>`;
+    }
+    // a hard-edged reflection stripe on lit facets reads as polish
+    const so = shine * crisp * Math.pow(lamF, 1.5) * 0.9;
+    if (so > 0.06) sheen += `<path d="${d}" fill="url(#${uid}sh)" fill-opacity="${f(clamp(so, 0, 1))}"/>`;
+    edges += d;
+    const cx = F.pts.reduce((a2, q) => a2 + q[0], 0) / F.pts.length, cy = F.pts.reduce((a2, q) => a2 + q[1], 0) / F.pts.length;
+    for (let i = 0; i < F.pts.length; i++) {
+      const A = F.pts[i], B = F.pts[(i + 1) % F.pts.length], mx = (A[0] + B[0]) / 2 - cx, my = (A[1] + B[1]) / 2 - cy, ml = Math.hypot(mx, my) || 1;
+      if ((mx * Ls[0] + my * Ls[1]) / ml > 0.3) litEdges += `M${f(A[0])},${f(A[1])}L${f(B[0])},${f(B[1])}`;
+    }
+  }
+  const rim = '', girdle = '';
+  const ib = frost * 6;
+  const gx = Math.cos(la), gy = -Math.sin(la);
+  let defs = `<filter id="${uid}ca" x="-5%" y="-5%" width="110%" height="110%"><feGaussianBlur stdDeviation="${f(0.5 * (S / 160))}"/></filter>` + `<linearGradient id="${uid}sh" x1="${f(0.5 + gx * 0.5)}" y1="${f(0.5 + gy * 0.5)}" x2="${f(0.5 - gx * 0.5)}" y2="${f(0.5 - gy * 0.5)}"><stop offset="0" stop-color="#FFFFFF" stop-opacity=".7"/><stop offset=".3" stop-color="#FFFFFF" stop-opacity=".22"/><stop offset=".31" stop-color="#FFFFFF" stop-opacity="0"/></linearGradient>` +
+    `<linearGradient id="${uid}fl" x1="${f(0.5 + gx * 0.5)}" y1="${f(0.5 + gy * 0.5)}" x2="${f(0.5 - gx * 0.5)}" y2="${f(0.5 - gy * 0.5)}"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".55" stop-color="#FFFFFF" stop-opacity=".55"/><stop offset="1" stop-color="#FFFFFF" stop-opacity=".1"/></linearGradient>` + `<clipPath id="${uid}cl"><path d="${hd}"/></clipPath><filter id="${uid}gb" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="${f((0.6 + frost * 3) * (S / 160))}"/></filter>`;
+  if (ib > 0.05) defs += `<filter id="${uid}fb" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="${f(ib)}"/></filter>`;
+  const svg = `<defs>${defs}</defs><g stroke-linejoin="round" stroke-linecap="round">` +
+    `<g clip-path="url(#${uid}cl)">` +
+      `<path d="${hd}" fill="${deep}"/>` +
+      `<g${ib > 0.05 ? ` filter="url(#${uid}fb)"` : ''}>${inner}` +
+        `<path d="${innerLines}" fill="none" stroke="${glint}" stroke-opacity="${f(0.45 * con)}" stroke-width="${f(Math.max(0.6, p.stroke * 0.45))}"/></g>` +
+      crown + sheen + flash +
+    `</g>` +
+    `<path d="${edges}" fill="none" stroke="#FFFFFF" stroke-opacity="${f(0.25 + 0.3 * shine)}" stroke-width="${f(p.stroke * 0.45)}"/>` +
+    (litEdges && fire > 0.01 ? (() => {
+      // colour fringes split either side of the shiny edges, like a lens
+      const off = (0.4 + 1.8 * fire) * (S / 160), dx = Ls[0] * off, dy = Ls[1] * off;
+      const o = clamp(fire * shine * (1 - frost * 0.5) * 0.85, 0, 0.75), sw2 = p.stroke * (0.9 + 0.8 * fire);
+      return `<g fill="none" stroke-width="${f(sw2)}" stroke-opacity="${f(o)}" clip-path="url(#${uid}cl)" filter="url(#${uid}ca)">` +
+        `<path d="${litEdges}" stroke="#FF2E4D" transform="translate(${f(dx)},${f(dy)})"/>` +
+        `<path d="${litEdges}" stroke="#1FB8FF" transform="translate(${f(-dx)},${f(-dy)})"/></g>`;
+    })() : '') +
+    (litEdges ? `<path d="${litEdges}" fill="none" stroke="#FFFFFF" stroke-opacity="${f(shine * 0.9 * (1 - frost * 0.5))}" stroke-width="${f(p.stroke * 0.8)}"/>` : '') +
+    `<path d="${hd}" fill="none" stroke="${mixHex(deep, '#000000', 0.2)}" stroke-width="${f(p.stroke * 0.7)}"/>` +
+    `</g>`;
+  return { svg, hullPts: H, C };
+}
+
+/* ================= scene ================= */
+const $ = s => document.querySelector(s);
+const stage = $('#stage'), art = $('#art');
+let rock = buildRock(state);
+let lastFaces = [], hover = null, lastExport = '';
+const fx = { frags: [], dust: [], rings: [] };
+const scaleOf = () => 158 / rock.radius;
+
+function draw() {
+  const M = rotM(state.yaw, state.pitch), S = scaleOf();
+  const faces = [];
+  const main = renderPoly(rock.poly, v => mv(M, v), n => mv(M, n), state, S, 'm', faces);
+  lastFaces = faces;
+
+  // export: tight crop around the silhouette
+  const pad = state.stroke * 1.4 + 2;
+  const xs = main.hullPts.map(q => q[0]), ys = main.hullPts.map(q => q[1]);
+  const x0 = Math.min(...xs) - pad, y0 = Math.min(...ys) - pad, w = Math.max(...xs) - Math.min(...xs) + pad * 2, h = Math.max(...ys) - Math.min(...ys) + pad * 2;
+  lastExport = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${f(x0)} ${f(y0)} ${f(w)} ${f(h)}" width="${Math.round(w)}" height="${Math.round(h)}">${main.svg}</svg>`;
+
+  let over = '';
+  if (hover) {
+    over += `<path d="M${f(hover[0][0])},${f(hover[0][1])}L${f(hover[1][0])},${f(hover[1][1])}" stroke="${main.C.outline}" stroke-width="7" stroke-linecap="round" opacity=".35"/>` +
+      `<path d="M${f(hover[0][0])},${f(hover[0][1])}L${f(hover[1][0])},${f(hover[1][1])}" stroke="#EDF23B" stroke-width="3.5" stroke-linecap="round"/>`;
+  }
+  fx.frags.forEach((fr, i) => {
+    const t = fr.t, ang = fr.spin * t;
+    const off = [fr.vel[0] * t, fr.vel[1] * t - 3.2 * t * t, fr.vel[2] * t];
+    const tv = v => add(mv(M, add(rodrigues(sub(v, fr.c), fr.axis, ang), fr.c)), off);
+    const tn = n => mv(M, rodrigues(n, fr.axis, ang));
+    const r = renderPoly(fr.poly, tv, tn, state, S, 'f' + i + '_');
+    over += `<g opacity="${f(clamp(1.6 - t * 1.9, 0, 1))}">${r.svg}</g>`;
+  });
+  fx.dust.forEach(dp => {
+    const x = dp.x + dp.vx * dp.t, y = dp.y + dp.vy * dp.t + 260 * dp.t * dp.t, s = dp.s;
+    over += `<path d="M${f(x)},${f(y - s)}L${f(x + s)},${f(y + s * .7)}L${f(x - s * .8)},${f(y + s * .5)}Z" fill="${dp.c}" stroke="${main.C.outline}" stroke-width=".6" opacity="${f(clamp(1 - dp.t * 1.6, 0, 1))}"/>`;
+  });
+  fx.rings.forEach(rg => {
+    over += `<circle cx="${f(rg.x)}" cy="${f(rg.y)}" r="${f(6 + rg.t * 90)}" fill="none" stroke="#EDF23B" stroke-width="${f(3 * (1 - rg.t * 3))}" opacity="${f(clamp(1 - rg.t * 3.2, 0, 1))}"/>`;
+  });
+
+  art.innerHTML = `<svg viewBox="0 0 ${VB} ${VB}" role="img" aria-label="3D rock, ${state.chips.length} chips">${main.svg}${over}</svg>`;
+  $('#undo').disabled = !state.chips.length; $('#clear').disabled = !state.chips.length;
+}
+let codeT; function updateCode() { clearTimeout(codeT); codeT = setTimeout(() => { $('#code').value = lastExport; }, 120); }
+
+// animation loop for flying flakes
+let animating = false, lastTs = 0;
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+function tick(ts) {
+  const dt = Math.min(0.05, (ts - lastTs) / 1000 || 0.016); lastTs = ts;
+  fx.frags.forEach(fr => fr.t += dt); fx.dust.forEach(d => d.t += dt); fx.rings.forEach(r => r.t += dt);
+  fx.frags = fx.frags.filter(fr => fr.t < .85); fx.dust = fx.dust.filter(d => d.t < .65); fx.rings = fx.rings.filter(r => r.t < .32);
+  draw();
+  if (fx.frags.length || fx.dust.length || fx.rings.length) requestAnimationFrame(tick); else { animating = false; updateCode(); }
+}
+function startAnim() { if (reduceMotion) { fx.frags = []; fx.dust = []; fx.rings = []; draw(); updateCode(); return; } if (!animating) { animating = true; lastTs = performance.now(); requestAnimationFrame(tick); } }
+
+/* ================= hammer ================= */
+function pip(pt, poly) {
+  let ins = false;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    const [xi, yi] = poly[i], [xj, yj] = poly[j];
+    if ((yi > pt[1]) !== (yj > pt[1]) && pt[0] < (xj - xi) * (pt[1] - yi) / (yj - yi) + xi) ins = !ins;
+  }
+  return ins;
+}
+function segDist2(p, a, b) {
+  const ab = [b[0] - a[0], b[1] - a[1]], t = clamp(((p[0] - a[0]) * ab[0] + (p[1] - a[1]) * ab[1]) / (ab[0] ** 2 + ab[1] ** 2 || 1), 0, 1);
+  const x = a[0] + ab[0] * t - p[0], y = a[1] + ab[1] * t - p[1];
+  return [x * x + y * y, t];
+}
+// nearest visible edge to a screen point: checks every visible face, prefers the face under the cursor
+function pickEdge(sp) {
+  let best = null;
+  const under = lastFaces.find(F => pip(sp, F.pts));
+  const pool = under ? [under] : lastFaces;
+  for (const F of pool) {
+    const n = F.pts.length;
+    for (let i = 0; i < n; i++) {
+      const [d2, t] = segDist2(sp, F.pts[i], F.pts[(i + 1) % n]);
+      if (!best || d2 < best.d2) best = { d2, t, F, i };
+    }
+  }
+  if (!best) return null;
+  if (!under && best.d2 > 22 * 22) return null;
+  const { F, i, t } = best, vs = F.fc.verts, A = vs[i], B = vs[(i + 1) % vs.length];
+  return { face: F.fc, A, B, t, scr: [F.pts[i], F.pts[(i + 1) % F.pts.length]] };
+}
+const near = (a, b) => Math.abs(a[0] - b[0]) < 1e-5 && Math.abs(a[1] - b[1]) < 1e-5 && Math.abs(a[2] - b[2]) < 1e-5;
+
+function chipAt(sp) {
+  const e = pickEdge(sp);
+  if (!e) return;
+  const adj = rock.poly.faces.find(fc => fc !== e.face && fc.verts.some(v => near(v, e.A)) && fc.verts.some(v => near(v, e.B)));
+  const nA = e.face.n, nB = adj ? adj.n : e.face.n;
+  const q = lerp3(e.A, e.B, e.t);
+  const edgeDir = norm(sub(e.B, e.A));
+  const ch = state.chaos;
+  // lean the flake toward the end of the edge you hit, so the chip stays local instead of shaving the whole edge
+  const lean = (e.t - 0.5) * 1.6 + (Math.random() - .5) * 0.5 * ch;
+  let n = norm(add(add(norm(add(nA, nB)), mul(randUnit(Math.random), 0.35 * ch)), mul(edgeDir, lean)));
+  const before = volume(rock.poly);
+  let depth = state.chip * rock.radius * 0.5 * (0.6 + 0.6 * Math.random());
+  let kept = null, d = 0;
+  for (let tries = 0; tries < 6; tries++) {
+    d = dot(n, q) - depth;
+    kept = cut(rock.poly, n, d);
+    const v = volume(kept);
+    if (kept.faces.length >= 4 && v > before * (0.985 - state.chip * 0.3) && v > rock.baseVol * 0.15) break;
+    depth *= 0.65; kept = null;
+  }
+  if (!kept) { toast('That piece is too thin to chip further'); return; }
+  const removed = before - volume(kept);
+  if (removed < before * 1e-4) return;
+
+  const flake = cut(rock.poly, mul(n, -1), -d);
+  state.chips.push({ n, d });
+  rock = { ...rock, poly: kept };
+  save();
+
+  // effects
+  const M = rotM(state.yaw, state.pitch), nv = mv(M, n);
+  if (flake.faces.length >= 4) {
+    fx.frags.push({ poly: flake, c: centroid(flake), t: 0, axis: norm(randUnit(Math.random)), spin: (Math.random() < .5 ? -1 : 1) * (5 + Math.random() * 6),
+      vel: add(mul(nv, 1.1 + Math.random() * .5), [0, .9, 0]) });
+  }
+  const C = palette(state.color), S = scaleOf();
+  for (let k = 0; k < 7; k++) {
+    const a = Math.atan2(-nv[1], nv[0]) + (Math.random() - .5) * 1.8, sp2 = 120 + Math.random() * 160;
+    fx.dust.push({ x: sp[0], y: sp[1], vx: Math.cos(a) * sp2, vy: Math.sin(a) * sp2 - 60, t: 0, s: 1.5 + Math.random() * 3.5 * (S / 160), c: Math.random() < .5 ? C.side : C.light });
+  }
+  fx.rings.push({ x: sp[0], y: sp[1], t: 0 });
+  hover = null;
+  art.classList.remove('knock'); void art.offsetWidth; art.classList.add('knock');
+  startAnim();
+}
+
+/* ================= pointer ================= */
+function toSvg(ev) { const r = stage.getBoundingClientRect(); return [(ev.clientX - r.left) / r.width * VB, (ev.clientY - r.top) / r.height * VB]; }
+let down = null;
+stage.addEventListener('pointerdown', ev => {
+  if (ev.button !== 0) return;
+  down = { x: ev.clientX, y: ev.clientY, yaw: state.yaw, pitch: state.pitch, drag: false, id: ev.pointerId };
+  stage.setPointerCapture(ev.pointerId);
+});
+stage.addEventListener('pointermove', ev => {
+  if (down) {
+    const dx = ev.clientX - down.x, dy = ev.clientY - down.y;
+    if (!down.drag && Math.hypot(dx, dy) > 6) { down.drag = true; stage.classList.add('dragging'); hover = null; }
+    if (down.drag) {
+      state.yaw = down.yaw + dx * 0.009;
+      state.pitch = clamp(down.pitch + dy * 0.009, -1.45, 1.45);
+      if (!animating) draw();
+    }
+    return;
+  }
+  if (ev.pointerType === 'mouse') {
+    const e = pickEdge(toSvg(ev));
+    const nh = e ? e.scr : null;
+    if (JSON.stringify(nh) !== JSON.stringify(hover)) { hover = nh; if (!animating) draw(); }
+  }
+});
+stage.addEventListener('pointerup', ev => {
+  if (!down) return;
+  const wasDrag = down.drag; down = null; stage.classList.remove('dragging');
+  if (wasDrag) { save(); updateCode(); } else chipAt(toSvg(ev));
+});
+stage.addEventListener('pointercancel', () => { down = null; stage.classList.remove('dragging'); });
+stage.addEventListener('pointerleave', () => { if (!down && hover) { hover = null; if (!animating) draw(); } });
+
+/* ================= controls ================= */
+const SHAPE_KEYS = ['width', 'height', 'thick', 'fractures', 'fdepth', 'faceBias'];
+function fmt(k, v, unit) { if (unit) return Math.round(v) + unit; if (k === 'fractures') return String(Math.round(v)); return (+v).toFixed(2); }
+const TIPS = {
+  width: 'How wide the starting block is, left to right.',
+  height: 'How tall the starting block is, top to bottom.',
+  thick: 'How deep the stone is from front to back. Low values make flat slabs, high values make chunky boulders.',
+  fractures: 'How many natural breaks are cut into the block before you start chipping. More breaks give a rounder, more faceted stone.',
+  fdepth: 'How deep each natural break cuts. Higher values take bigger pieces off the block.',
+  faceBias: 'How much the natural breaks avoid the front and back. Higher values keep a big flat front face, like a tablet.',
+  chip: 'How much stone each hammer tap knocks off.',
+  chaos: 'How unpredictable each chip is. Low values make clean, even bevels. High values make jagged breaks.',
+  shadow: 'How much darker the faces turned away from the light get. Low looks soft and flat, high gives strong contrast.',
+  stroke: 'Thickness of the dark outline around the stone and between its faces.',
+  transp: 'How see-through the gem is. Higher values show more of the facets on the far side.',
+  frost: 'How cloudy the gem is. Higher values blur the inside and soften highlights, like frosted glass.',
+  shine: 'How glossy the gem is. Higher values make the facets flash bright white as they catch the light and deepen the colour in between, like polished glass.',
+  fire: 'Splits a thin red and blue fringe either side of the shiny edges, like light through a lens. Only shows where there is shine.',
+  light: 'Which direction the light comes from. 135° is the upper left, 45° the upper right.',
+};
+const INFO_SVG = '<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.6" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M8 7.2v4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="8" cy="4.9" r=".95" fill="currentColor"/></svg>';
+const CTRL_INDEX = {};
+const groupsEl = $('.rail'), groupsMount = $('#groups');
+for (const g of CTRL_GROUPS) {
+  const div = document.createElement('div'); div.className = 'group'; div.dataset.group = g.name;
+  div.innerHTML = (g.hideName ? '' : `<p class="gh">${g.name}</p>`) + (g.note ? `<div class="noterow"><p class="note">${g.note}</p>${g.action || ''}</div>` : '') + g.ctrls.map(([k, label, mn, mx, st, unit]) => {
+    CTRL_INDEX[k] = { mn, mx, st, unit: unit || '' };
+    return `<div class="ctrl"><span class="lab"><label for="c-${k}">${label}</label><button type="button" class="info" aria-label="About ${label}" aria-describedby="t-${k}">${INFO_SVG}</button></span>
+     <input type="text" inputmode="decimal" class="num" id="o-${k}" data-num="${k}" aria-label="${label} value" autocomplete="off">
+     <span class="tip" role="tooltip" id="t-${k}">${TIPS[k] || ''}</span>
+     <input type="range" id="c-${k}" min="${mn}" max="${mx}" step="${st}" data-key="${k}" data-unit="${unit || ''}"></div>`;
+  }).join('');
+  (g.mount ? $(g.mount) : groupsMount).appendChild(div);
+}
+// typed values: commit on Enter or when the field loses focus
+groupsEl.addEventListener('focusin', e => { if (e.target.dataset.num) { e.target.select(); e.target._fresh = true; } });
+groupsEl.addEventListener('mouseup', e => { if (e.target._fresh) { e.preventDefault(); e.target._fresh = false; } });
+groupsEl.addEventListener('keydown', e => {
+  const k = e.target.dataset.num; if (!k) return;
+  if (e.key === 'Enter') e.target.blur();
+  if (e.key === 'Escape') { e.target.value = fmt(k, state[k], CTRL_INDEX[k].unit); e.target.blur(); }
+});
+groupsEl.addEventListener('change', e => {
+  const k = e.target.dataset.num; if (!k) return;
+  const c = CTRL_INDEX[k];
+  let v = parseFloat(String(e.target.value).replace(',', '.'));
+  if (isNaN(v)) v = state[k];
+  if (k === 'light') v = ((v % 360) + 360) % 360;
+  v = clamp(Math.round(v / c.st) * c.st, c.mn, c.mx);
+  state[k] = +v.toFixed(4);
+  $('#c-' + k).value = state[k];
+  e.target.value = fmt(k, state[k], c.unit);
+  if (SHAPE_KEYS.includes(k)) rock = buildRock(state);
+  draw(); updateCode(); save();
+  if (k !== 'chip' && k !== 'chaos') { clearTimeout(thumbT); thumbT = setTimeout(drawThumbs, 200); }
+});
+let thumbT;
+groupsEl.addEventListener('input', e => {
+  const k = e.target.dataset.key; if (!k) return;
+  state[k] = +e.target.value;
+  $('#o-' + k).value = fmt(k, state[k], e.target.dataset.unit);
+  if (SHAPE_KEYS.includes(k)) rock = buildRock(state);
+  draw(); updateCode(); save();
+  if (k !== 'chip' && k !== 'chaos') { clearTimeout(thumbT); thumbT = setTimeout(drawThumbs, 200); }
+});
+
+const swEl = $('#swatches');
+swEl.innerHTML = STONES.map(([n, c]) => `<button type="button" class="sw" data-c="${c}"><i style="background:${c}"></i>${n}</button>`).join('');
+swEl.addEventListener('click', e => { const b = e.target.closest('.sw'); if (!b) return; setColor(b.dataset.c); });
+$('#custom').addEventListener('input', e => setColor(e.target.value.toUpperCase()));
+function setColor(c) { state.color = c; syncSwatches(); draw(); updateCode(); save(); clearTimeout(thumbT); thumbT = setTimeout(drawThumbs, 120); }
+function syncSwatches() {
+  swEl.querySelectorAll('.sw').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.c.toUpperCase() === state.color.toUpperCase())));
+  $('#custom').value = state.color.toLowerCase(); $('#hexlbl').textContent = state.color.toUpperCase();
+}
+
+function setSeed(s) { state.seed = s; state.chips = []; rock = buildRock(state); draw(); updateCode(); save(); }
+document.addEventListener('keydown', e => {
+  if (/INPUT|TEXTAREA/.test(document.activeElement.tagName) || e.metaKey || e.ctrlKey) return;
+  if (e.key === 'z' || e.key === 'Z') undo();
+  if (e.key === 's' || e.key === 'S') shuffleSliders();
+});
+function undo() { if (!state.chips.length) return; state.chips.pop(); rock = buildRock(state); draw(); updateCode(); save(); }
+$('#undo').addEventListener('click', undo);
+$('#clear').addEventListener('click', () => { state.chips = []; rock = buildRock(state); draw(); updateCode(); save(); toast('Chips cleared'); });
+$('#resetview').addEventListener('click', () => { state.yaw = DEFAULTS.yaw; state.pitch = DEFAULTS.pitch; draw(); updateCode(); save(); });
+
+const toastEl = $('#toast'); let tt;
+function toast(msg) { toastEl.textContent = msg; toastEl.classList.add('on'); clearTimeout(tt); tt = setTimeout(() => toastEl.classList.remove('on'), 1900); }
+/* ================= export ================= */
+const menu = $('#exportmenu'), exportBtn = $('#exportbtn');
+function setMenu(open) { menu.hidden = !open; exportBtn.setAttribute('aria-expanded', String(open)); }
+exportBtn.addEventListener('click', e => { e.stopPropagation(); setMenu(menu.hidden); });
+document.addEventListener('click', e => { if (!menu.hidden && !e.target.closest('.export')) setMenu(false); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') setMenu(false); });
+
+function saveFile(filename, data) {
+  try {
+    const blob = data instanceof Blob ? data : new Blob([data], { type: filename.endsWith('.svg') ? 'image/svg+xml' : 'application/octet-stream' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename; a.rel = 'noopener';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+    toast('Downloaded ' + filename);
+  } catch (e) { toast('That file could not be downloaded'); }
+}
+const baseName = () => 'flint-' + (state.mode === 'gem' ? 'gem' : 'rock') + '-' + state.seed + (state.chips.length ? '-' + state.chips.length + 'chips' : '');
+function copySvg() {
+  const fallback = () => { const box = $('#codebox'); box.hidden = false; box.open = true; const ta = $('#code'); ta.value = lastExport; ta.focus(); ta.select(); toast('Code selected below. Copy it from there.'); };
+  try { navigator.clipboard.writeText(lastExport).then(() => toast('SVG code copied'), fallback); } catch (e) { fallback(); }
+}
+async function makePng(maxSide = 2048) {
+  const m = lastExport.match(/width="(\d+)" height="(\d+)"/), w = +m[1], h = +m[2], sc = maxSide / Math.max(w, h);
+  const W = Math.round(w * sc), H = Math.round(h * sc);
+  const svg = lastExport.replace(`width="${w}" height="${h}"`, `width="${W}" height="${H}"`);
+  const url = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
+  try {
+    const img = new Image();
+    await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = url; });
+    const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+    cv.getContext('2d').drawImage(img, 0, 0, W, H);
+    return await new Promise(r => cv.toBlob(r, 'image/png'));
+  } finally { URL.revokeObjectURL(url); }
+}
+function buildObj(poly, name) {
+  const verts = [], index = new Map(), normals = [], faceLines = [];
+  const key = v => v.map(x => x.toFixed(5)).join(' ');
+  const vi = v => { const k = key(v); if (!index.has(k)) { verts.push(k); index.set(k, verts.length); } return index.get(k); };
+  for (const fc of poly.faces) {
+    const vs = fc.verts.slice();
+    let a = [0, 0, 0]; for (let j = 1; j < vs.length - 1; j++) a = add(a, cross(sub(vs[j], vs[0]), sub(vs[j + 1], vs[0])));
+    if (dot(a, fc.n) < 0) vs.reverse();
+    normals.push(fc.n.map(x => x.toFixed(5)).join(' '));
+    const ni = normals.length;
+    faceLines.push('f ' + vs.map(v => vi(v) + '//' + ni).join(' '));
+  }
+  const [r, g, b] = hexToRgb(state.color).map(x => (x / 255).toFixed(4));
+  const obj = `# Flint rock, seed ${state.seed}, ${state.chips.length} chips\nmtllib ${name}.mtl\no rock\n` +
+    verts.map(v => 'v ' + v).join('\n') + '\n' + normals.map(n => 'vn ' + n).join('\n') + '\nusemtl stone\ns off\n' + faceLines.join('\n') + '\n';
+  const gemMode = state.mode === 'gem', op = gemMode ? (1 - state.transp * 0.9 + state.frost * 0.3) : 1;
+  const mtl = gemMode
+    ? `# Flint gem material\nnewmtl stone\nKa 0 0 0\nKd ${r} ${g} ${b}\nKs ${state.shine.toFixed(3)} ${state.shine.toFixed(3)} ${state.shine.toFixed(3)}\nNs ${Math.round(10 + state.shine * 900 * (1 - state.frost * 0.7))}\nNi 1.55\nd ${clamp(op, 0.08, 1).toFixed(3)}\nTr ${(1 - clamp(op, 0.08, 1)).toFixed(3)}\nillum 4\n`
+    : `# Flint stone material\nnewmtl stone\nKa 0 0 0\nKd ${r} ${g} ${b}\nKs 0 0 0\nNs 10\nd 1\nillum 1\n`;
+  return { obj, mtl };
+}
+const CRC_T = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+function crc32(b) { let c = 0xFFFFFFFF; for (let i = 0; i < b.length; i++) c = CRC_T[(c ^ b[i]) & 255] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; }
+function zipStore(files) {
+  const enc = new TextEncoder(), parts = [], central = []; let offset = 0;
+  for (const fl of files) {
+    const name = enc.encode(fl.name), data = enc.encode(fl.text), crc = crc32(data), sz = data.length;
+    const lh = new DataView(new ArrayBuffer(30));
+    lh.setUint32(0, 0x04034b50, true); lh.setUint16(4, 20, true); lh.setUint16(12, 0x21, true);
+    lh.setUint32(14, crc, true); lh.setUint32(18, sz, true); lh.setUint32(22, sz, true); lh.setUint16(26, name.length, true);
+    parts.push(new Uint8Array(lh.buffer), name, data);
+    const ch = new DataView(new ArrayBuffer(46));
+    ch.setUint32(0, 0x02014b50, true); ch.setUint16(4, 20, true); ch.setUint16(6, 20, true); ch.setUint16(14, 0x21, true);
+    ch.setUint32(16, crc, true); ch.setUint32(20, sz, true); ch.setUint32(24, sz, true); ch.setUint16(28, name.length, true); ch.setUint32(42, offset, true);
+    central.push(new Uint8Array(ch.buffer), name);
+    offset += 30 + name.length + sz;
+  }
+  const cdSize = central.reduce((a, b) => a + b.length, 0);
+  const end = new DataView(new ArrayBuffer(22));
+  end.setUint32(0, 0x06054b50, true); end.setUint16(8, files.length, true); end.setUint16(10, files.length, true); end.setUint32(12, cdSize, true); end.setUint32(16, offset, true);
+  return new Blob([...parts, ...central, new Uint8Array(end.buffer)]);
+}
+menu.addEventListener('click', async e => {
+  const b = e.target.closest('button'); if (!b) return;
+  setMenu(false);
+  const x = b.dataset.x, name = baseName();
+  if (x === 'copy') copySvg();
+  else if (x === 'svg') saveFile(name + '.svg', lastExport);
+  else if (x === 'png') { try { saveFile(name + '.png', await makePng()); } catch (err) { toast('The PNG could not be rendered'); } }
+  else if (x === 'obj') { const { obj, mtl } = buildObj(rock.poly, name); saveFile(name + '.zip', zipStore([{ name: name + '.obj', text: obj }, { name: name + '.mtl', text: mtl }])); }
+});
+
+/* ================= other rocks ================= */
+let thumbSeeds = [];
+function shuffleThumbs() { thumbSeeds = Array.from({ length: 6 }, () => Math.floor(Math.random() * 100000)); drawThumbs(); }
+function drawThumbs() {
+  const M = rotM(DEFAULTS.yaw, DEFAULTS.pitch);
+  $('#thumbs').innerHTML = thumbSeeds.map((s, i) => {
+    const p = { ...state, seed: s, chips: [] }, r = buildRock(p);
+    const out = renderPoly(r.poly, v => mv(M, v), n => mv(M, n), p, 158 / r.radius, 't' + i + '_');
+    return `<button type="button" class="thumb" data-s="${s}" aria-label="Use rock ${s}"><svg viewBox="0 0 ${VB} ${VB}">${out.svg}</svg><span>${s}</span></button>`;
+  }).join('');
+}
+$('#thumbs').addEventListener('click', e => { const b = e.target.closest('.thumb'); if (b) setSeed(+b.dataset.s); });
+$('#more').addEventListener('click', shuffleThumbs);
+
+function shuffleSliders() {
+  for (const g of CTRL_GROUPS) for (const [k, , mn, mx, st, unit] of g.ctrls) {
+    const v = mn + Math.random() * (mx - mn);
+    state[k] = +(Math.round(v / st) * st).toFixed(4);
+    $('#c-' + k).value = state[k];
+    $('#o-' + k).value = fmt(k, state[k], unit);
+  }
+  rock = buildRock(state); draw(); updateCode(); save(); drawThumbs();
+}
+$('#shuffleall').addEventListener('click', shuffleSliders);
+
+function syncMaterial() {
+  document.querySelectorAll('#material button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.m === state.mode)));
+  $('#gemctrls').hidden = state.mode !== 'gem';
+}
+$('#material').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b || b.dataset.m === state.mode) return;
+  state.mode = b.dataset.m; syncMaterial(); draw(); updateCode(); save(); drawThumbs();
+});
+
+/* ================= boot ================= */
+for (const g of CTRL_GROUPS) for (const [k, , , , , unit] of g.ctrls) { $('#c-' + k).value = state[k]; $('#o-' + k).value = fmt(k, state[k], unit); }
+syncSwatches(); syncMaterial();
+draw(); $('#code').value = lastExport;
+shuffleThumbs();
+})();
+</script>
+</body>
+</html>

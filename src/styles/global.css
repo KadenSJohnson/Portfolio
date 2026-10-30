@@ -1,0 +1,496 @@
+/* Layout: plain white page. A small top bar (name, links, copy email), then a hero where the
+   name sits inside a Figma-style selection box and gets dragged up to full size, then the work
+   grid (two columns of large rounded media tiles with captions), a contact block and a footer.
+   Each project opens in a lightbox sheet. */
+@font-face{font-family:"Timeless Sans";src:url("/fonts/TimelessSansVF.woff") format("woff");font-weight:300 800;font-style:normal;font-display:swap}
+:root{
+  --bg:#FFFFFF; --ink:#0C0C0C; --sub:#5C5C5C; --mu:#8A8A8A; --line:#E8E8E8; --tile:#F3F3F3;
+  --grid:#EAE4DE; --dot:#D9CFC5;
+  --sel:#0D99FF; /* Figma's selection blue: only the selection box, handles and size label */
+  --display:"Timeless Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+  --mono:"Timeless Sans","Helvetica Neue",Helvetica,Arial,sans-serif; /* small labels use the same Grotesk */
+  /* Layout grid: the content width is split into --cols square cells (12 on phones, 24 wider).
+     src/scripts/grid.js measures the cell; spacing and sizes below are whole cells, and block
+     heights are rounded up to whole cells, so edges and text sit on the background grid. */
+  --maxw:1440px; /* widest the content gets */
+  --cols:12; --cell:29.17px; --gut:max(20px,env(safe-area-inset-left,0px));
+  --bio-fs:clamp(16px,1.75vw,21px);
+  --F:calc(var(--cell) * 1.3); /* the name's final size: 1.3 cells on phones (fits inside the card), 3 wider */
+  --lh:calc(var(--cell) * .8); /* bio line height: 0.8 cell on phones, half a cell wider */
+  --gap:clamp(20px,3vw,36px);
+  color-scheme:light;
+}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;color:var(--ink);font:400 16px/1.5 var(--display);-webkit-font-smoothing:antialiased;background:var(--bg)}
+h1,h2,h3,p,figure,blockquote,dl,dd,ul{margin:0}
+ul{padding:0;list-style:none}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--ink);outline-offset:3px;border-radius:6px}
+.sr{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
+.page{position:relative;max-width:var(--maxw);margin-inline:auto;padding-left:var(--gut);padding-right:var(--gut);padding-bottom:calc(var(--cell) * 2)}
+/* Once grid.js has measured: the content is exactly cols × cell wide, starting on a grid line */
+.gridded .page{width:var(--content);max-width:none;margin-left:var(--gx);margin-right:0;padding-left:0;padding-right:0}
+/* Cards on the grid: white, with their top and left edge drawn on the grid line they start on;
+   their right and bottom edges end exactly on the next grid lines, which then read as the border */
+.gcard,.obj{position:relative;background:#FFFFFF;padding-top:1px;padding-left:1px}
+/* Card edges are dotted like the grid: the top and left dots are drawn here, on the grid line the
+   card starts on; the right and bottom edges are the page's own dotted grid lines showing past it. */
+.gcard::before,.obj::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(90deg,var(--dot) 0 1px,transparent 1px var(--dot-step,3px)) 0 0/100% 1px no-repeat,
+    repeating-linear-gradient(180deg,var(--dot) 0 1px,transparent 1px var(--dot-step,3px)) 0 0/1px 100% no-repeat}
+/* The background grid, offset (--gx, set by grid.js) so a line runs along the content's left edge */
+.canvas{min-height:100vh;overflow-x:hidden;overflow-x:clip;
+  background-image:var(--grid-img,linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px));
+  background-size:var(--cell) var(--cell);background-position:var(--gx,var(--gut)) 0}
+@media (min-width:720px){:root{--cols:24;--F:calc(var(--cell) * 3);--lh:calc(var(--cell) / 2);--gut:max(40px,env(safe-area-inset-left,0px))}}
+
+/* ---------- Top bar ---------- */
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;height:calc(var(--cell) * 2);padding-inline:calc(var(--cell) / 2)}
+@media (min-width:720px){.top{height:calc(var(--cell) * 2)}}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;font:600 15px/1.2 var(--display);white-space:nowrap}
+.brand span{color:var(--mu);font-weight:500}
+.top nav{display:flex;align-items:center;gap:4px 20px;font:500 15px/1 var(--display)}
+.top nav a{padding-block:12px;text-decoration:none;color:var(--sub)}
+.top nav a:hover{color:var(--ink)}
+.pill{display:inline-flex;align-items:center;white-space:nowrap;min-height:40px;padding:0 16px;border:0;border-radius:999px;background:var(--ink);color:#FFFFFF;font:600 14px/1 var(--display);cursor:pointer;text-decoration:none}
+.pill:hover{background:#2A2A2A}
+.pill.light{background:var(--tile);color:var(--ink)}
+.pill.light:hover{background:#E8E8E8}
+@media (max-width:639px){.brand span,.top nav .opt{display:none}}
+@media (max-width:359px){.top nav a{display:none}}
+
+/* ---------- Hero: the name, selected like a text layer in Figma ---------- */
+.hero{padding-block:calc(var(--cell) * 2)}
+.hero-card{padding:var(--cell)}
+.name-stage{position:relative;height:var(--F)}
+.name{font:700 var(--F)/1 var(--display);letter-spacing:-.04em;white-space:nowrap}
+.sel{--k:.3;position:relative;display:inline-block;font-size:calc(var(--k) * 1em);padding:0 .03em;margin-left:calc(var(--bio-fs) * .0908 - .1118em); /* optical: K stem lines up with the bio's first letter (side bearings from Timeless Sans: U 0.0908em at 400, K 0.0818em at 700, plus .03em padding) */outline:1.5px solid var(--sel)}
+.hd{position:absolute;width:9px;height:9px;background:#FFFFFF;border:1.5px solid var(--sel);}
+.sel.done{outline-color:transparent}.sel.done .hd,.sel.done .dims{opacity:0}
+.hd.tl{top:-5px;left:-5px}.hd.tr{top:-5px;right:-5px}.hd.bl{bottom:-5px;left:-5px}.hd.br{bottom:-5px;right:-5px}
+.dims{position:absolute;z-index:2;top:calc(100% + 9px);left:50%;transform:translateX(-50%);padding:3px 6px;border-radius:3px;background:var(--sel);color:#FFFFFF;
+  font:600 11px/1.2 var(--display);letter-spacing:0;white-space:nowrap;font-variant-numeric:tabular-nums}
+.cursor{position:absolute;top:0;left:0;width:24px;height:24px;pointer-events:none;opacity:0;will-change:transform}
+.cursor svg{position:absolute;inset:0;width:100%;height:100%}
+.cursor .resize{display:none}
+.cursor.dragging .arrow{display:none}.cursor.dragging .resize{display:block}
+@media (prefers-reduced-motion:reduce){.sel{--k:1;outline-color:transparent}.sel .hd,.sel .dims{opacity:0}}
+.bio{position:relative;display:grid;outline:1.5px solid transparent;outline-offset:3px;max-width:44ch;margin-top:calc(var(--cell) / 2);font:400 var(--bio-fs)/var(--lh) var(--display);color:var(--sub);text-wrap:pretty}
+/* The bio is "typed" into a Figma text box: placeholder "Text", select it, delete, type */
+.bio>span{grid-area:1/1}
+.bio-ghost{visibility:hidden}
+.typed>.bio-ghost{visibility:visible}
+.bio.editing{outline-color:var(--sel)}
+.bio-live mark{background:rgba(13,153,255,.28);color:inherit}
+.caret{display:none;width:1.5px;height:1.1em;margin-left:1px;background:var(--ink);vertical-align:-.18em;animation:caret 1s steps(1) infinite}
+.editing .caret{display:inline-block}
+@keyframes caret{50%{opacity:0}}
+.bio b{color:var(--ink);font-weight:600}
+.where{position:relative;width:max-content;max-width:100%;white-space:nowrap;opacity:0;outline:1.5px solid transparent;outline-offset:2px;margin-top:calc(var(--cell) / 4);font:500 13px/var(--lh) var(--mono);color:var(--mu);font-variant-numeric:tabular-nums}
+/* The location is dragged in from off screen by a second, "multiplayer" Figma cursor */
+
+.where.moving{outline-color:#9747FF}
+.mp{position:absolute;left:62%;top:30%;display:none;pointer-events:none;transition:transform .45s cubic-bezier(.2,.8,.2,1),opacity .3s .1s}
+.mp svg{display:block;width:20px;height:20px}
+.mp b{position:absolute;left:14px;top:17px;padding:2px 6px;border-radius:4px;background:#9747FF;color:#FFFFFF;font:600 11px/1.3 var(--display);white-space:nowrap}
+.where.moving .mp,.where.leaving .mp{display:block}
+.where.leaving .mp{transform:translate(36px,22px);opacity:0}
+
+/* ---------- Work ---------- */
+.work-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 20px;margin-bottom:var(--cell);padding:calc(var(--cell) / 2)}
+.label{font:500 13px/1 var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--mu)}
+.filters{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:4px 14px 4px 6px;border:1px solid var(--line);border-radius:999px;cursor:pointer;
+  background:#FFFFFF;color:var(--ink);font:500 14px/1 var(--display)}
+.chip[data-filter="all"]{padding-left:14px}
+.chip:hover{border-color:#CFCFCF}
+.chip .ct{font:500 12px/1 var(--mono);color:var(--mu)}
+.chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#FFFFFF}
+.chip[aria-pressed="true"] .ct{color:#A9A9A9}
+.filter-pick{display:none;position:relative}
+.filter-pick select{appearance:none;-webkit-appearance:none;width:100%;min-height:48px;margin:0;padding:0 46px 0 18px;border:1px solid var(--line);border-radius:999px;cursor:pointer;
+  background:#FFFFFF;color:var(--ink);font:500 16px/1 var(--display)}
+.filter-pick svg{position:absolute;right:18px;top:50%;width:16px;height:16px;margin-top:-8px;pointer-events:none;color:var(--ink)}
+@media (max-width:639px){.filters{width:100%}.filters .chip{display:none}.filter-pick{display:block;width:100%}}
+
+.gallery{display:grid;gap:calc(var(--cell) * 2);grid-template-columns:minmax(0,1fr);align-items:stretch;grid-auto-flow:row dense}
+@media (min-width:720px){.gallery{gap:calc(var(--cell) * 2)}}
+@media (min-width:720px){.gallery{grid-template-columns:repeat(2,minmax(0,1fr))}}
+/* Wide screens: tighter, so more work shows in the first screen. 29 grid columns: three cards
+   of 9 cells with 1-cell gaps fit exactly. */
+@media (min-width:1200px){:root{--cols:29;--F:calc(var(--cell) * 2)}.gallery{grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--cell)}.hero{padding-block:var(--cell)}}
+
+.obj{position:relative;display:flex;flex-direction:column}
+
+.obj-img{position:relative;overflow:hidden;background:var(--tile);isolation:isolate}
+.obj-img>*{height:100%}
+.ph{display:grid;place-items:center;width:100%;padding:10px;text-align:center;color:var(--sub);
+  background:repeating-linear-gradient(135deg,#EFEFEF 0 10px,#F4F4F4 10px 20px)}
+.ph.empty{background:var(--tile);outline:1.5px dashed #CFCFCF;outline-offset:-10px}
+.ph-tag{display:inline-flex;flex-direction:column;gap:3px;max-width:100%;padding:7px 10px;border-radius:8px;background:#FFFFFF;font:500 11px/1.25 var(--mono);overflow-wrap:anywhere}
+.ph-tag b{font:700 12px/1.2 var(--display)}
+.ph.is-real{position:relative;padding:0;background:none;overflow:hidden}
+/* Images fill their reserved box exactly; positioned so Safari can't size them from the file instead */
+.ph.is-real img{position:absolute;inset:0}
+.ph img{display:block;width:100%;height:100%;object-fit:cover}
+.obj-cap{display:grid;align-content:start;gap:4px;padding:calc(var(--cell) / 2);border-top:1px solid transparent;
+  background:repeating-linear-gradient(90deg,var(--dot) 0 1px,transparent 1px var(--dot-step,3px)) -1px 0/calc(100% + 1px) 1px no-repeat border-box}
+.obj-title{font:600 clamp(18px,1.6vw,21px)/1.2 var(--display);letter-spacing:-.02em;text-wrap:balance}
+.obj-sub{font:400 15px/1.4 var(--display);color:var(--sub)}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.tag{display:inline-flex;align-items:center;gap:7px;padding:3px 10px 3px 3px;border-radius:999px;font:500 12px/1 var(--display);background:var(--tile)}
+.dot{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:#FFFFFF;color:var(--ink);flex:none;box-shadow:inset 0 0 0 1px #E2E2E2}
+.dot svg{width:13px;height:13px}
+.hit{position:absolute;inset:0;z-index:3;width:100%;padding:0;border:0;border-radius:0;background:none;cursor:pointer}
+.hit:focus-visible{outline-offset:6px}
+
+/* Testimonials sit in the grid as plain quote tiles */
+/* Testimonials: an iOS Messages thread inside the card */
+.imsg{padding-top:1px}
+@media (min-width:720px){.im-screen{min-height:calc(var(--cell) * 11)}}
+.im-screen{touch-action:manipulation;-webkit-user-select:none;user-select:none;position:relative;display:flex;flex-direction:column;flex:1;min-height:calc(var(--cell) * 15);overflow:hidden;background:#FFFFFF;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",var(--display)}
+.im-head{position:relative;display:grid;place-items:center;padding:10px 12px 8px;background:rgba(247,247,247,.96);border-bottom:1px solid #E5E5E5}
+.im-back{position:absolute;left:4px;top:50%;width:40px;height:40px;margin-top:-20px;padding:10px 14px;border:0;background:none;color:#8A8A8A;cursor:pointer}
+.im-back:hover{color:var(--ink)}
+.im-back svg,.im-name svg{display:block;width:100%;height:100%}
+.im-who{display:grid;justify-items:center;gap:3px;padding:2px 10px;border:0;background:none;cursor:pointer;color:var(--ink);font:inherit;border-radius:10px}
+.im-who:hover .im-name{color:var(--sub)}
+.im-av{width:44px;height:44px;border-radius:50%;object-fit:cover;background:#D7D7D7;display:grid;place-items:center;color:#FFFFFF;font:600 17px/1 var(--display)}
+.im-av.big{width:88px;height:88px;font-size:32px}
+.im-name{display:inline-flex;align-items:center;gap:3px;font:500 12px/1.2 var(--display)}
+.im-name svg{width:6px;height:9px;color:#9A9A9A}
+.im-thread{display:flex;flex-direction:column;flex:1;padding:12px 12px 14px}
+.im-time{margin-bottom:10px;text-align:center;font:500 11px/1.2 var(--display);color:#8E8E93}
+.im-time b{font-weight:600}
+.im-msgs{display:grid;justify-items:start;gap:4px;margin:8px 0 0}
+.im-bubble.ask{margin-top:0}
+.im-bubble{position:relative;max-width:82%;margin:0;padding:8px 12px;border-radius:18px;background:#E9E9EB;color:#0C0C0C;
+  font:400 15px/1.33 var(--display);letter-spacing:-.005em;text-wrap:pretty}
+.im-bubble:last-child{border-bottom-left-radius:6px}
+.im-dots{display:none}
+/* The message bar keeps one line of space in the layout; when a message runs long it grows
+   upward over the thread (like iOS) instead of cutting the text off */
+.im-input{position:relative;z-index:3;height:36px;margin:0 12px 12px;transition:transform .32s cubic-bezier(.2,.8,.2,1)}
+.im-bar{position:absolute;left:0;right:0;bottom:0;display:flex;align-items:flex-end;gap:6px;min-height:36px;padding:4px 4px 4px 14px;border:1px solid #DADADA;border-radius:18px;background:#FFFFFF;
+  font:400 14px/1.3 var(--display)}
+.im-field{flex:1;min-width:0;padding-block:4px;white-space:normal;overflow-wrap:anywhere}
+.im-typed{color:var(--ink)}
+.im-typed:not(:empty)+.im-ph{display:none}
+.im-typed:not(:empty)::after{content:"";display:inline-block;width:1.5px;height:1.1em;margin-left:1px;vertical-align:-.2em;background:var(--ink);animation:caret 1s steps(1) infinite}
+.im-ph{color:#A3A3A3}
+.im-send{flex:none;display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:#007AFF;color:#FFFFFF;opacity:0;transform:scale(.5);transition:opacity .15s,transform .2s}
+.im-send svg{width:14px;height:14px}
+.im-send.on{opacity:1;transform:none}
+.im-send.down{transform:scale(.85);filter:brightness(.85)}
+/* Kaden's reply: a blue bubble on the right, space held from the start */
+.im-bubble.me{align-self:flex-end;max-width:82%;margin-top:8px;background:#007AFF;color:#FFFFFF;border-radius:18px;border-bottom-right-radius:6px;transform-origin:100% 100%}
+.im-status{align-self:flex-end;margin-top:2px;font:500 11px/1.2 var(--display);color:#8E8E93}
+.js-imsg .im-status{opacity:0;transition:opacity .3s}
+.js-imsg .im-status.in{opacity:1}
+/* iOS keyboard that slides up while the reply is typed */
+.im-kb{position:absolute;left:0;right:0;bottom:0;z-index:4;display:grid;gap:9px;padding:8px 3px 10px;background:#D1D4DA;
+  transform:translateY(100%);transition:transform .32s cubic-bezier(.2,.8,.2,1);--kh:34px}
+.kb .im-kb{transform:none}
+.kb .im-input{transform:translateY(calc(-1 * var(--kbh,190px)))}
+.im-row{display:flex;justify-content:center;gap:4px}
+.im-row.r1{padding-inline:5%}
+.k{position:relative;flex:1;max-width:44px;display:grid;place-items:center;height:var(--kh);border-radius:5px;background:#FFFFFF;box-shadow:0 1px 0 #898A8D;
+  font:400 16px/1 var(--display);color:#0C0C0C}
+.k.sp{flex:1.4;max-width:58px;background:#ABB0BC;font-size:13px}
+.k.sp svg{width:16px;height:16px}
+.k.space{flex:5;max-width:none;font-size:13px}
+.k.ret{flex:2;max-width:none}
+.k.down{background:#BFC3CB}
+.k[data-c].down::after{content:attr(data-c);position:absolute;left:50%;bottom:calc(100% - 4px);transform:translateX(-50%);min-width:130%;padding:6px 0 10px;border-radius:8px;
+  background:#FFFFFF;box-shadow:0 2px 6px rgba(0,0,0,.25);font:400 26px/1 var(--display);text-align:center}
+.k.sp.down{background:#FFFFFF}
+@media (min-width:720px){.im-kb{--kh:38px}}
+/* Animation states (set by messages.js): waiting bubbles keep their space but are invisible;
+   the next one shows typing dots before its text pops in */
+.js-imsg .im-bubble{opacity:0;transform:scale(.6);transform-origin:0 100%;transition:opacity .2s ease,transform .35s cubic-bezier(.2,1.3,.4,1)}
+.js-imsg .im-bubble.typing{opacity:1;transform:none;background:none}
+.js-imsg .im-bubble.typing .im-text{visibility:hidden}
+.js-imsg .im-bubble.typing .im-dots{position:absolute;top:0;left:0;display:flex;gap:4px;align-items:center;padding:12px 14px;border-radius:18px;background:#E9E9EB}
+.im-dots i{width:7px;height:7px;border-radius:50%;background:#8E8E93;animation:imdot 1.2s infinite ease-in-out}
+.im-dots i:nth-child(2){animation-delay:.15s}.im-dots i:nth-child(3){animation-delay:.3s}
+@keyframes imdot{0%,60%,100%{opacity:.35;transform:none}30%{opacity:1;transform:translateY(-2px)}}
+.js-imsg .im-bubble.in{opacity:1;transform:none}
+/* Contact card */
+.im-card{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;padding:0 14px 16px;overflow:auto;background:#F2F2F7;
+  animation:imcard .28s cubic-bezier(.2,.8,.2,1)}
+@keyframes imcard{from{transform:translateY(16px);opacity:0}}
+.im-card-bar{align-self:stretch;display:flex;justify-content:flex-end;padding:8px 0 4px}
+.im-done{padding:8px 4px;border:0;background:none;color:var(--ink);font:600 15px/1 var(--display);cursor:pointer}
+.im-card-name{margin-top:10px;font:600 21px/1.2 var(--display);letter-spacing:-.01em;text-align:center}
+.im-card-role{margin-top:2px;font:400 14px/1.35 var(--display);color:var(--sub);text-align:center}
+.im-rows{align-self:stretch;margin-top:16px;border-radius:12px;background:#FFFFFF;overflow:hidden}
+.im-rows>div{padding:9px 14px}
+.im-rows>div+div{border-top:1px solid #E5E5EA}
+.im-rows dt{font:400 12px/1.3 var(--display);color:#8E8E93}
+.im-rows dd{display:flex;align-items:center;gap:8px;font:400 15px/1.35 var(--display);color:var(--ink)}
+.im-logo{height:18px;width:auto;max-width:90px;object-fit:contain}
+.init{width:40px;height:40px;border-radius:50%;object-fit:cover;flex:none;background:#E4E4E4}
+
+/* Looping video tiles */
+.vid-wrap{position:relative;aspect-ratio:1/1;background:#FFFFFF}
+.vid-wrap video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.lb-hero .vid-wrap video{object-fit:contain}
+.vid-wrap.contain{background:var(--tile)}
+.vid-wrap.contain video{object-fit:contain;inset:auto;top:var(--cell);left:var(--cell);width:calc(100% - var(--cell) * 2);height:calc(100% - var(--cell) * 2)}
+.figs .vid-wrap{max-height:78vh}
+
+/* ---------- 3D model ---------- */
+.model-wrap{position:relative;aspect-ratio:1/1;background:radial-gradient(50% 12% at 50% 86%,rgba(0,0,0,.14),transparent 70%),var(--tile)}
+.model-wrap canvas{display:block;width:100%;height:100%}
+.model-wrap.big canvas{cursor:grab}
+.model-wrap.big canvas:active{cursor:grabbing}
+.model-wrap.big canvas:focus-visible{outline:2px solid var(--ink);outline-offset:-6px}
+.model-hint{position:absolute;left:14px;bottom:12px;padding:6px 10px;border-radius:999px;background:var(--ink);color:#FFFFFF;font:500 12px/1 var(--mono);pointer-events:none}
+.no-gl-msg{display:none}
+.no-gl .no-gl-msg{display:grid;place-items:center;position:absolute;inset:0;color:var(--sub);font:500 13px/1.3 var(--mono)}
+
+/* Real images in the lightbox */
+/* Every popup's top image, 3D viewer or compare is the same size, so moving between projects doesn't shift */
+.lb-hero{display:grid;gap:10px}
+.lb-hero>:first-child{width:100%;max-width:100%;aspect-ratio:16/10!important;max-height:70vh;overflow:hidden}
+@media (max-width:639px){.lb-hero>:first-child{aspect-ratio:1/1!important}}
+.lb-hero .ph.is-real{background:var(--tile)}
+.lb-hero .ph.is-real img{width:100%;height:100%;object-fit:contain}
+/* Images inside the case study keep their own shape (reserved before they load) */
+.figs .ph.is-real{max-height:78vh;background:var(--tile)}
+.figs .ph.is-real img{width:100%;height:100%;object-fit:contain}
+
+/* Loading placeholders: a soft shimmer in the exact space an image, viewer or compare will fill */
+@keyframes shimmer{to{background-position:-200% 0}}
+.ph.is-real:not(.loaded),.ba:not(.loaded),.ba-layer:not(.loaded),.model-wrap:not(.ready){
+  background:linear-gradient(100deg,#EEEEEE 30%,#F7F7F7 50%,#EEEEEE 70%) 0 0/200% 100%;animation:shimmer 1.3s linear infinite}
+.ph.is-real img,.ba img,.ba-layer img{transition:opacity .25s ease}
+.ph.is-real:not(.loaded) img,.ba:not(.loaded)>img,.ba-layer:not(.loaded) img{opacity:0}
+.model-wrap canvas{transition:opacity .25s ease}
+.model-wrap:not(.ready) canvas{opacity:0}
+
+/* ---------- Contact + footer ---------- */
+.contact{display:grid;align-content:start;gap:16px;margin-top:calc(var(--cell) * 2);padding:var(--cell)}
+.contact h2{font:700 clamp(44px,7vw,88px)/.95 var(--display);letter-spacing:-.05em}
+.c-lede{font:400 clamp(18px,1.9vw,22px)/1.4 var(--display);color:var(--sub)}
+.c-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin-top:6px}
+.c-email{font:600 clamp(18px,1.8vw,22px)/1.2 var(--display);user-select:all;overflow-wrap:anywhere}
+.c-links{display:flex;flex-wrap:wrap;gap:4px 22px;font:500 15px/1 var(--display)}
+.c-links a{display:inline-block;padding-block:12px;text-decoration:underline;text-underline-offset:4px;text-decoration-color:#C4C4C4}
+.c-links a:hover{text-decoration-color:var(--ink)}
+.foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin-top:calc(var(--cell) * 2);min-height:calc(var(--cell) * 2);padding:0 calc(var(--cell) / 2);font:500 12px/1.4 var(--mono);color:var(--mu)}
+
+/* Before / after slider */
+.ba{position:relative;aspect-ratio:16/9;overflow:hidden;background:var(--tile);user-select:none}
+.ba img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top center;display:block}
+.ba-before{clip-path:inset(0 calc(100% - var(--pos)) 0 0)}
+.ba-line{position:absolute;top:0;bottom:0;left:var(--pos);width:3px;margin-left:-1.5px;background:#FFFFFF;box-shadow:0 0 0 1px rgba(0,0,0,.25);pointer-events:none}
+.ba-knob{position:absolute;top:50%;left:50%;display:grid;place-items:center;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;background:#FFFFFF;color:var(--ink);box-shadow:0 2px 8px rgba(0,0,0,.35)}
+.ba:not(.big) .ba-knob{width:30px;height:30px;margin:-15px 0 0 -15px}
+.ba-knob svg{width:60%;height:60%}
+.ba-tag{position:absolute;bottom:10px;padding:5px 9px;border-radius:999px;background:rgba(12,12,12,.82);color:#FFFFFF;font:600 11px/1 var(--mono);letter-spacing:.04em;pointer-events:none}
+.ba-tag.l{left:10px}.ba-tag.r{right:10px}
+.ba-range{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:ew-resize;touch-action:pan-y}
+.ba.big:has(.ba-range:focus-visible) .ba-knob{outline:3px solid var(--ink);outline-offset:3px}
+/* Lightbox: both full-length homepages side by side behind the handle; each side scrolls on its own */
+.ba.split{width:100%;max-width:100%}
+.ba.split .ba-layer{position:absolute;inset:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;background:#EDEDED}
+.ba.split .ba-layer::-webkit-scrollbar{display:none}
+.ba.split .ba-layer:focus-visible{outline:3px solid var(--ink);outline-offset:-3px}
+.ba.split .ba-layer img{position:static;inset:auto;width:100%;height:auto;object-fit:fill}
+.ba.split .ba-range{pointer-events:none}
+.ba.split .ba-line{width:44px;margin-left:-22px;background:none;box-shadow:none;pointer-events:auto;cursor:ew-resize;touch-action:none;z-index:2}
+.ba.split .ba-line::before{content:"";position:absolute;top:0;bottom:0;left:50%;width:3px;margin-left:-1.5px;background:#FFFFFF;box-shadow:0 0 0 1px rgba(0,0,0,.25)}
+.ba.split .ba-tag{z-index:2}
+.ba.split.dragging .ba-layer{pointer-events:none}
+.ba-note{margin:10px 0 0;color:#6B6B6B;font-size:13px;line-height:1.5}
+.ba-note a{color:#1A1A1A;font-weight:600;text-underline-offset:3px;margin-left:8px;white-space:nowrap}
+
+
+/* ---------- Lightbox ---------- */
+/* Popup: fills the screen. The content sits on a white sheet in the middle; the page behind shows
+   through a soft white veil. Close is in the top corner; previous/next sit on the sides on desktop
+   and at the bottom right on phones. */
+.lb{position:fixed;inset:0;width:100vw;height:100dvh;max-width:none;max-height:none;margin:0;padding:0;border:0;background:transparent;overflow:hidden}
+.lb::backdrop{background:rgba(255,255,255,.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.lb[open] .sheet{animation:lb-in .28s cubic-bezier(.2,.8,.2,1)}
+@keyframes lb-in{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.sheet{position:relative;width:min(1040px,calc(100vw - 176px));height:calc(100dvh - 48px);margin:24px auto;overflow:auto;overscroll-behavior:contain;color:var(--ink);
+  background:#FFFFFF;padding:0 clamp(18px,4vw,48px) clamp(28px,4vw,48px);box-shadow:0 0 0 1px rgba(0,0,0,.06),0 30px 80px -30px rgba(0,0,0,.35)}
+.lb-bar,.lb-nav{display:contents}
+.lb-bar-tags{display:none}
+.lb-btn{position:fixed;z-index:6;display:grid;place-items:center;width:48px;height:48px;padding:0;border:0;border-radius:50%;background:#FFFFFF;color:var(--ink);cursor:pointer;
+  box-shadow:0 0 0 1px rgba(0,0,0,.08),0 6px 18px -6px rgba(0,0,0,.25)}
+.lb-btn:hover{background:#F2F2F2}
+.lb-btn svg{width:20px;height:20px}
+.lb [data-close]{top:calc(20px + env(safe-area-inset-top,0px));right:calc(20px + env(safe-area-inset-right,0px))}
+.lb [data-step="-1"]{left:calc(32px + env(safe-area-inset-left,0px));top:50%;transform:translateY(-50%)}
+.lb [data-step="1"]{right:calc(32px + env(safe-area-inset-right,0px));top:50%;transform:translateY(-50%)}
+.lb-btn .flip{transform:rotate(180deg)}
+.lb :focus-visible{outline-color:var(--ink)}
+.lb-head{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;padding-block:clamp(22px,3vw,34px) clamp(16px,2vw,22px)}
+.lb-head .tags{margin:0}
+.lb-bar-tags{display:none}
+.lb-head h2{font:700 clamp(28px,4vw,48px)/1.02 var(--display);letter-spacing:-.04em;text-wrap:balance;max-width:20em}
+.lb-sub{font:500 clamp(16px,1.4vw,19px)/1.4 var(--display);color:var(--sub)}
+
+.lb-body{display:grid;grid-template-columns:minmax(0,1fr);gap:22px;margin-top:clamp(22px,3vw,32px);max-width:860px}
+.lb-body p{font:400 17px/1.6 var(--display);max-width:68ch}
+.lb-body .lead{font:600 clamp(19px,1.8vw,23px)/1.4 var(--display);letter-spacing:-.015em}
+.lb-body .note{font:500 14px/1.5 var(--mono);color:var(--sub)}
+.meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));gap:14px 24px;padding:16px 0;border-block:1px solid var(--line)}
+.meta dt{font:500 11px/1.2 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mu);margin-bottom:5px}
+.meta dd{font:600 15px/1.35 var(--display)}
+.ps{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr))}
+.ps>div{padding:16px 18px;background:var(--tile)}
+.ps b{font:700 13px/1 var(--display);letter-spacing:.02em}
+.ps p{margin-top:6px;font-size:16px}
+.lb-sec{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;padding-top:22px;border-top:1px solid var(--line)}
+.lb-sec h3{font:700 clamp(20px,2vw,26px)/1.12 var(--display);letter-spacing:-.025em;text-wrap:balance}
+.stats{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));margin-top:4px}
+.stat{padding:16px 18px;background:var(--tile)}
+.stat .num{font:800 clamp(34px,4vw,48px)/.95 var(--display);letter-spacing:-.05em;font-variant-numeric:tabular-nums}
+.stat .lbl{margin-top:8px;font:600 15px/1.3 var(--display)}
+.stat .sm{margin-top:6px;font:400 14px/1.45 var(--display);color:var(--sub)}
+.figs{display:grid;gap:12px;margin-top:4px}
+@media (min-width:640px){.figs.c2{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.figs figure{display:grid;gap:8px}
+
+.figs figcaption{font:500 12px/1.3 var(--mono);color:var(--sub)}
+.pull{margin:4px 0 0;padding:18px 20px;border-left:4px solid var(--ink);background:var(--tile);font:600 19px/1.45 var(--display)}
+.pull cite{display:block;margin-top:8px;font:500 13px/1 var(--mono);font-style:normal;color:var(--sub)}
+.ext{font-weight:600;text-decoration:underline;text-underline-offset:4px}
+@media (max-width:639px){
+  .sheet{width:calc(100vw - 16px);height:calc(100dvh - 16px);margin:8px auto;padding-top:56px;padding-bottom:96px}
+  .lb [data-close]{top:calc(16px + env(safe-area-inset-top,0px));right:calc(16px + env(safe-area-inset-right,0px))}
+  .lb [data-step]{top:auto;transform:none;bottom:calc(20px + env(safe-area-inset-bottom,0px));width:52px;height:52px}
+  .lb [data-step="-1"]{left:auto;right:calc(84px + env(safe-area-inset-right,0px))}
+  .lb [data-step="1"]{right:calc(20px + env(safe-area-inset-right,0px))}}
+
+
+/* Full-screen image viewer inside the lightbox */
+.lb-hero .ph.is-real img,.figs .ph.is-real img{cursor:zoom-in}
+.zoom{position:fixed;inset:0;z-index:20;display:grid;place-items:center;overflow:auto;overscroll-behavior:contain;
+  padding:max(64px,env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-right,0px)) max(40px,env(safe-area-inset-bottom,0px)) max(12px,env(safe-area-inset-left,0px));background:rgba(12,12,12,.94)}
+.zoom img{display:block;max-width:100%;max-height:calc(100dvh - 112px);width:auto;height:auto;cursor:zoom-in;background:#FFFFFF}
+.zoom.tall{place-items:start center}
+.zoom.tall img{width:min(100%,760px);max-height:none}
+.zoom.actual{place-items:start}
+.zoom.actual img{max-width:none;max-height:none;cursor:zoom-out}
+.zoom-close{position:fixed;top:max(12px,env(safe-area-inset-top,0px));right:max(12px,env(safe-area-inset-right,0px));z-index:1;background:#FFFFFF}
+.zoom-hint{position:fixed;left:50%;bottom:max(12px,env(safe-area-inset-bottom,0px));transform:translateX(-50%);padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.14);color:#FFFFFF;font:500 12px/1 var(--mono);white-space:nowrap;pointer-events:none}
+.zoom.actual .zoom-hint{display:none}
+.zoom :focus-visible{outline-color:#FFFFFF}
+
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+/* Card drop-in (src/scripts/reveal.js) */
+.anim .gallery>.obj:not(.shown),.anim .rl-list>.rl:not(.shown){opacity:0}
+.gallery{position:relative}
+.slot{position:absolute;pointer-events:none;background:rgba(13,153,255,.06);outline:1.5px solid var(--sel);outline-offset:-1px;z-index:0}
+.gallery>.obj,.rl-list>.rl{z-index:1}
+
+/* ---------- Redlines: notes on problems in other software ---------- */
+.rl-promo{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:6px 16px;margin-top:calc(var(--cell) * 2);padding:var(--cell);text-decoration:none}
+.rl-promo .label{grid-column:1/-1}
+.rl-promo-t{font:600 clamp(20px,2.2vw,28px)/1.2 var(--display);letter-spacing:-.02em;text-wrap:balance}
+.rl-promo-go{display:grid;place-items:center;width:44px;height:44px;border-radius:999px;background:var(--ink);color:#FFFFFF}
+.rl-promo-go svg{width:20px;height:20px}
+.rl-promo:hover .rl-promo-go{background:#2A2A2A}
+
+.rl-head{display:grid;gap:12px;margin-block:calc(var(--cell) * 2);padding:var(--cell)}
+.np-title{font:700 clamp(44px,7vw,88px)/.95 var(--display);letter-spacing:-.05em}
+.np-word{position:relative;display:inline-block;will-change:transform;backface-visibility:hidden;outline:1.5px solid transparent;cursor:pointer}
+.np-word .hd{opacity:0}
+.anim .np-word{transform:translateX(18px)} /* starts out of line; nitpicks.js fixes it */
+.np-word.selected{outline-color:var(--sel)}.np-word.selected .hd{opacity:1}
+.np-lede{max-width:34ch;font:400 clamp(18px,1.9vw,22px)/1.4 var(--display);color:var(--sub);text-wrap:pretty}
+/* Header animation (src/scripts/nitpicks.js): the title starts out of line, a visitor's cursor pins a
+   comment on it, then Kaden's cursor drags it back into line and the comment resolves */
+.np-guide,.np-pin,.np-cur{position:absolute;top:0;left:0;pointer-events:none;opacity:0;z-index:4}
+.np-guide{width:1px;background:#F24822}
+.np-pin b{display:block;width:26px;height:26px;border-radius:50% 50% 50% 0;background:#9747FF;border:2.5px solid #FFFFFF;box-shadow:0 2px 8px rgba(0,0,0,.25);transform:translateY(-100%)}
+.np-bubble{position:absolute;left:34px;top:-30px;padding:7px 11px;border-radius:10px;background:#FFFFFF;color:var(--ink);font:500 14px/1.2 var(--display);white-space:nowrap;box-shadow:0 0 0 1px rgba(0,0,0,.06),0 6px 18px -6px rgba(0,0,0,.25)}
+.np-bubble.flip{left:auto;right:8px}
+.np-cur svg{display:block;width:20px;height:20px}
+.np-cur em{position:absolute;left:14px;top:17px;padding:2px 6px;border-radius:4px;color:#FFFFFF;font:600 11px/1.3 var(--display);font-style:normal;white-space:nowrap}
+.np-cur.you em{background:#9747FF}.np-cur.me em{background:#0D99FF}
+.rl-count{font:500 13px/1 var(--mono);color:var(--mu)}
+.rl-list{position:relative;display:grid;gap:calc(var(--cell) * 2)}
+@media (min-width:720px){.rl-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.rl{display:flex;flex-direction:column;text-decoration:none}
+.rl-media{position:relative;display:grid;place-items:center;overflow:hidden;background:var(--tile)}
+/* List cards: square media (12 cells on phones, 11 = one column wide on desktop) */
+.rl .rl-media{height:calc(var(--cell) * 12 - 1px)}
+@media (min-width:720px){.rl .rl-media{height:calc(var(--cell) * 11 - 1px)}}
+.rl-cap{display:grid;gap:6px;padding:calc(var(--cell) / 2);border-top:1px solid transparent;
+  background:repeating-linear-gradient(90deg,var(--dot) 0 1px,transparent 1px var(--dot-step,3px)) -1px 0/calc(100% + 1px) 1px no-repeat border-box}
+.rl:has(.hit:hover) .rl-title{text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1.5px}
+.rl-meta{display:flex;flex-wrap:wrap;gap:4px 12px;font:500 13px/1.3 var(--mono);color:var(--mu)}
+.rl-meta span{color:var(--sub);font-weight:600}
+.rl-title{font:650 clamp(18px,1.7vw,22px)/1.25 var(--display);letter-spacing:-.02em;text-wrap:balance}
+.rl-title.big{font-size:clamp(24px,2.6vw,34px);line-height:1.15}
+/* In the lightbox: the frame fills the hero box; a close crop stays square so its selection box lands right */
+.lb-hero .dev-crop{position:relative;inset:auto;height:100%;aspect-ratio:1/1;max-width:100%}
+/* Detail layout (kept for reference): media left, text right on desktop */
+.rl-back{display:flex;align-items:center;gap:8px;width:max-content;max-width:100%;margin-block:calc(var(--cell) * 2);padding:0 calc(var(--cell) / 2);height:calc(var(--cell) * 2);font:600 15px/1 var(--display);text-decoration:none}
+.rl-detail{display:grid;grid-template-columns:minmax(0,1fr)}
+@media (min-width:720px){.rl-detail{grid-template-columns:calc(var(--cell) * 15 - 1px) minmax(0,1fr)}}
+.rl-detail .rl-media{height:calc(var(--cell) * 15 - 1px)}
+.rl-detail .rl-media.is-desktop{height:calc(var(--cell) * 9 - 1px)}
+.rl-detail .rl-media.is-crop{height:calc(var(--cell) * 12 - 1px)}
+@media (min-width:720px){.rl-detail .rl-media,.rl-detail .rl-media.is-desktop,.rl-detail .rl-media.is-crop{height:calc(var(--cell) * 15 - 1px)}}
+.rl-text{display:grid;align-content:start;gap:12px;padding:calc(var(--cell) / 2) calc(var(--cell) / 2) var(--cell)}
+@media (min-width:720px){.rl-text{padding:var(--cell)}}
+.rl-parts{display:grid;gap:14px;margin:4px 0 0}
+.rl-parts dt{font:500 12px/1 var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--mu)}
+.rl-parts dd{margin:6px 0 0;font:400 16px/1.45 var(--display);color:var(--sub);max-width:52ch}
+
+/* Device frames: drawn in CSS. The screen inside is where the clip or screenshot sits. */
+.dev .scr{position:relative;overflow:hidden;background:#FFFFFF}
+.dev .frame{position:absolute;inset:0}
+.dev .scr img,.dev .scr video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top center;display:block}
+/* iPhone 14 Pro Max proportions: body 77.6 x 160.7 mm; the screen inside is 1290 x 2796 px (the same
+   shape as its screenshots and screen recordings), so a recording fills it exactly with nothing cropped. */
+.dev-phone{height:calc(100% - var(--cell) * 2);aspect-ratio:77.6/160.7}
+.dev-phone .dev-body{height:100%;padding:4.13%;border-radius:15.9% / 7.68%;background:#0C0C0C;box-shadow:0 0 0 1.5px #3A3A3A inset,0 18px 40px -18px rgba(0,0,0,.35)}
+.dev-phone .scr{height:100%;border-radius:12.8% / 5.9%;background:#000}
+/* The Dynamic Island (126 x 37 pt, 11 pt from the top). Screen recordings already include it, so it's
+   only drawn over screenshots. */
+.dev-phone .scr:not(.has-video)::after{content:"";position:absolute;z-index:2;top:1.18%;left:50%;width:29.3%;height:3.97%;transform:translateX(-50%);border-radius:999px;background:#000}
+.dev-desktop{width:calc(100% - var(--cell) * 2)}
+.dev-desktop .dev-body{margin-inline:7%;padding:2.2% 2.2% 3%;border-radius:12px 12px 0 0;background:#0C0C0C;box-shadow:0 0 0 1.5px #3A3A3A inset}
+.dev-desktop .scr{aspect-ratio:16/10}
+.dev-base{position:relative;height:clamp(9px,1.4vw,14px);border-radius:0 0 14px 14px / 0 0 10px 10px;background:linear-gradient(#E4E4E4,#B8B8B8);box-shadow:0 14px 30px -16px rgba(0,0,0,.35)}
+.dev-base::before{content:"";position:absolute;top:0;left:50%;width:15%;height:45%;transform:translateX(-50%);border-radius:0 0 6px 6px;background:#A8A8A8}
+.dev-crop{position:absolute;inset:0}
+.dev-crop .dev-body,.dev-crop .scr{height:100%}
+.dev-crop .frame{transform:scale(var(--zoom));transform-origin:var(--focus)}
+.dev-crop .scr img,.dev-crop .scr video{object-position:var(--focus)}
+/* Selection box over the problem (in the crop, it scales with the zoom) */
+.mark{position:absolute;z-index:3;outline:1.5px solid var(--sel);pointer-events:none}
+.dev-crop .mark{outline-width:calc(1.5px / var(--zoom))}
+.dev-crop .mark .hd{transform:scale(calc(1 / var(--zoom)))}
+@media (min-width:1200px){.rl-list{grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--cell)}.rl .rl-media{height:calc(var(--cell) * 9 - 1px)}.rl-head{margin-block:var(--cell)}}
+.rt-list{margin:0;padding-left:1.2em;display:grid;gap:6px}
+.lb-body .rt-list li{font:400 17px/1.6 var(--display);max-width:68ch}
+/* Images and videos inside rich text (nitpicks) */
+.rt-media{display:grid;gap:8px;margin:4px 0}
+.rt-media>img,.rt-media>video{display:block;width:100%;max-height:78vh;object-fit:contain;background:var(--tile)}
+.rt-dev{display:grid;place-items:center;background:var(--tile);padding:var(--cell) 0}
+.rt-dev.is-phone{height:min(78vh,640px)}
+.rt-dev.is-phone .dev-phone{height:100%}
+.rt-media figcaption{font:500 12px/1.3 var(--mono);color:var(--sub)}
+/* A row of images (e.g. three phone screenshots) side by side */
+.rt-row-in{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:clamp(10px,2.5vw,28px);align-items:start;padding:clamp(14px,3vw,var(--cell));background:var(--tile)}
+.rt-row-in>img{display:block;width:100%;height:auto}
+.rt-row .dev-phone{width:100%;height:auto;aspect-ratio:77.6/160.7}
+/* Hover: the reverse of the scroll-in. The card lifts up out of its blue slot, then settles back. */
+.gallery>.obj,.rl-list>.rl{transition:transform .45s cubic-bezier(.45,0,.2,1),box-shadow .45s cubic-bezier(.45,0,.2,1)}
+.gallery>.obj.lifted,.rl-list>.rl.lifted{transform:translateY(-12px);box-shadow:0 18px 32px -14px rgba(0,0,0,.24)}
+.slot.hover{opacity:0;transition:opacity .25s ease}
+.slot.hover.on{opacity:1}
+.sheet:focus{outline:none}

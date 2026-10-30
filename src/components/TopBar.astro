@@ -1,0 +1,13 @@
+---
+import type { Settings } from "../lib/content";
+interface Props { settings: Settings; base?: string }
+const { settings: s, base = "" } = Astro.props;
+---
+<header class="top gcard">
+  <a class="brand" href="/">Kaden Johnson <span>UX/UI Designer</span></a>
+  <nav aria-label="Main">
+    <a class="opt" href={`${base}#work`}>Work</a>
+    <a href="/nitpicks/">Nitpicks</a>
+    <button class="pill" type="button" data-copy={s.email}>Copy email</button>
+  </nav>
+</header>

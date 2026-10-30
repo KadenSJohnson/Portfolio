@@ -1,0 +1,18 @@
+---
+import type { Settings } from "../lib/content";
+interface Props { settings: Settings }
+const { settings: s } = Astro.props;
+---
+<section class="contact gcard" id="say-hi" aria-labelledby="contact-h" data-snap>
+  <h2 id="contact-h">{s.contactHeading}</h2>
+  <p class="c-lede">{s.contactLede}</p>
+  <div class="c-row">
+    <span class="c-email" id="email-text">{s.email}</span>
+    <button class="pill" type="button" data-copy={s.email}>Copy email</button>
+  </div>
+  <ul class="c-links">
+    <li><a href={s.linkedin} target="_blank" rel="noopener">LinkedIn</a></li>
+    <li><a href={s.x} target="_blank" rel="noopener">X / @kadensly</a></li>
+    <li><a href={s.contactForm} target="_blank" rel="noopener">Contact form</a></li>
+  </ul>
+</section>

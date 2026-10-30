@@ -1,0 +1,23 @@
+{
+  "name": "kaden-johnson-portfolio",
+  "type": "module",
+  "version": "2.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "node --experimental-strip-types scripts/seed-sanity.mjs && astro build && node scripts/build-studio.mjs",
+    "preview": "astro preview",
+    "studio": "sanity dev"
+  },
+  "dependencies": {
+    "astro": "^5.0.0",
+    "sanity": "^6.0.0",
+    "@sanity/client": "^8.0.0",
+    "react": "^19.2.2",
+    "react-dom": "^19.2.2",
+    "styled-components": "^6.1.15"
+  },
+  "engines": {
+    "node": ">=22.12"
+  }
+}

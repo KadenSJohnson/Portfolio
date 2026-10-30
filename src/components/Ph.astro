@@ -1,0 +1,30 @@
+---
+// Image box: the real image when there is one, otherwise a labeled placeholder
+import { img } from "../data/projects";
+import { imageUrl } from "../lib/content";
+import type { SanityImage } from "../data/local";
+import sizes from "../data/image-sizes.json";
+import { srcsetFor } from "../lib/srcset";
+// ratio "natural" uses the image's own shape (known ahead of time) so its space is reserved before it loads
+// sizes: how wide the image shows, so the browser can pick a smaller file (cards pass their own)
+interface Props { src?: string | null; image?: SanityImage; label: string; ratio?: string; alt?: string; sizes?: string; eager?: boolean }
+const { src, image, label, alt, sizes: sz = "(min-width: 900px) 860px, 100vw", eager = false } = Astro.props;
+const url = imageUrl(image, src, (f) => `/images/${img(f)}`);
+const dims = (() => {
+  const m = image?.asset?._ref?.match(/-(\d+)x(\d+)-/);
+  if (m) return [Number(m[1]), Number(m[2])];
+  const f = img(src);
+  return f ? (sizes as Record<string, number[]>)[f] : undefined;
+})();
+const srcset = url ? srcsetFor(url, image, dims?.[0]) : undefined;
+const ratio = Astro.props.ratio === "natural" ? (dims ? `${dims[0]}/${dims[1]}` : "16/10") : Astro.props.ratio || "4/3";
+---
+{url ? (
+  <div class="ph is-real" style={`aspect-ratio:${ratio}`}>
+    <img src={url} srcset={srcset} sizes={srcset ? sz : undefined} alt={alt || label} loading={eager ? "eager" : "lazy"} fetchpriority={eager ? "high" : undefined} decoding="async" width={dims?.[0]} height={dims?.[1]} />
+  </div>
+) : (
+  <div class="ph empty" style={`aspect-ratio:${ratio}`}>
+    <span class="ph-tag"><b>{label}</b><span>Image goes here</span></span>
+  </div>
+)}
