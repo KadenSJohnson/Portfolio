@@ -3,6 +3,22 @@
    dropped into it like a component being placed, then the slot clears. Plays once per card.
    Reduced motion: no card animation. */
 const root = document.documentElement;
+
+// Videos load only when they're about to scroll into view, so they don't compete with the first
+// screen. (Copies opened in the lightbox are started by app.js.)
+const startVideo = (v) => {
+  if (v.dataset.src && !v.getAttribute("src")) { v.src = v.dataset.src; v.preload = "auto"; }
+  v.muted = true;
+  const p = v.play(); if (p && p.catch) p.catch(() => {});
+};
+window.startVideo = startVideo;
+const vids = document.querySelectorAll("video[data-src]");
+if ("IntersectionObserver" in window) {
+  const vio = new IntersectionObserver((es) => es.forEach((e) => {
+    if (e.isIntersecting) startVideo(e.target); else if (!e.target.paused) e.target.pause();
+  }), { rootMargin: "300px 0px" });
+  vids.forEach((v) => vio.observe(v));
+} else vids.forEach(startVideo);
 const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 const loaded = new Promise((r) => (document.readyState === "complete" ? r() : addEventListener("load", r, { once: true })));

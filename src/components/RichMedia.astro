@@ -26,7 +26,7 @@ const alt = b.alt || b.caption || "";
     {frame
       ? <div class={`rt-dev is-${frame}`}><Device r={{ id: b._key, date: "", app: "", title: "", device: frame, video: isVideo ? src : undefined, image: isVideo ? undefined : src, alt } as any} /></div>
       : isVideo
-        ? <video src={src} autoplay muted loop playsinline preload="metadata" aria-label={alt}></video>
+        ? <video data-src={src} muted loop playsinline preload="none" aria-label={alt}></video>
         : <img src={src} alt={alt} loading="lazy" decoding="async" />}
     {b.caption && <figcaption>{b.caption}</figcaption>}
   </figure>

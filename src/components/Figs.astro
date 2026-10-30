@@ -6,6 +6,6 @@ const { items, cols = 2 } = Astro.props;
 ---
 <div class={`figs c${cols}`}>
   {items.map((f) => <figure>{f.imageFile && f.imageFile.endsWith(".mp4")
-    ? <div class="vid-wrap"><video src={`/video/${f.imageFile}`} poster={`/images/${f.imageFile.replace(/\.mp4$/, "-poster.jpg")}`} autoplay muted loop playsinline preload="metadata" aria-label={f.label}></video></div>
+    ? <div class="vid-wrap"><video data-src={`/video/${f.imageFile}`} poster={`/images/${f.imageFile.replace(/\.mp4$/, "-poster.jpg")}`} muted loop playsinline preload="none" aria-label={f.label}></video></div>
     : <Ph src={f.imageFile} image={f.image} label={f.label} ratio="natural" />}<figcaption>{f.label}</figcaption></figure>)}
 </div>

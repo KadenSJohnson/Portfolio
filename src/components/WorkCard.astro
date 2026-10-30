@@ -3,6 +3,7 @@
 import type { Project } from "../lib/content";
 import { FEATURES } from "../data/projects";
 import Ph from "./Ph.astro";
+import { CARD_SIZES } from "../lib/srcset";
 import Tag from "./Tag.astro";
 import BeforeAfter from "./BeforeAfter.astro";
 import ModelView from "./ModelView.astro";
@@ -19,7 +20,7 @@ const f = it.coverVideo
 ---
 <article class={`obj${it.wide ? " wide" : ""}`} data-cat={it.categories.join(" ")} data-id={it.id}>
   <div class="obj-img">
-    {f.ba ? <BeforeAfter ba={f.ba} /> : f.video ? <VideoView video={f.video} /> : f.model ? <ModelView model={f.model} /> : <Ph src={it.imageFile} image={it.image} label={it.imageLabel} ratio={it.imageRatio || "4/3"} />}
+    {f.ba ? <BeforeAfter ba={f.ba} /> : f.video ? <VideoView video={f.video} /> : f.model ? <ModelView model={f.model} /> : <Ph src={it.imageFile} image={it.image} label={it.imageLabel} ratio={it.imageRatio || "4/3"} sizes={CARD_SIZES} />}
   </div>
   <div class="obj-cap">
     <h2 class="obj-title" id={`t-${it.id}`}>{it.title}</h2>

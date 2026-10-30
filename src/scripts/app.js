@@ -172,6 +172,7 @@ import { Model3D } from "./model3d.js";
     content.replaceChildren(tpl.content.cloneNode(true));
     // Copies from a <template> don't start on their own (Safari especially), so start each clip here
     content.querySelectorAll("video").forEach((v) => {
+      if (v.dataset.src && !v.getAttribute("src")) v.src = v.dataset.src;
       v.muted = true; v.defaultMuted = true; v.playsInline = true; v.loop = true;
       const go = () => { const p = v.play(); if (p && p.catch) p.catch(() => {}); };
       go();

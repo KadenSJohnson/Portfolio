@@ -5,5 +5,5 @@ interface Props { video: VideoInfo }
 const { video } = Astro.props;
 ---
 <div class={`vid-wrap${video.fit === "contain" ? " contain" : ""}`}>
-  <video src={video.src} poster={video.poster ? `/images/${video.poster}` : undefined} autoplay muted loop playsinline preload="metadata" aria-label={video.label}></video>
+  <video data-src={video.src} poster={video.poster ? `/images/${video.poster}` : undefined} muted loop playsinline preload="none" aria-label={video.label}></video>
 </div>

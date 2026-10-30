@@ -17,7 +17,7 @@ const style = r.device === "crop"
   <div class="dev-body">
     <div class="scr" style={style}><div class="frame">
       {r.video
-        ? <video src={r.video} poster={poster} autoplay muted loop playsinline preload="metadata" aria-label={r.alt}></video>
+        ? <video data-src={r.video} poster={poster} muted loop playsinline preload="none" aria-label={r.alt}></video>
         : src && <img src={src} alt={r.alt} loading="lazy" decoding="async" />}
       {r.mark && (
         <span class="mark" aria-hidden="true" style={`left:${r.mark.x}%;top:${r.mark.y}%;width:${r.mark.w}%;height:${r.mark.h}%`}>
