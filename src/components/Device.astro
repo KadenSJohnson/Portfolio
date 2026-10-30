@@ -15,7 +15,7 @@ const style = r.device === "crop"
 ---
 <div class={`dev dev-${r.device}`}>
   <div class="dev-body">
-    <div class="scr" style={style}><div class="frame">
+    <div class={`scr${r.video ? " has-video" : ""}`} style={style}><div class="frame">
       {r.video
         ? <video data-src={r.video} poster={poster} muted loop playsinline preload="none" aria-label={r.alt}></video>
         : src && <img src={src} alt={r.alt} loading="lazy" decoding="async" />}

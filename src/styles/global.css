@@ -450,10 +450,14 @@ a{color:inherit}
 .dev .scr{position:relative;overflow:hidden;background:#FFFFFF}
 .dev .frame{position:absolute;inset:0}
 .dev .scr img,.dev .scr video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top center;display:block}
-.dev-phone{height:calc(100% - var(--cell) * 2);aspect-ratio:9/19.5}
-.dev-phone .dev-body{height:100%;padding:3.2%;border-radius:15% / 7%;background:#0C0C0C;box-shadow:0 0 0 1.5px #3A3A3A inset,0 18px 40px -18px rgba(0,0,0,.35)}
-.dev-phone .scr{height:100%;border-radius:12.5% / 5.8%}
-.dev-phone .scr::after{content:"";position:absolute;z-index:2;top:1.7%;left:50%;width:31%;height:3.6%;transform:translateX(-50%);border-radius:999px;background:#0C0C0C}
+/* iPhone 14 Pro Max proportions: body 77.6 x 160.7 mm; the screen inside is 1290 x 2796 px (the same
+   shape as its screenshots and screen recordings), so a recording fills it exactly with nothing cropped. */
+.dev-phone{height:calc(100% - var(--cell) * 2);aspect-ratio:77.6/160.7}
+.dev-phone .dev-body{height:100%;padding:4.13%;border-radius:15.9% / 7.68%;background:#0C0C0C;box-shadow:0 0 0 1.5px #3A3A3A inset,0 18px 40px -18px rgba(0,0,0,.35)}
+.dev-phone .scr{height:100%;border-radius:12.8% / 5.9%;background:#000}
+/* The Dynamic Island (126 x 37 pt, 11 pt from the top). Screen recordings already include it, so it's
+   only drawn over screenshots. */
+.dev-phone .scr:not(.has-video)::after{content:"";position:absolute;z-index:2;top:1.18%;left:50%;width:29.3%;height:3.97%;transform:translateX(-50%);border-radius:999px;background:#000}
 .dev-desktop{width:calc(100% - var(--cell) * 2)}
 .dev-desktop .dev-body{margin-inline:7%;padding:2.2% 2.2% 3%;border-radius:12px 12px 0 0;background:#0C0C0C;box-shadow:0 0 0 1.5px #3A3A3A inset}
 .dev-desktop .scr{aspect-ratio:16/10}
@@ -480,7 +484,7 @@ a{color:inherit}
 /* A row of images (e.g. three phone screenshots) side by side */
 .rt-row-in{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:clamp(10px,2.5vw,28px);align-items:start;padding:clamp(14px,3vw,var(--cell));background:var(--tile)}
 .rt-row-in>img{display:block;width:100%;height:auto}
-.rt-row .dev-phone{width:100%;height:auto;aspect-ratio:9/19.5}
+.rt-row .dev-phone{width:100%;height:auto;aspect-ratio:77.6/160.7}
 /* Hover: the reverse of the scroll-in. The card lifts up out of its blue slot, then settles back. */
 .gallery>.obj,.rl-list>.rl{transition:transform .45s cubic-bezier(.45,0,.2,1),box-shadow .45s cubic-bezier(.45,0,.2,1)}
 .gallery>.obj.lifted,.rl-list>.rl.lifted{transform:translateY(-12px);box-shadow:0 18px 32px -14px rgba(0,0,0,.24)}
