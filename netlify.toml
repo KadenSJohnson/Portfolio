@@ -10,3 +10,22 @@
   from = "/admin/*"
   to = "/admin/index.html"
   status = 200
+
+# Long caching for static files. Fonts never change; images and videos keep their names, so a
+# week keeps repeat visits fast while still picking up a replaced file within days.
+[[headers]]
+  for = "/fonts/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+[[headers]]
+  for = "/_astro/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+[[headers]]
+  for = "/images/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+[[headers]]
+  for = "/video/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"

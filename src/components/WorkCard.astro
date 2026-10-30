@@ -9,8 +9,9 @@ import BeforeAfter from "./BeforeAfter.astro";
 import ModelView from "./ModelView.astro";
 import VideoView from "./VideoView.astro";
 import RichText from "./RichText.astro";
-interface Props { item: Project }
-const { item: it } = Astro.props;
+// eager: the first row loads right away (it's on the first screen) instead of lazily
+interface Props { item: Project; eager?: boolean }
+const { item: it, eager = false } = Astro.props;
 // Built-in extras (KPM compare, Flint video) attach by the document, so renaming a project's slug keeps them.
 // Anything uploaded in Sanity (a card video or card image) takes their place.
 const base = FEATURES[it.id] || FEATURES[(it.docId || "").replace(/^(drafts\.)?project-/, "")] || {};
@@ -20,7 +21,7 @@ const f = it.coverVideo
 ---
 <article class={`obj${it.wide ? " wide" : ""}`} data-cat={it.categories.join(" ")} data-id={it.id}>
   <div class="obj-img">
-    {f.ba ? <BeforeAfter ba={f.ba} /> : f.video ? <VideoView video={f.video} /> : f.model ? <ModelView model={f.model} /> : <Ph src={it.imageFile} image={it.image} label={it.imageLabel} ratio={it.imageRatio || "4/3"} sizes={CARD_SIZES} />}
+    {f.ba ? <BeforeAfter ba={f.ba} eager={eager} /> : f.video ? <VideoView video={f.video} /> : f.model ? <ModelView model={f.model} /> : <Ph src={it.imageFile} image={it.image} label={it.imageLabel} ratio={it.imageRatio || "4/3"} sizes={CARD_SIZES} eager={eager} />}
   </div>
   <div class="obj-cap">
     <h2 class="obj-title" id={`t-${it.id}`}>{it.title}</h2>
