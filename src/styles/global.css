@@ -494,3 +494,4 @@ a{color:inherit}
 .slot.hover{opacity:0;transition:opacity .25s ease}
 .slot.hover.on{opacity:1}
 .sheet:focus{outline:none}
+#lb-content .dev img,#lb-content .rt-media img{cursor:zoom-in}

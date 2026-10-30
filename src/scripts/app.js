@@ -233,7 +233,8 @@ import { Model3D } from "./model3d.js";
     zImg.removeAttribute("src");
     if (zoomFrom && document.contains(zoomFrom)) zoomFrom.focus();
   };
-  const imgOf = (el) => el.closest && el.closest("#lb-content .ph.is-real img");
+  // Expandable: project images, plus nitpick screenshots (in device frames, rows or plain)
+  const imgOf = (el) => el.closest && el.closest("#lb-content .ph.is-real img, #lb-content .dev img, #lb-content .rt-media img");
   content.addEventListener("click", (e) => { const img = imgOf(e.target); if (img) openZoom(img); });
   content.addEventListener("keydown", (e) => {
     const img = imgOf(e.target);
