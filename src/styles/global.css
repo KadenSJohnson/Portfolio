@@ -311,18 +311,24 @@ a{color:inherit}
 
 
 /* ---------- Lightbox ---------- */
-.lb{width:min(1040px,calc(100vw - 32px));max-width:none;max-height:calc(100dvh - 32px);padding:0;border:0;background:transparent;overflow:visible}
-.lb::backdrop{background:rgba(0,0,0,.42);backdrop-filter:blur(3px)}
-.lb[open]{animation:lb-in .28s cubic-bezier(.2,.8,.2,1)}
+/* Popup: fills the screen. The content sits on a white sheet in the middle; the page behind shows
+   through a soft white veil. Close is in the top corner; previous/next sit on the sides on desktop
+   and at the bottom right on phones. */
+.lb{position:fixed;inset:0;width:100vw;height:100dvh;max-width:none;max-height:none;margin:0;padding:0;border:0;background:transparent;overflow:hidden}
+.lb::backdrop{background:rgba(255,255,255,.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.lb[open] .sheet{animation:lb-in .28s cubic-bezier(.2,.8,.2,1)}
 @keyframes lb-in{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
-.sheet{position:relative;max-height:calc(100dvh - 32px);overflow:auto;overscroll-behavior:contain;border-radius:0;color:var(--ink);
-  background:#FFFFFF;padding:0 clamp(18px,4vw,48px) clamp(28px,4vw,48px);box-shadow:0 30px 80px -20px rgba(0,0,0,.6)}
-.lb-bar{position:sticky;top:0;z-index:2;display:flex;justify-content:space-between;align-items:center;gap:10px;
-  margin-inline:calc(-1 * clamp(18px,4vw,48px));padding:12px clamp(12px,2vw,20px);background:rgba(255,255,255,.94);backdrop-filter:blur(6px);border-bottom:1px solid #E6E6E6}
-.lb-nav{display:flex;gap:8px}
-.lb-btn{display:grid;place-items:center;width:44px;height:44px;padding:0;border:0;border-radius:50%;background:#EDEDED;color:var(--ink);cursor:pointer}
-.lb-btn:hover{background:#E0E0E0}
+.sheet{position:relative;width:min(1040px,calc(100vw - 176px));height:calc(100dvh - 48px);margin:24px auto;overflow:auto;overscroll-behavior:contain;color:var(--ink);
+  background:#FFFFFF;padding:0 clamp(18px,4vw,48px) clamp(28px,4vw,48px);box-shadow:0 0 0 1px rgba(0,0,0,.06),0 30px 80px -30px rgba(0,0,0,.35)}
+.lb-bar,.lb-nav{display:contents}
+.lb-bar-tags{display:none}
+.lb-btn{position:fixed;z-index:6;display:grid;place-items:center;width:48px;height:48px;padding:0;border:0;border-radius:50%;background:#FFFFFF;color:var(--ink);cursor:pointer;
+  box-shadow:0 0 0 1px rgba(0,0,0,.08),0 6px 18px -6px rgba(0,0,0,.25)}
+.lb-btn:hover{background:#F2F2F2}
 .lb-btn svg{width:20px;height:20px}
+.lb [data-close]{top:calc(20px + env(safe-area-inset-top,0px));right:calc(20px + env(safe-area-inset-right,0px))}
+.lb [data-step="-1"]{left:calc(32px + env(safe-area-inset-left,0px));top:50%;transform:translateY(-50%)}
+.lb [data-step="1"]{right:calc(32px + env(safe-area-inset-right,0px));top:50%;transform:translateY(-50%)}
 .lb-btn .flip{transform:rotate(180deg)}
 .lb :focus-visible{outline-color:var(--ink)}
 .lb-head{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;padding-block:clamp(22px,3vw,34px) clamp(16px,2vw,22px)}
@@ -357,15 +363,12 @@ a{color:inherit}
 .pull{margin:4px 0 0;padding:18px 20px;border-left:4px solid var(--ink);background:var(--tile);font:600 19px/1.45 var(--display)}
 .pull cite{display:block;margin-top:8px;font:500 13px/1 var(--mono);font-style:normal;color:var(--sub)}
 .ext{font-weight:600;text-decoration:underline;text-underline-offset:4px}
-@media (max-width:639px){.lb{width:calc(100vw - 16px);max-height:calc(100dvh - 16px)}.sheet{max-height:calc(100dvh - 16px);padding-bottom:88px}
-  .lb-bar{background:#FFFFFF;backdrop-filter:none} /* a backdrop filter would trap the fixed arrows inside the bar */
-  .lb-bar-tags{display:flex;margin:0;min-width:0}
-  .lb-head .tags{display:none}
-  /* The popup keeps one size on phones, so stepping between projects doesn't jump */
-  .lb{height:calc(100dvh - 16px)}
-  .sheet{height:100%}
-  .lb-nav{position:fixed;z-index:4;right:calc(20px + env(safe-area-inset-right,0px));bottom:calc(20px + env(safe-area-inset-bottom,0px))}
-  .lb-nav .lb-btn{width:52px;height:52px;background:#FFFFFF;box-shadow:0 0 0 1px var(--line),0 6px 18px rgba(0,0,0,.16)}}
+@media (max-width:639px){
+  .sheet{width:calc(100vw - 16px);height:calc(100dvh - 16px);margin:8px auto;padding-top:56px;padding-bottom:96px}
+  .lb [data-close]{top:calc(16px + env(safe-area-inset-top,0px));right:calc(16px + env(safe-area-inset-right,0px))}
+  .lb [data-step]{top:auto;transform:none;bottom:calc(20px + env(safe-area-inset-bottom,0px));width:52px;height:52px}
+  .lb [data-step="-1"]{left:auto;right:calc(84px + env(safe-area-inset-right,0px))}
+  .lb [data-step="1"]{right:calc(20px + env(safe-area-inset-right,0px))}}
 
 
 /* Full-screen image viewer inside the lightbox */
@@ -490,3 +493,4 @@ a{color:inherit}
 .gallery>.obj.lifted,.rl-list>.rl.lifted{transform:translateY(-12px);box-shadow:0 18px 32px -14px rgba(0,0,0,.24)}
 .slot.hover{opacity:0;transition:opacity .25s ease}
 .slot.hover.on{opacity:1}
+.sheet:focus{outline:none}
