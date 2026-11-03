@@ -513,3 +513,5 @@ a{color:inherit}
 }
 /* On the card, the before/after labels move to the top so the title capsule has the bottom */
 .gallery .obj-img .ba-tag{top:10px;bottom:auto}
+/* Card images and videos show whole, nothing cropped, on the light grey tile */
+.gallery>.obj:not(.quote) .obj-img .ph img,.gallery>.obj:not(.quote) .obj-img .vid-wrap video{object-fit:contain}
