@@ -517,3 +517,5 @@ a{color:inherit}
 .gallery>.obj:not(.quote) .obj-img .ph img,.gallery>.obj:not(.quote) .obj-img .vid-wrap video{object-fit:contain}
 /* Title capsule sits 8px from the image edge */
 .gallery>.obj:not(.quote) .obj-cap{left:8px;right:8px;bottom:8px}
+/* 8px of breathing room around card images and videos */
+.gallery>.obj:not(.quote) .obj-img .ph img,.gallery>.obj:not(.quote) .obj-img .vid-wrap video{box-sizing:border-box;padding:8px}
