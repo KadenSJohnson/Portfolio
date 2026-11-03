@@ -16,7 +16,7 @@ const { item: it, eager = false } = Astro.props;
 // Anything uploaded in Sanity (a card video or card image) takes their place.
 const base = FEATURES[it.id] || FEATURES[(it.docId || "").replace(/^(drafts\.)?project-/, "")] || {};
 const f = it.coverVideo
-  ? { video: { src: it.coverVideo, poster: "", label: it.imageLabel || it.title } }
+  ? { video: { src: it.coverVideo, poster: "", label: it.imageLabel || it.title, fit: "contain" as const } }
   : it.image?.asset ? {} : base;
 ---
 <article class={`obj${it.wide ? " wide" : ""}`} data-cat={it.categories.join(" ")} data-id={it.id}>
