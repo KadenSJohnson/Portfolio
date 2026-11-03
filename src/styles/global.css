@@ -519,3 +519,6 @@ a{color:inherit}
 .gallery>.obj:not(.quote) .obj-cap{left:8px;right:8px;bottom:8px}
 /* 8px of breathing room around card images and videos */
 .gallery>.obj:not(.quote) .obj-img .ph img,.gallery>.obj:not(.quote) .obj-img .vid-wrap video{box-sizing:border-box;padding:8px}
+/* Card video fills the whole image area, centered, with the same 8px margin as images */
+.gallery>.obj:not(.quote) .obj-img .vid-wrap{width:100%;height:100%;aspect-ratio:auto}
+.gallery>.obj:not(.quote) .obj-img .vid-wrap video{inset:0;top:0;left:0;width:100%;height:100%}
