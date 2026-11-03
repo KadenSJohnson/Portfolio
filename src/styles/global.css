@@ -496,3 +496,18 @@ a{color:inherit}
 .slot.hover.on{opacity:1}
 .sheet:focus{outline:none}
 #lb-content .dev img,#lb-content .rt-media img{cursor:zoom-in}
+
+/* Project cards: just the image, with the title in a black capsule on it. The subtitle and category
+   tags stay in the markup (the popup copies the tags) but aren't shown on the card. */
+.gallery>.obj:not(.quote) .obj-cap{position:absolute;left:calc(var(--cell) / 2);right:calc(var(--cell) / 2);bottom:calc(var(--cell) / 2);z-index:2;display:block;padding:0;border:0;background:none;pointer-events:none}
+.gallery>.obj:not(.quote) .obj-sub,.gallery>.obj:not(.quote) .tags{display:none}
+.gallery>.obj:not(.quote) .obj-title{display:inline-block;max-width:100%;padding:8px 14px;border-radius:999px;background:#0C0C0C;color:#FFFFFF;font:600 15px/1.25 var(--display);letter-spacing:-.01em;text-wrap:balance}
+/* Desktop: every project image is the same height, and testimonials span two rows, so two
+   projects stack beside each one. Phones stay one column at each image's own shape. */
+@media (min-width:720px){
+  .gallery>.obj:not(.quote) .obj-img{height:calc(var(--cell) * 7 - 1px)!important}
+  .gallery>.obj.quote{grid-row:span 2}
+}
+@media (min-width:1200px){
+  .gallery>.obj:not(.quote) .obj-img{height:calc(var(--cell) * 6 - 1px)!important}
+}
