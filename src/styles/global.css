@@ -543,3 +543,5 @@ a{color:inherit}
 @media (min-width:1200px){
   .gallery>.obj.quote{height:calc(var(--cell) * 13)}
 }
+/* Experiments: no title capsule on the card (it stays for keyboard and screen readers, and shows while focused) */
+.gallery>.obj.live .obj-cap:not(:focus-within){clip-path:inset(50%);opacity:0}
