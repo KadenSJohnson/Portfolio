@@ -340,6 +340,8 @@ class Sim {
     if (style === 'knot') { g.hookY = 0.13 * Hc; g.yTop = g.hookY + 0.12 * Hc; }
     else if (style === 'diecut') { g.tabW = 0.32 * bw; g.tabLen = 1.18 * g.tabW; g.hookY = 0.06 * Hc; g.yTop = g.hookY + g.tabLen + 0.11 * Hc; }
     else { g.hookY = -0.08 * Hc; g.yTop = 0.17 * Hc; g.hs = 0.44 * bw; }
+    // hanging bags sit lower, so the bag fills the middle of the picture instead of the top
+    if (hang) { const drop = Math.max(0, Math.min(0.14 * Hc, Hc * 0.5 - (g.yTop + bh / 2))); g.hookY += drop; g.yTop += drop; }
     g.yBot = Math.min(g.yTop + bh, Hc * 0.965);
     if (!hang) {
       const dy = (Hc - 4) - g.yBot;
