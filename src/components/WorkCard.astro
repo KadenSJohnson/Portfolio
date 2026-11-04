@@ -19,16 +19,18 @@ const f = it.coverVideo
   ? { video: { src: it.coverVideo, poster: "", label: it.imageLabel || it.title, fit: "contain" as const } }
   : it.image?.asset ? {} : base;
 ---
-<article class={`obj${it.wide ? " wide" : ""}`} data-cat={it.categories.join(" ")} data-id={it.id}>
+<article class={`obj${it.wide ? " wide" : ""}${it.embed ? " live" : ""}`} data-cat={it.categories.join(" ")} data-id={it.id}>
   <div class="obj-img">
-    {f.ba ? <BeforeAfter ba={f.ba} eager={eager} /> : f.video ? <VideoView video={f.video} /> : f.model ? <ModelView model={f.model} /> : <Ph src={it.imageFile} image={it.image} label={it.imageLabel} ratio={it.imageRatio || "4/3"} sizes={CARD_SIZES} eager={eager} />}
+    {it.embed ? <div class="embed-wrap"><iframe src={it.embed} title={`${it.title}, live demo`} allow="autoplay" loading="lazy"></iframe></div> : f.ba ? <BeforeAfter ba={f.ba} eager={eager} /> : f.video ? <VideoView video={f.video} /> : f.model ? <ModelView model={f.model} /> : <Ph src={it.imageFile} image={it.image} label={it.imageLabel} ratio={it.imageRatio || "4/3"} sizes={CARD_SIZES} eager={eager} />}
   </div>
   <div class="obj-cap">
-    <h2 class="obj-title" id={`t-${it.id}`}>{it.title}</h2>
+    {it.embed
+      ? <h2 class="obj-title" id={`t-${it.id}`}><button class="cap-open" type="button" data-open={it.id} aria-haspopup="dialog">{it.title}</button></h2>
+      : <h2 class="obj-title" id={`t-${it.id}`}>{it.title}</h2>}
     <p class="obj-sub">{it.subtitle}</p>
     <div class="tags">{it.categories.map((c) => <Tag cat={c} />)}</div>
   </div>
-  <button class="hit" type="button" data-open={it.id} aria-haspopup="dialog" aria-labelledby={`t-${it.id}`}></button>
+  {!it.embed && <button class="hit" type="button" data-open={it.id} aria-haspopup="dialog" aria-labelledby={`t-${it.id}`}></button>}
 </article>
 <template id={`p-${it.id}`} data-title={it.title} data-sub={it.subtitle} data-cats={it.categories.join(" ")}>
   <div class="lb-hero">

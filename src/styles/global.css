@@ -525,6 +525,13 @@ a{color:inherit}
 .gallery>.obj:not(.quote) .obj-img .vid-wrap{width:100%}
 .gallery>.obj:not(.quote) .obj-img .vid-wrap video{inset:0;top:0;left:0;width:100%;height:100%}
 /* Live demo (an experiment) running at the top of the popup */
-.lb-hero .embed-wrap{background:#333333}
+.lb-hero .embed-wrap{background:var(--tile)}
 .lb-hero .embed-wrap iframe{display:block;width:100%;height:100%;border:0}
 @media (max-width:639px){.lb-hero>.embed-wrap{aspect-ratio:4/5!important}}
+/* Live cards: the demo is playable right on the card; the title capsule opens the popup */
+.obj-img>.embed-wrap{width:100%;height:100%;background:var(--tile)}
+.obj-img>.embed-wrap iframe{display:block;width:100%;height:100%;border:0}
+@media (max-width:719px){.gallery>.obj.live .obj-img>.embed-wrap{height:auto;aspect-ratio:4/5}}
+.gallery>.obj.live .obj-cap{right:auto}
+.gallery>.obj.live .cap-open{pointer-events:auto;display:block;padding:0;border:0;background:none;color:inherit;font:inherit;letter-spacing:inherit;text-align:left;cursor:pointer}
+.gallery>.obj.live .cap-open:focus-visible{outline:2px solid #FFFFFF;outline-offset:4px;border-radius:999px}

@@ -55,7 +55,7 @@ if (lists.length && !reduce && "IntersectionObserver" in window && Element.proto
 
 // Hover (mouse and trackpad only): the card lifts out of a blue slot, the reverse of the scroll-in
 if (!reduce && matchMedia("(hover: hover) and (pointer: fine)").matches) {
-  document.querySelectorAll(".gallery > .obj, .rl-list > .rl").forEach((card) => {
+  document.querySelectorAll(".gallery > .obj:not(.live), .rl-list > .rl").forEach((card) => { // live demos stay put so they can be played
     let slot = null;
     card.addEventListener("pointerenter", () => {
       if (!card.classList.contains("shown") && root.classList.contains("anim")) return; // still dropping in
