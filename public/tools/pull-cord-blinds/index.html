@@ -183,7 +183,7 @@ layout();
 S={hL:0.035*G.glassH,hR:0.3*G.glassH,locked:true,jam:false,constrained:false,vf:0,
    held:false,pid:null,off:{x:0,y:0},ptr:{x:0,y:0},gs:0,anchor:0,prevDist:0,prevHx:0,sp:0,slowT:0,vx:0,
    theta:0,omega:0,L:0,rattle:0,shake:0,spin:0,spinT:0,stackCnt:0,lastTick:0,wand:{held:false,pid:null,x0:0,t0:0,swing:0,vs:0,notch:0}};
-S.finger={i:-1,fx:0,dy:0,v:0,held:false,pid:null,y0:0,dy0:0,k:520,damp:16};
+S.finger={i:-1,fx:0,dy:0,v:0,held:false,pid:null,y0:0,dy0:0,k:320,damp:34}; // nearly critically damped: settles back without bouncing
 S.hR=Math.min(S.hR,G.maxH);S.hL=Math.min(S.hL,S.hR);
 S.L=G.base+(S.hL+S.hR)/2/set.ratio;
 S.stackCnt=stackCount(S.hL)+stackCount(S.hR);
