@@ -841,15 +841,15 @@ G.BagPhys = { Sim, makeShape, resample };
 'use strict';
 const { Sim, makeShape } = window.BagPhys;
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
-const STORE = 'producebag.v2';
+const STORE = 'producebag.v3';
 // On the portfolio: ?card=1 is the live homepage card (just the bag, no settings); any iframe skips the setup dialog
 const EMBED = window.self !== window.top, CARD = new URLSearchParams(location.search).has('card');
 if (CARD) document.documentElement.classList.add('as-card');
 const ASPECTS = { '1:1': [1080, 1080], '4:5': [1080, 1350], '3:4': [1080, 1440], '9:16': [1080, 1920] };
 const BG_SW = ['#cde3d6', '#ffffff', '#d4e2ee', '#f1d8d0', '#eee5c2', '#24292b'];
 const BAG_SW = ['#fbfbf9', '#ebebea', '#e4edf5', '#f6e5eb', '#f3f0de', '#e1eee5'];
-const DEF = { setupDone: false, aspect: '4:5', style: 'handles', hang: true, fill: 'oranges', bg: '#f3f3f3', bagColor: '#fbfbf9',
-  frost: 0.62, haze: 0.18, opacity: 0.92, sheen: 0.25, stretch: 0.45, strength: 0.45, bagW: 0.5, bagH: 0.42,
+const DEF = { setupDone: false, aspect: '4:5', style: 'handles', hang: true, fill: 'oranges', bg: '#f3f3f3', bagColor: '#ffffff',
+  frost: 0.62, haze: 0.18, opacity: 0.92, sheen: 0.25, stretch: 0.16, strength: 1, bagW: 0.45, bagH: 0.42,
   itemSize: 1, gravity: 0.5, grainStyle: 'fine', grain: 0.42, caption: '', cut: 42 };
 let S = Object.assign({}, DEF);
 try { const s = JSON.parse(localStorage.getItem(STORE) || 'null'); if (s && typeof s === 'object') for (const k in DEF) if (k in s && typeof s[k] === typeof DEF[k]) S[k] = s[k]; } catch (e) {}
@@ -1473,7 +1473,7 @@ const FMT = {
   opacity: v => Math.round(v * 100), sheen: v => Math.round(v * 100), itemSize: v => Math.round(v * 100),
   gravity: v => Math.round(v * 100), grain: v => Math.round(v * 100), cut: v => v,
 };
-const PRESETS = [['#fbfbf9', '#f3f3f3'], ['#fbfbf9', '#cde3d6'], ['#ebebea', '#ffffff'], ['#f4f6f8', '#d4e2ee'], ['#f6e5eb', '#f1d8d0'],
+const PRESETS = [['#ffffff', '#f3f3f3'], ['#fbfbf9', '#cde3d6'], ['#ebebea', '#ffffff'], ['#f4f6f8', '#d4e2ee'], ['#f6e5eb', '#f1d8d0'],
   ['#f3f0de', '#eee5c2'], ['#e8ece9', '#24292b'], ['#ffffff', '#22285e'], ['#f7efe6', '#e8714a']];
 let rebuildPending = false;
 function onSetting(k) {
