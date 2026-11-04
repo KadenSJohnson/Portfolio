@@ -535,3 +535,11 @@ a{color:inherit}
 .gallery>.obj.live .obj-cap{right:auto}
 .gallery>.obj.live .cap-open{pointer-events:auto;display:block;padding:0;border:0;background:none;color:inherit;font:inherit;letter-spacing:inherit;text-align:left;cursor:pointer}
 .gallery>.obj.live .cap-open:focus-visible{outline:2px solid #FFFFFF;outline-offset:4px;border-radius:999px}
+/* Testimonials span exactly two card rows (plus the gap) so the cards beside them don't stretch off the grid */
+@media (min-width:720px){
+  .gallery>.obj.quote{height:calc(var(--cell) * 16);overflow:hidden}
+  .gallery>.obj.quote .im-screen{min-height:0}
+}
+@media (min-width:1200px){
+  .gallery>.obj.quote{height:calc(var(--cell) * 13)}
+}
