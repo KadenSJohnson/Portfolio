@@ -271,7 +271,7 @@ const RECIPES={
 const ASPECTS={'1:1':[1200,1200],'4:5':[960,1200],'3:2':[1200,800],'9:16':[675,1200]};
 const NAMES=['KESTREL','ALDER RIDGE','STATION 4','OXBOW','MERIDIAN','HALCYON','NORTH COL','BASIN 9','LOWELL','VESPER','GRANITE','TALUS','CAIRN','SUMMIT 2','FERNDALE','OLD SPUR'];
 
-let S, uid=1, selId=null, tool='high', K=1, last=null, DL=null;
+let S, uid=1, selId=null, selEnd=null, tool='high', K=1, last=null, DL=null;
 const rnd=Math.random;
 function newFeat(type,x,y,r=rnd){
   const f={id:uid++,type,x,y,r:.1+r()*.14,s:(.7+r()*.5)*(type==='low'?-1:1),ax:1+r()*1.1,ang:r()*Math.PI,label:NAMES[Math.floor(r()*NAMES.length)]};
@@ -941,6 +941,19 @@ function drawOverlay(){
     g.beginPath();g.arc(x,y,3.5,0,TAU);g.fillStyle='#ff6b3d';g.fill()}
   if(rangePath&&rangePath.length>1){g.beginPath();g.moveTo(rangePath[0][0]*sc,rangePath[0][1]*sc);for(const q of rangePath)g.lineTo(q[0]*sc,q[1]*sc);
     g.setLineDash([6,5]);g.lineWidth=2.5;g.strokeStyle='#ff6b3d';g.stroke();g.setLineDash([])}
+  placeSelbar();
+}
+// Desktop: the selection bar floats just above whatever is selected (below it near the top edge).
+// Phones keep it docked at the bottom of the map.
+function placeSelbar(){
+  const st=selbar.style;
+  if(selbar.hidden||window.innerWidth<900||!last){st.left=st.top=st.bottom='';return}
+  const h=handles().filter(q=>q.f.id===selId),pick=h.find(q=>q.end===selEnd)||h[0];if(!pick){st.left=st.top=st.bottom='';return}
+  const sr=stage.getBoundingClientRect(),shr=sheet.getBoundingClientRect(),sc=cssW/last.W;
+  const x=shr.left-sr.left+pick.p[0]*sc,y=shr.top-sr.top+pick.p[1]*sc,bw=selbar.offsetWidth,bh=selbar.offsetHeight,gap=26;
+  let top=y-gap-bh;if(top<6)top=y+gap;
+  st.bottom='auto';st.top=Math.min(top,sr.height-bh-6)+'px';
+  st.left=clamp(x,bw/2+6,sr.width-bw/2-6)+'px';
 }
 function toCanvas(e){const r=ov.getBoundingClientRect();return [(e.clientX-r.left)/r.width*cv.width,(e.clientY-r.top)/r.height*cv.height]}
 function toMap(x,y){const fr=last.fr;let py=y;if(last.relief)py=last.relief.cyc+(y-last.relief.base)/last.relief.tilt;return [clamp((x-fr.x0)/fr.w,.02,.98),clamp((py-fr.y0)/fr.h,.02,.98)]}
@@ -949,7 +962,7 @@ function hit(e){const r=ov.getBoundingClientRect(),mx=e.clientX-r.left,my=e.clie
 let drag=null;
 ov.addEventListener('pointerdown',e=>{
   if(!last)return;ov.setPointerCapture(e.pointerId);const [x,y]=toCanvas(e),h=hit(e);
-  if(h){select(h.f.id);drag={id:h.f.id,end:h.end,x,y};if(pendA){pendA=null;drawOverlay()}return}
+  if(h){selEnd=h.end||null;select(h.f.id);drag={id:h.f.id,end:h.end,x,y};if(pendA){pendA=null;drawOverlay()}return}
   if(tool==='select'){pendA=null;select(null);return}
   if(tool==='range'){rangePath=[[x,y]];drag={range:true};drawOverlay();return}
   if(tool==='river'||tool==='trail'){rangePath=[[x,y]];drag={route:tool};drawOverlay();return}
@@ -1015,10 +1028,11 @@ function renderSelbar(editing=false){
     const inp=$('#tagText');inp.focus();inp.select();
     const commit=()=>{f.label=inp.value.trim()||f.label;renderSelbar();queue()};
     inp.addEventListener('input',()=>{f.label=inp.value;queue()});inp.addEventListener('keydown',e=>{if(e.key==='Enter')commit();if(e.key==='Escape')renderSelbar()});
-    selbar.querySelector('[data-a=ok]').onclick=commit;return}
+    selbar.querySelector('[data-a=ok]').onclick=commit;placeSelbar();return}
   const acts=[],pk=f.type==='high'||f.type==='low',ip=isPath(f);if(pk)acts.push(['flip','Flip high and low']);if(ip)acts.push(['flip','Swap start and end']);if(!ip)acts.push(['smaller','Smaller'],['bigger','Bigger']);
   if(f.type==='high'||f.type==='tag')acts.push(['text','Edit label']);if(pk||ip)acts.push(['regen','Regenerate']);acts.push(['dup','Duplicate'],['del','Delete']);
   selbar.innerHTML=acts.map(([a,l])=>`<button data-a="${a}" aria-label="${l}"${a==='del'?' class="danger"':''}>${svg(a==='flip'?'flip':a)}</button>`).join('');
+  placeSelbar();
 }
 selbar.addEventListener('click',e=>{
   const b=e.target.closest('button');if(!b)return;const a=b.dataset.a,f=S.feats.find(q=>q.id===selId);if(!f)return;
