@@ -202,6 +202,21 @@ import { Model3D } from "./model3d.js";
   });
 
   document.querySelectorAll("[data-open]").forEach((b) => b.addEventListener("click", () => { opener = b; show(b.dataset.open); }));
+  // Live demos on cards: a double click inside the demo opens its popup (the demo can opt out with preventDefault)
+  document.querySelectorAll(".gallery > .obj.live").forEach((card) => {
+    const frame = card.querySelector("iframe"), btn = card.querySelector("[data-open]");
+    if (!frame || !btn) return;
+    const hook = () => {
+      try {
+        frame.contentDocument.addEventListener("dblclick", (e) => {
+          if (e.defaultPrevented) return;
+          opener = btn; show(btn.dataset.open);
+        });
+      } catch (err) {}
+    };
+    frame.addEventListener("load", hook);
+    try { if (frame.contentDocument && frame.contentDocument.readyState === "complete" && frame.contentDocument.URL !== "about:blank") hook(); } catch (err) {}
+  });
   dlg.querySelector("[data-close]").addEventListener("click", close);
   dlg.addEventListener("click", (e) => { if (e.target === dlg) close(); });
   dlg.querySelectorAll("[data-step]").forEach((b) => b.addEventListener("click", () => {

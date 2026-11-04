@@ -434,6 +434,8 @@ function release(e){
   S.omega=clamp(S.vx/Math.max(40,S.L),-8,8);
 }
 cv.addEventListener("pointerup",release);
+// a double click on the window buttons only toggles the settings (it shouldn't open the portfolio popup)
+cv.addEventListener("dblclick",e=>{if(lightAt({x:e.clientX,y:e.clientY}))e.preventDefault();});
 cv.addEventListener("pointercancel",release);
 cv.addEventListener("keydown",e=>{
   if(e.key==="ArrowDown"){e.preventDefault();audio();const dh=G.glassH*0.05;S.hR=Math.min(G.maxH,S.hR+dh);S.hL=Math.min(S.hR,S.hL+dh);S.locked=true;}
