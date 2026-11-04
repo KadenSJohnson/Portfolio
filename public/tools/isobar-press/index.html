@@ -78,7 +78,7 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stro
 .phead h2{margin:0 auto 0 0;font-family:var(--f-display);font-variation-settings:"wdth" 118;font-size:14px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
 .pbody{overflow:auto;padding:0 max(16px,env(safe-area-inset-right,0px)) 24px max(16px,env(safe-area-inset-left,0px));overscroll-behavior:contain}
 @media (min-width:900px){
-  .panel{left:auto;top:0;width:360px;max-height:none;border-radius:0;border-top:0;border-left:1px solid var(--line);padding-top:env(safe-area-inset-top,0px)}
+  .panel{left:auto;top:0;height:auto;width:360px;max-height:none;border-radius:0;border-top:0;border-left:1px solid var(--line);padding-top:env(safe-area-inset-top,0px)}
 }
 .psec{padding-block:14px 6px;border-bottom:1px solid var(--panel-2)}
 .hmrow{padding-block:6px 4px}
@@ -151,6 +151,26 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
 .ibtn:disabled{opacity:.35;cursor:default}
 #bRedo{margin-right:8px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+/* Stepper pills for every slider: track, a fill up to the value, - and + at the ends */
+.sbody{display:grid;gap:8px;padding-top:2px}
+.prow.range{display:flex;flex-direction:column;align-items:stretch;gap:5px;min-height:0}
+.pill{position:relative;height:54px;border-radius:16px;background:var(--panel-2);display:flex;align-items:center;overflow:hidden;touch-action:pan-y;cursor:ew-resize;user-select:none;-webkit-user-select:none}
+.pill:focus-within{outline:2px solid var(--accent);outline-offset:2px}
+.pill-fill{position:absolute;left:3px;top:3px;bottom:3px;width:calc((100% - 6px) * var(--t,0));min-width:0;background:var(--btn);border:1px solid var(--line);box-sizing:border-box;border-radius:13px;transition:width .12s ease-out}
+.pill.dragging .pill-fill{transition:none}
+.pill-btn{position:relative;z-index:1;width:46px;height:100%;border:0;background:transparent;display:grid;place-items:center;flex:none;color:var(--text);padding:0}
+.pill-btn:disabled{opacity:.25;cursor:default}
+.pill-btn svg.i{width:20px;height:20px}
+.pill-mid{position:relative;z-index:1;flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;pointer-events:none;text-align:center}
+.pill-val{font-family:var(--f-data);font-size:19px;font-weight:600;line-height:1.1;font-variant-numeric:tabular-nums;white-space:nowrap}
+.pill-lab{font-size:12px;line-height:1.2;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.pill-ends{display:flex;justify-content:space-between;font-family:var(--f-data);font-size:11.5px;color:var(--muted);padding:0 4px;font-variant-numeric:tabular-nums}
+.vh{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden;clip-path:inset(50%);white-space:nowrap;opacity:0;margin:0;padding:0;border:0}
+/* the other controls sit on the same rounded track so the panel reads as one set */
+.prow.toggle,.prow.select,.prow.ink{min-height:54px;padding:6px 10px 6px 14px;border-radius:16px;background:var(--panel-2);box-sizing:border-box}
+.prow.select select{background:var(--btn)}
+.prow.ink .inks span{border-color:rgba(255,255,255,.28)}
+@media (prefers-reduced-motion:reduce){.pill-fill{transition:none}}
 </style>
 </head>
 <body>
@@ -1072,6 +1092,21 @@ const syncers=[],visers=[];
 let ctlN=0;
 const fmt=(v,st)=>st>=1?Math.round(v).toString():(+v).toFixed(st<.05?2:1);
 const changed=()=>{updateVis();queue()};
+const PILL_MINUS='<svg class="i" viewBox="0 0 24 24"><path d="M5 12h14"/></svg>',PILL_PLUS='<svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>';
+function pillHold(btn,fn){let t1=0,t2=0;const stop=()=>{clearTimeout(t1);clearInterval(t2)};
+  btn.addEventListener('pointerdown',e=>{if(e.button)return;e.preventDefault();stop();if(fn()===false)return;t1=setTimeout(()=>{t2=setInterval(()=>{if(fn()===false)stop()},70)},380)});
+  ['pointerup','pointerleave','pointercancel'].forEach(ev=>btn.addEventListener(ev,stop));
+  btn.addEventListener('click',e=>{if(e.detail===0)fn()})}
+function pillDrag(pill,onT){let st=null;
+  const tAt=x=>{const r=pill.getBoundingClientRect();return clamp((x-r.left-3)/Math.max(1,r.width-6),0,1)};
+  pill.addEventListener('pointerdown',e=>{if(e.button||e.target.closest('.pill-btn'))return;st={id:e.pointerId,x:e.clientX,y:e.clientY,on:e.pointerType==='mouse'};
+    if(st.on){pill.setPointerCapture(e.pointerId);pill.classList.add('dragging');onT(tAt(e.clientX))}});
+  pill.addEventListener('pointermove',e=>{if(!st||e.pointerId!==st.id)return;
+    if(!st.on){const dx=Math.abs(e.clientX-st.x),dy=Math.abs(e.clientY-st.y);
+      if(dx>6&&dx>dy){st.on=true;try{pill.setPointerCapture(e.pointerId)}catch(_){}pill.classList.add('dragging')}else if(dy>8){st=null;return}else return}
+    onT(tAt(e.clientX))});
+  pill.addEventListener('pointerup',e=>{if(!st||e.pointerId!==st.id)return;if(!st.on)onT(tAt(e.clientX));st=null;pill.classList.remove('dragging')});
+  pill.addEventListener('pointercancel',()=>{st=null;pill.classList.remove('dragging')})}
 function control(spec){
   spec=spec.slice();const last=spec[spec.length-1],opt=last&&typeof last==='object'&&!Array.isArray(last)?spec.pop():{};
   const [type,key,label,...rest]=spec;
@@ -1079,10 +1114,21 @@ function control(spec){
   const row=document.createElement('div');row.className='prow '+type;const id='c'+(ctlN++)+'-'+key;
   if(opt.when)visers.push(()=>row.hidden=!opt.when());
   if(type==='range'){const [min,max,st,unit='']=rest;
-    row.innerHTML=`<label for="${id}">${label}</label><output id="${id}-o"></output><input type="range" id="${id}" min="${min}" max="${max}" step="${st}">`;
-    const inp=row.querySelector('input'),out=row.querySelector('output');
-    syncers.push(()=>{inp.value=S.p[key];out.textContent=fmt(S.p[key],st)+unit});
-    inp.addEventListener('input',()=>{S.p[key]=+inp.value;out.textContent=fmt(S.p[key],st)+unit;changed()})}
+    // Stepper pill: track, a fill up to the value, - and + at the ends; drag across it or hold a button
+    row.innerHTML=`<div class="pill"><div class="pill-fill"></div><button type="button" class="pill-btn" aria-label="Less ${label.toLowerCase()}">${PILL_MINUS}</button>`+
+      `<div class="pill-mid"><span class="pill-val"></span><span class="pill-lab" id="${id}-l">${label}</span></div>`+
+      `<button type="button" class="pill-btn" aria-label="More ${label.toLowerCase()}">${PILL_PLUS}</button>`+
+      `<input type="range" class="vh" id="${id}" min="${min}" max="${max}" step="${st}" aria-labelledby="${id}-l"></div>`+
+      `<div class="pill-ends"><span>${fmt(min,st)+unit}</span><span>${fmt(max,st)+unit}</span></div>`;
+    const inp=row.querySelector('input'),pill=row.querySelector('.pill'),val=row.querySelector('.pill-val'),[minus,plus]=row.querySelectorAll('.pill-btn');
+    const by=Math.max(st,Math.round((max-min)/40/st)*st);
+    const show=()=>{const v=+S.p[key];pill.style.setProperty('--t',clamp((v-min)/(max-min||1),0,1));val.textContent=fmt(v,st)+unit;minus.disabled=v<=min;plus.disabled=v>=max};
+    const setV=v=>{v=+(Math.round((clamp(v,min,max)-min)/st)*st+min).toFixed(4);if(v===+S.p[key])return false;S.p[key]=v;inp.value=v;show();changed();return true};
+    syncers.push(()=>{inp.value=S.p[key];show()});
+    inp.addEventListener('input',()=>setV(+inp.value));
+    pillHold(minus,()=>setV(+S.p[key]-by)&&+S.p[key]>min);
+    pillHold(plus,()=>setV(+S.p[key]+by)&&+S.p[key]<max);
+    pillDrag(pill,t=>setV(min+t*(max-min)))}
   else if(type==='toggle'){row.innerHTML=`<span class="lab" id="${id}-l">${label}</span><button class="tg" role="switch" id="${id}" aria-labelledby="${id}-l"></button>`;
     const b=row.querySelector('button');syncers.push(()=>b.setAttribute('aria-checked',!!S.p[key]));
     b.addEventListener('click',()=>{S.p[key]=!S.p[key];b.setAttribute('aria-checked',S.p[key]);changed()})}
@@ -1248,6 +1294,7 @@ load();applyVars();buildPanel();buildSetup();syncAll();
 const [W0,H0]=ASPECTS[S.aspect];cv.width=W0;cv.height=H0;
 doRender();commit();
 if(firstRun)openSetup(true);
+if(window.innerWidth>=900)setPanel(true); // settings start open on desktop
 if(document.fonts){Promise.all(['600 20px "Archivo Narrow"','600 20px Oswald'].map(f=>document.fonts.load(f).catch(()=>{}))).then(()=>queue())}
 })();
 </script>

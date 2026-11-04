@@ -1526,6 +1526,7 @@ function loadFont() {
 }
 buildSwatches();
 syncPanel();
+if (window.matchMedia('(min-width: 860px)').matches) setSheet(true); // settings start open on desktop
 function boot(raw) { setImage('main', raw); fit(); }
 let stored = null; try { stored = localStorage.getItem(IMGKEY); } catch (e) {}
 if (stored) {
