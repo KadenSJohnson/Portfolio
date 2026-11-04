@@ -183,6 +183,7 @@ layout();
 S={hL:0.035*G.glassH,hR:0.3*G.glassH,locked:true,jam:false,constrained:false,vf:0,
    held:false,pid:null,off:{x:0,y:0},ptr:{x:0,y:0},gs:0,anchor:0,prevDist:0,prevHx:0,sp:0,slowT:0,vx:0,
    theta:0,omega:0,L:0,rattle:0,shake:0,spin:0,spinT:0,stackCnt:0,lastTick:0,wand:{held:false,pid:null,x0:0,t0:0,swing:0,vs:0,notch:0}};
+S.finger={i:-1,fx:0,dy:0,v:0,held:false,pid:null,y0:0,dy0:0,k:520,damp:16};
 S.hR=Math.min(S.hR,G.maxH);S.hL=Math.min(S.hL,S.hR);
 S.L=G.base+(S.hL+S.hR)/2/set.ratio;
 S.stackCnt=stackCount(S.hL)+stackCount(S.hR);
@@ -270,6 +271,8 @@ function step(dt,t){
   }
   const W_=S.wand;
   if(!W_.held){W_.vs+=(-90*W_.swing-9*W_.vs)*dt;W_.swing+=W_.vs*dt;}
+  const F=S.finger;
+  if(F.i>=0&&!F.held){F.v+=(-F.k*F.dy-F.damp*F.v)*dt;F.dy+=F.v*dt;if(Math.abs(F.dy)<0.3&&Math.abs(F.v)<4){F.dy=0;F.v=0;F.i=-1;}}
   S.rattle*=Math.exp(-dt*5);S.shake*=Math.exp(-dt*8);
   if(S.spinT>0){S.spinT-=dt;S.spin+=dt*12;}
 }
@@ -284,6 +287,31 @@ function drawBar(yl,yr,th,fill){
   ctx.fillStyle=fill;ctx.beginPath();
   ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.lineTo(x2-s*th,y2+c*th);ctx.lineTo(x1-s*th,y1+c*th);ctx.closePath();ctx.fill();
   const at=lx=>{const d=lx-g.cx;return{x:g.cx+d*c-s*th/2,y:cy+d*s+c*th/2};};
+  return{L:at(g.ladL),R:at(g.ladR)};
+}
+// How far each slat is pushed where the finger is: the grabbed slat moves with the finger, and once it
+// closes the gap to its neighbour it pushes that one along too (down pushes the slats below, up the ones above).
+function fingerOffsets(gap){
+  const F=S.finger,N=G.N,d=new Array(N).fill(0);if(F.i<0||!F.dy)return d;
+  d[F.i]=F.dy;
+  if(F.dy>0){for(let j=F.i+1;j<N;j++){d[j]=Math.max(0,d[j-1]-gap)*0.92;if(d[j]<0.2)break;}
+             if(F.i>0)d[F.i-1]=F.dy*0.12;}
+  else{for(let j=F.i-1;j>=0;j--){d[j]=Math.min(0,d[j-1+2]+gap)*0.92;if(d[j]>-0.2)break;}
+       if(F.i<N-1)d[F.i+1]=F.dy*0.12;}
+  return d;
+}
+function drawBentBar(yl,yr,th,fill,amt){
+  const g=G;if(!amt)return drawBar(yl,yr,th,fill);
+  const m=(yr-yl)/(g.ladR-g.ladL),a=Math.atan(m),c=Math.cos(a),s=Math.sin(a);
+  const cy=yl+m*(g.cx-g.ladL),hl=g.halfLen,sig=Math.max(40*g.u,g.W*0.11),fx=S.finger.fx;
+  const bend=x=>amt*Math.exp(-((x-fx)*(x-fx))/(2*sig*sig));
+  const n=48,top=[];
+  for(let k=0;k<=n;k++){const dd=-hl+2*hl*k/n,x=g.cx+dd*c;top.push({x,y:cy+dd*s+bend(x)});}
+  ctx.fillStyle=fill;ctx.beginPath();ctx.moveTo(top[0].x,top[0].y);
+  for(const q of top)ctx.lineTo(q.x,q.y);
+  for(let k=n;k>=0;k--){const q=top[k];ctx.lineTo(q.x-s*th,q.y+c*th);}
+  ctx.closePath();ctx.fill();
+  const at=lx=>{const dd=lx-g.cx;return{x:g.cx+dd*c-s*th/2,y:cy+dd*s+c*th/2+bend(lx)};};
   return{L:at(g.ladL),R:at(g.ladR)};
 }
 function draw(t){
@@ -305,9 +333,10 @@ function draw(t){
   const ra=S.rattle*g.p*0.12;
   const bandNow=Math.max(g.p*0.12,g.ws*Math.abs(Math.sin(set.tilt*Math.PI/2))),bOff=g.p*0.32-bandNow/2;
   const face=set.tilt<0?mix(col.slat,"#000000",0.07):col.slat;
+  const fo=fingerOffsets(Math.max(0,g.p-bandNow-1));S._band=bandNow;S._bOff=bOff;
   for(let i=0;i<g.N;i++){
     const yl=slatY(i,S.hL)+ra*Math.sin(t*47+i*2.3),yr=slatY(i,S.hR)+ra*Math.sin(t*53+i*1.7+1);
-    const p=drawBar(yl+bOff,yr+bOff,bandNow,face);ptsL.push(p.L);ptsR.push(p.R);
+    const p=drawBentBar(yl+bOff,yr+bOff,bandNow,face,fo[i]);ptsL.push(p.L);ptsR.push(p.R);
   }
   const rp=drawBar(g.railNat-S.hL,g.railNat-S.hR,g.railT,col.slat);ptsL.push(rp.L);ptsR.push(rp.R);
   ctx.strokeStyle=col.cord;ctx.lineWidth=Math.max(1.4,2.6*u);ctx.lineJoin="round";ctx.lineCap="round";
@@ -402,14 +431,39 @@ cv.addEventListener("pointerdown",e=>{
   const {E,d}=freeGeom(),tot=S.L+g.tasH;
   const t=clamp((p.x-E.x)*d.x+(p.y-E.y)*d.y,0,tot);
   const c={x:E.x+d.x*t,y:E.y+d.y*t};
-  if(Math.hypot(p.x-c.x,p.y-c.y)>26||t<12*g.u)return;
+  if(Math.hypot(p.x-c.x,p.y-c.y)>26||t<12*g.u){grabSlat(e,p);return;}
   e.preventDefault();
   if(t>=S.L){const tip={x:E.x+d.x*S.L,y:E.y+d.y*S.L};S.gs=0;S.off={x:tip.x-p.x,y:tip.y-p.y};S.anchor=S.L;}
   else{S.gs=S.L-t;S.off={x:c.x-p.x,y:c.y-p.y};S.anchor=t;}
   S.ptr=p;S.held=true;S.pid=e.pointerId;S.prevDist=S.anchor;S.prevHx=c.x;S.sp=0;S.slowT=0;S.vx=0;S.vf=0;S.jam=false;
   try{cv.setPointerCapture(e.pointerId);}catch(_){}
 });
+function slatAt(p){
+  const g=G;if(p.x<g.winX+8*g.u||p.x>g.winX+g.W-8*g.u||p.y<g.glassTop||p.y>g.glassBot)return -1;
+  const m0=(slatY(0,S.hR)-slatY(0,S.hL)),fo=fingerOffsets(0);let best=-1,bd=1e9;
+  for(let i=0;i<g.N;i++){
+    const yl=slatY(i,S.hL),yr=slatY(i,S.hR),y=yl+(yr-yl)*(p.x-g.ladL)/(g.ladR-g.ladL)+(S._bOff||0)+(S._band||0)/2;
+    const dist=Math.abs(p.y-y);if(dist<bd){bd=dist;best=i;}
+  }
+  return bd<Math.max(g.p*0.75,10)?best:-1;
+}
+function grabSlat(e,p){
+  const i=slatAt(p);if(i<0)return;
+  e.preventDefault();const F=S.finger;
+  if(F.i!==i){F.dy=0;F.v=0;}
+  F.i=i;F.fx=p.x;F.held=true;F.pid=e.pointerId;F.y0=p.y;F.dy0=F.dy;
+  hit(1700+Math.random()*500,6,0.07,0.025);cv.style.cursor="grabbing";
+  try{cv.setPointerCapture(e.pointerId);}catch(_){}
+}
 cv.addEventListener("pointermove",e=>{
+  const Fg=S.finger;
+  if(Fg.held&&e.pointerId===Fg.pid){
+    const g=G,lim=g.p*2.6,raw=Fg.dy0+(e.clientY-Fg.y0);
+    const prev=Fg.dy;Fg.dy=lim*Math.tanh(raw/lim);   // soft limit: the slat gets stiffer the further it bends
+    Fg.fx=clamp(e.clientX,g.winX+10*g.u,g.winX+g.W-10*g.u);
+    if(Math.abs(Fg.dy-prev)>g.p*0.35)sTick(false);
+    return;
+  }
   const W_=S.wand;
   if(W_.held&&e.pointerId===W_.pid){
     const dx=e.clientX-W_.x0;
@@ -418,8 +472,10 @@ cv.addEventListener("pointermove",e=>{
     const n=Math.round(set.tilt*24);if(n!==W_.notch){W_.notch=n;hit(1500+Math.random()*500,6,0.06,0.02);}
     return;
   }if(S.held&&e.pointerId===S.pid){S.ptr={x:e.clientX,y:e.clientY};}
-  else if(e.pointerType==="mouse")cv.style.cursor=lightAt({x:e.clientX,y:e.clientY})?"pointer":"";});
+  else if(e.pointerType==="mouse"){const q={x:e.clientX,y:e.clientY};cv.style.cursor=lightAt(q)?"pointer":slatAt(q)>=0?"grab":"";}});
 function release(e){
+  const Fg=S.finger;
+  if(Fg.held&&e.pointerId===Fg.pid){Fg.held=false;Fg.v=0;cv.style.cursor="";if(Math.abs(Fg.dy)>G.p*0.6){S.rattle=Math.min(1,S.rattle+0.25);hit(1300,3,0.18,0.05);}return;}
   const W_=S.wand;
   if(W_.held&&e.pointerId===W_.pid){W_.held=false;W_.vs=0;save();return;}
   if(!S.held||e.pointerId!==S.pid)return;

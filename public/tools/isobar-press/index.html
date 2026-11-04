@@ -1288,7 +1288,7 @@ function openSetup(first){
 }
 
 /* top bar */
-$('#bShuffle').onclick=()=>{S.seed=Math.floor(rnd()*1e9);queue()};
+$('#bShuffle').onclick=()=>randomMap(); // the top shuffle button makes a whole new random map
 $('#bNew').onclick=()=>openSetup(false);
 function setPanel(open){
   const p=$('#panel'),app=$('#app'),dock=document.querySelector('.dock');p.hidden=!open;
