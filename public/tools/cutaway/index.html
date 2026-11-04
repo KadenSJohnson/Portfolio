@@ -6,7 +6,7 @@
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);box-sizing:border-box}body{margin:0;font:14px system-ui,-apple-system,"Segoe UI",sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Cutaway</title>
 <meta name="description" content="Turn a photo into a chart: slice it, stack it, or cut it into a pie, bars or a waveform from your own numbers.">
-<meta name="theme-color" content="#e2e3df">
+<meta name="theme-color" content="#ffffff">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Cutaway">
 <meta property="og:description" content="Turn a photo into a chart: slice it, stack it, or cut it into a pie, bars or a waveform.">
@@ -19,7 +19,7 @@
 <style>
 /* Layout: the artboard sits on a plain neutral stage; one tool rail below it; every fine control lives in a sheet a tap away */
 :root{
-  --mat:#e2e3df;
+  --mat:#ffffff;
   --mat-minor:rgba(255,255,255,.07);
   --mat-major:rgba(255,255,255,.14);
   --surface:#f4f5f2;
@@ -43,7 +43,7 @@
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --mat:#0e1110; --mat-minor:rgba(255,255,255,.05); --mat-major:rgba(255,255,255,.1);
+    --mat:#ffffff; --mat-minor:rgba(255,255,255,.05); --mat-major:rgba(255,255,255,.1);
     --surface:#151817; --raise:#1e2221; --line:#2c3230; --text:#e8ebe8; --muted:#95a09a;
     --seg:#262b29; --accent:#ef6955; --on-accent:#1a0f0c; --shadow:rgba(0,0,0,.5);
     --track:#252a28; --fill:#3a403e; --fill-edge:#454c49; --ok:#38b25c; --on-ok:#ffffff; --btn-dark:#e8ebe8; --on-dark:#151817;
@@ -51,7 +51,7 @@
   }
 }
 :root[data-theme="dark"]{
-  --mat:#0e1110; --mat-minor:rgba(255,255,255,.05); --mat-major:rgba(255,255,255,.1);
+  --mat:#ffffff; --mat-minor:rgba(255,255,255,.05); --mat-major:rgba(255,255,255,.1);
   --surface:#151817; --raise:#1e2221; --line:#2c3230; --text:#e8ebe8; --muted:#95a09a;
   --seg:#262b29; --accent:#ef6955; --on-accent:#1a0f0c; --shadow:rgba(0,0,0,.5);
   --track:#252a28; --fill:#3a403e; --fill-edge:#454c49; --ok:#38b25c; --on-ok:#ffffff; --btn-dark:#e8ebe8; --on-dark:#151817;
@@ -209,8 +209,8 @@ input[type=color].sw::-moz-color-swatch{border:none;border-radius:50%}
 <aside class="sheet" id="sheet" hidden>
   <div class="sheet-head">
     <div class="seg" role="group" aria-label="Chart style">
-      <button data-mode="slice" aria-pressed="true">Slice</button>
-      <button data-mode="strip" aria-pressed="false">Strip</button>
+      <button data-mode="slice" aria-pressed="false">Slice</button>
+      <button data-mode="strip" aria-pressed="true">Strip</button>
       <button data-mode="bars" aria-pressed="false">Bars</button>
       <button data-mode="portion" aria-pressed="false">Portion</button>
       <button data-mode="pie" aria-pressed="false">Pie</button>
@@ -275,9 +275,9 @@ input[type=color].sw::-moz-color-swatch{border:none;border-radius:50%}
 <script>
 (() => {
 'use strict';
-const KEY = 'cutaway.v1', IMGKEY = 'cutaway.v1.image';
+const KEY = 'cutaway.v2', IMGKEY = 'cutaway.v2.image';
 const DEFAULTS = {
-  mode: 'slice',
+  mode: 'strip',
   title: 'Life of a pencil',
   subtitle: 'Where a typical pencil’s length ends up, in percent (example data)',
   source: 'Source: example data',
@@ -293,7 +293,7 @@ const DEFAULTS = {
   s: { cutout: true, tol: 30, format: 'auto', order: 'none', gap: 40, explode: 22, turn: 0,
        dir: 'vertical', fill: 'stretch', barFit: 'scale', unit: '', waveStyle: 'stretch', amp: 2.4, ends: 14, seed: 7,
        font: 'condensed', textScale: 1, showTitle: true, showSource: false,
-       paper: '#f2f2ee', ink: '#1d1e21', accent: '#e0533f', faces: true, guides: true, ghost: 'gray' }
+       paper: '#ffffff', ink: '#202124', accent: '#e0533f', faces: true, guides: true, ghost: 'gray' }
 };
 const PAPERS = [['#f2f2ee','#1d1e21'],['#ffffff','#202124'],['#e6e4dd','#2a2722'],['#1f2226','#eceae4'],['#0f2b3a','#e9f0f2']];
 const ACCENTS = ['#e0533f','#6cbf5c','#2f6fd6','#e3a41b'];
@@ -343,7 +343,7 @@ function load() {
     st.isSample = typeof saved.isSample === 'boolean' ? saved.isSample : JSON.stringify(st.items) === JSON.stringify(DEFAULTS.items);
     st.s = Object.assign(clone(DEFAULTS.s), saved.s || {});
   }
-  if (!AUTO[st.mode]) st.mode = 'slice';
+  if (!AUTO[st.mode]) st.mode = 'strip';
   return st;
 }
 let S = load();
