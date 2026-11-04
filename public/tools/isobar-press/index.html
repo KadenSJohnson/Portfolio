@@ -1045,10 +1045,22 @@ selbar.addEventListener('click',e=>{
   else if(a==='text'){renderSelbar(true);return}
   if(a!=='dup'&&a!=='del')renderSelbar();syncAll();queue();
 });
+// Copy / paste keeps a copy of the selected mark; each paste lands a little further along
+let clip=null,pasteN=0;
+function copySel(){const f=S.feats.find(q=>q.id===selId);if(!f)return false;clip=JSON.parse(JSON.stringify(f));pasteN=0;return true}
+function pasteClip(){if(!clip)return;pasteN++;const d=.04*pasteN,g=JSON.parse(JSON.stringify(clip));g.id=uid++;
+  if(isPath(g)){g.a=[clamp(g.a[0]+d,0,1),clamp(g.a[1]+d,0,1)];g.b=[clamp(g.b[0]+d,0,1),clamp(g.b[1]+d,0,1)];if(g.type==='river')S.p.rivers=true;else S.p.trails=true}
+  else{g.x=clamp(g.x+d,0,1);g.y=clamp(g.y+d,0,1)}
+  S.feats.push(g);selEnd=null;select(g.id);syncAll();queue()}
 document.addEventListener('keydown',e=>{
-  if(e.target.closest('input,select'))return;
-  if((e.metaKey||e.ctrlKey)&&(e.key==='z'||e.key==='Z')){e.preventDefault();e.shiftKey?redo():undo();return}
-  if((e.metaKey||e.ctrlKey)&&(e.key==='y'||e.key==='Y')){e.preventDefault();redo();return}
+  // only typing fields keep their own keys; sliders and buttons still get the shortcuts
+  if(e.target.closest('input[type=text],input:not([type]),textarea,select,[contenteditable]'))return;
+  const mod=e.metaKey||e.ctrlKey,k=e.key.toLowerCase();
+  if(mod&&k==='z'){e.preventDefault();e.shiftKey?redo():undo();return}
+  if(mod&&k==='c'){if(copySel()){e.preventDefault();toast('Copied')}return}
+  if(mod&&k==='x'){if(copySel()){e.preventDefault();S.feats=S.feats.filter(q=>q.id!==selId);select(null);queue()}return}
+  if(mod&&k==='v'){if(clip){e.preventDefault();pasteClip()}return}
+  if(mod&&k==='y'){e.preventDefault();redo();return}
   if((e.key==='Delete'||e.key==='Backspace')&&selId){S.feats=S.feats.filter(q=>q.id!==selId);select(null);queue()}
   if(e.key==='Escape'){select(null);setPanel(false)}
 });
@@ -1057,6 +1069,10 @@ document.addEventListener('keydown',e=>{
 const TOOLS=[['select','Select'],['high','High'],['low','Low'],['range','Range'],['river','River'],['trail','Trail'],['tag','Tag']];
 const TOOL_MODES={river:['currents','isobars'],trail:['currents','isobars']};
 $('#tools').innerHTML=TOOLS.map(([k,l])=>`<button data-t="${k}" aria-pressed="${k===tool}">${svg(k)}<span>${l}</span></button>`).join('');
+document.addEventListener('pointerdown',e=>{
+  if(e.button||e.target.closest('#sheet,button,input,select,label,a,.panel,.selbar,.setup,.export,.xmenu,.toast'))return;
+  if(tool!=='select')setTool('select');if(selId)select(null);if(pendA){pendA=null;drawOverlay()}
+});
 function setTool(t){tool=t;if(pendA&&pendA.type!==tool){pendA=null;drawOverlay()}$('#tools').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.t===tool))}
 $('#tools').addEventListener('click',e=>{const b=e.target.closest('button');if(b)setTool(b.dataset.t)});
 function syncTools(){let n=0;$('#tools').querySelectorAll('button').forEach(b=>{const m=TOOL_MODES[b.dataset.t],show=!m||m.includes(S.mode);b.hidden=!show;if(show)n++});
