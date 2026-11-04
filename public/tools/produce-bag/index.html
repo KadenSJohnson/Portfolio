@@ -127,6 +127,11 @@ svg.i { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-widt
 #exp .dlg { width: min(520px, 100%); }
 #exp img { display: block; max-width: 100%; max-height: 66vh; width: auto; height: auto; align-self: center; border-radius: 10px; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+/* homepage card: only the bag, on the card's grey */
+html.as-card body { background: #f3f3f3; padding: 0; }
+html.as-card #main { padding: 0; }
+html.as-card #panel, html.as-card .tb, html.as-card #addsheet, html.as-card #selbar { display: none !important; }
+html.as-card #c { border-radius: 0; }
 </style>
 
 <div id="app">
@@ -836,11 +841,14 @@ G.BagPhys = { Sim, makeShape, resample };
 'use strict';
 const { Sim, makeShape } = window.BagPhys;
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
-const STORE = 'producebag.v1';
+const STORE = 'producebag.v2';
+// On the portfolio: ?card=1 is the live homepage card (just the bag, no settings); any iframe skips the setup dialog
+const EMBED = window.self !== window.top, CARD = new URLSearchParams(location.search).has('card');
+if (CARD) document.documentElement.classList.add('as-card');
 const ASPECTS = { '1:1': [1080, 1080], '4:5': [1080, 1350], '3:4': [1080, 1440], '9:16': [1080, 1920] };
 const BG_SW = ['#cde3d6', '#ffffff', '#d4e2ee', '#f1d8d0', '#eee5c2', '#24292b'];
 const BAG_SW = ['#fbfbf9', '#ebebea', '#e4edf5', '#f6e5eb', '#f3f0de', '#e1eee5'];
-const DEF = { setupDone: false, aspect: '4:5', style: 'handles', hang: true, fill: 'oranges', bg: '#cde3d6', bagColor: '#fbfbf9',
+const DEF = { setupDone: false, aspect: '4:5', style: 'handles', hang: true, fill: 'oranges', bg: '#f3f3f3', bagColor: '#fbfbf9',
   frost: 0.62, haze: 0.18, opacity: 0.92, sheen: 0.25, stretch: 0.45, strength: 0.45, bagW: 0.5, bagH: 0.42,
   itemSize: 1, gravity: 0.5, grainStyle: 'fine', grain: 0.42, caption: '', cut: 42 };
 let S = Object.assign({}, DEF);
@@ -1465,7 +1473,7 @@ const FMT = {
   opacity: v => Math.round(v * 100), sheen: v => Math.round(v * 100), itemSize: v => Math.round(v * 100),
   gravity: v => Math.round(v * 100), grain: v => Math.round(v * 100), cut: v => v,
 };
-const PRESETS = [['#fbfbf9', '#cde3d6'], ['#ebebea', '#ffffff'], ['#f4f6f8', '#d4e2ee'], ['#f6e5eb', '#f1d8d0'],
+const PRESETS = [['#fbfbf9', '#f3f3f3'], ['#fbfbf9', '#cde3d6'], ['#ebebea', '#ffffff'], ['#f4f6f8', '#d4e2ee'], ['#f6e5eb', '#f1d8d0'],
   ['#f3f0de', '#eee5c2'], ['#e8ece9', '#24292b'], ['#ffffff', '#22285e'], ['#f7efe6', '#e8714a']];
 let rebuildPending = false;
 function onSetting(k) {
@@ -1618,8 +1626,8 @@ $('#newCanvas').onclick = () => { setPanel(false); openSetup(); };
 
 /* ---------- boot ---------- */
 makeGrain(); syncUI(); buildWorld(S.fill);
-if (!S.setupDone) openSetup();
-if (matchMedia('(min-width: 900px)').matches) setPanel(true);
+if (!S.setupDone && !EMBED && !CARD) openSetup();
+if (!CARD && matchMedia('(min-width: 900px)').matches) setPanel(true);
 try { document.fonts && document.fonts.load('italic 400 40px Newsreader'); } catch (e) {}
 requestAnimationFrame(frame);
 })();

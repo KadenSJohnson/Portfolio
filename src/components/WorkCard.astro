@@ -21,7 +21,7 @@ const f = it.coverVideo
 ---
 <article class={`obj${it.wide ? " wide" : ""}${it.embed ? " live" : ""}`} data-cat={it.categories.join(" ")} data-id={it.id}>
   <div class="obj-img">
-    {it.embed ? <div class="embed-wrap"><iframe src={it.embed} title={`${it.title}, live demo`} allow="autoplay" loading="lazy"></iframe></div> : f.ba ? <BeforeAfter ba={f.ba} eager={eager} /> : f.video ? <VideoView video={f.video} /> : f.model ? <ModelView model={f.model} /> : <Ph src={it.imageFile} image={it.image} label={it.imageLabel} ratio={it.imageRatio || "4/3"} sizes={CARD_SIZES} eager={eager} />}
+    {it.embed ? <div class="embed-wrap"><iframe src={`${it.embed}${it.embed.includes("?") ? "&" : "?"}card=1`} title={`${it.title}, live demo`} allow="autoplay" loading="lazy"></iframe></div> : f.ba ? <BeforeAfter ba={f.ba} eager={eager} /> : f.video ? <VideoView video={f.video} /> : f.model ? <ModelView model={f.model} /> : <Ph src={it.imageFile} image={it.image} label={it.imageLabel} ratio={it.imageRatio || "4/3"} sizes={CARD_SIZES} eager={eager} />}
   </div>
   <div class="obj-cap">
     {it.embed
