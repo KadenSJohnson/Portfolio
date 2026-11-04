@@ -8,6 +8,3 @@ https://www.timeless.co/type/timeless-free-font-license-1.2.pdf
 The file here is an embedding conversion of the original font (subset to Latin characters and
 compressed as WOFF) so it can be served as part of this website. It is not offered for download
 on its own; get the font from https://timeless.co.
-
-Timeless Serif (TimelessSerifVF.woff, TimelessSerifItalicVF.woff)
-Copyright 2026 Timeless Ventures Private Limited, Chennai (timeless.co). Same Timeless Free Font License, Version 1.2.

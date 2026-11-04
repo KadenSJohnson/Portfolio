@@ -2,14 +2,13 @@
    name sits inside a Figma-style selection box and gets dragged up to full size, then the work
    grid (two columns of large rounded media tiles with captions), a contact block and a footer.
    Each project opens in a lightbox sheet. */
-@font-face{font-family:"Timeless Serif";src:url("/fonts/TimelessSerifVF.woff") format("woff");font-weight:300 700;font-style:normal;font-display:swap}
-@font-face{font-family:"Timeless Serif";src:url("/fonts/TimelessSerifItalicVF.woff") format("woff");font-weight:300 700;font-style:italic;font-display:swap}
+@font-face{font-family:"Timeless Sans";src:url("/fonts/TimelessSansVF.woff") format("woff");font-weight:300 800;font-style:normal;font-display:swap}
 :root{
   --bg:#FFFFFF; --ink:#0C0C0C; --sub:#5C5C5C; --mu:#8A8A8A; --line:#E8E8E8; --tile:#F3F3F3;
   --grid:#EAE4DE; --dot:#D9CFC5;
   --sel:#0D99FF; /* Figma's selection blue: only the selection box, handles and size label */
-  --display:"Timeless Serif",Georgia,"Times New Roman",serif;
-  --mono:"Timeless Serif",Georgia,"Times New Roman",serif; /* small labels use the same serif */
+  --display:"Timeless Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+  --mono:"Timeless Sans","Helvetica Neue",Helvetica,Arial,sans-serif; /* small labels use the same Grotesk */
   /* Layout grid: the content width is split into --cols square cells (12 on phones, 24 wider).
      src/scripts/grid.js measures the cell; spacing and sizes below are whole cells, and block
      heights are rounded up to whole cells, so edges and text sit on the background grid. */
