@@ -5,11 +5,18 @@ const root = document.documentElement;
 
 // Videos load only when they're about to scroll into view, so they don't compete with the first
 // screen. (Copies opened in the lightbox are started by app.js.)
+// iPhone only autoplays a clip that is muted and inline before it loads; if it still refuses (Low Power
+// Mode, data saver), the clip shows its first frame and starts on the next tap or scroll release.
+const blocked = new Set();
 const startVideo = (v) => {
-  if (v.dataset.src && !v.getAttribute("src")) { v.src = v.dataset.src; v.preload = "auto"; }
-  v.muted = true;
-  const p = v.play(); if (p && p.catch) p.catch(() => {});
+  v.muted = true; v.defaultMuted = true; v.playsInline = true;
+  v.setAttribute("muted", ""); v.setAttribute("playsinline", "");
+  if (v.dataset.src && !v.getAttribute("src")) { v.preload = "auto"; v.src = v.dataset.src + "#t=0.001"; }
+  const p = v.play();
+  if (p && p.then) p.then(() => blocked.delete(v), () => blocked.add(v));
 };
+const retryBlocked = () => blocked.forEach((v) => { if (v.isConnected) startVideo(v); });
+["touchend", "click", "keydown"].forEach((ev) => addEventListener(ev, retryBlocked, { passive: true }));
 window.startVideo = startVideo;
 const vids = document.querySelectorAll("video[data-src]");
 if ("IntersectionObserver" in window) {
