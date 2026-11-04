@@ -859,7 +859,7 @@ if (!ASPECTS[S.aspect]) S.aspect = DEF.aspect;
 const save = () => { try { localStorage.setItem(STORE, JSON.stringify(S)); } catch (e) {} };
 
 const cv = $('#c'), ctx = cv.getContext('2d');
-let W = 1080, H = 1350, sim = null, sel = null, queue = [], nextSpawn = 0, photos = [], photoSeq = 0;
+let W = 1080, H = 1350, U = 1080, sim = null, sel = null, queue = [], nextSpawn = 0, photos = [], photoSeq = 0;
 const mk = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
 let bagL, bctx, sharpL, sctx2, itemL, ictx, blurL, fctx, smallL, sctx, grainPat = null;
 const Q = 0.5;
@@ -943,7 +943,7 @@ function sampleTex(kind) {
 }
 
 /* ---------- world ---------- */
-function bagOpts(keep) { return { style: S.style, hang: S.hang, bw: W * S.bagW, bh: H * S.bagH, keepB: !!keep, hookX: sim ? sim.hook.x : undefined }; }
+function bagOpts(keep) { return { style: S.style, hang: S.hang, bw: U * S.bagW, bh: H * S.bagH, keepB: !!keep, hookX: sim ? sim.hook.x : undefined }; }
 function applyPhys() {
   if (!sim) return;
   const s = S.stretch;
@@ -971,11 +971,12 @@ function newItem(info, base, kind, extra) {
 }
 function sampleItem(kind) {
   const info = sampleTex(kind), c = info.tex;
-  return newItem(info, SAMPLES[kind].size * W / Math.max(c.width, c.height), kind);
+  return newItem(info, SAMPLES[kind].size * U / Math.max(c.width, c.height), kind);
 }
 const FILLS = { oranges: ['orange', 'orange', 'orange', 'orange'], lemons: ['lemon', 'lemon', 'lemon', 'lemon', 'lemon', 'lemon'], pumpkin: ['pumpkin'], mixed: ['orange', 'lemon', 'apple', 'lime', 'orange', 'lemon'], empty: [] };
 function buildWorld(fill) {
-  [W, H] = ASPECTS[S.aspect];
+  [W, H] = FIT ? fitSize() : ASPECTS[S.aspect];
+  U = Math.min(W, H * 0.8); // sizes (bag, fruit, blur) follow this so a wide frame doesn't make a giant bag
   cv.width = W; cv.height = H; setLayers();
   sim = null; sel = null; queue = [];
   sim = new Sim(W, H); applyPhys();
@@ -1107,7 +1108,7 @@ async function addFiles(files) {
       const photo = { id: ++photoSeq, src };
       photos.push(photo);
       const big = Math.max(...comps.map(c => Math.max(c.width, c.height)));
-      const base = 0.24 * W / big;
+      const base = 0.24 * U / big;
       enqueue(comps.map((c, k) => newItem(texInfo(c), base, 'photo', { photo: photo.id, comp: k })));
     } catch (e) { failed = true; busy.textContent = e.message; }
   }
@@ -1337,7 +1338,7 @@ function render(ui) {
     sctx2.globalCompositeOperation = 'destination-out'; sctx2.fill(path);
     const walls = new Path2D();
     for (const li of sim.loopLinks) { const L = sim.links[li]; if (L.broken) continue; const a = sim.P[L.a], q = sim.P[L.b]; walls.moveTo(a.x, a.y); walls.lineTo(q.x, q.y); }
-    sctx2.lineWidth = W * 0.05; sctx2.lineCap = 'round'; sctx2.lineJoin = 'round'; sctx2.stroke(walls);
+    sctx2.lineWidth = U * 0.05; sctx2.lineCap = 'round'; sctx2.lineJoin = 'round'; sctx2.stroke(walls);
     sctx2.globalCompositeOperation = 'source-over';
   }
   sctx2.save(); const out = new Path2D(); out.rect(-10, -10, W + 20, H + 20); out.addPath(path); sctx2.clip(out, 'evenodd'); drawItems(sctx2, true); sctx2.restore();
@@ -1348,7 +1349,7 @@ function render(ui) {
   bctx.fillStyle = S.bagColor; bctx.fill(path);
   if (S.opacity < 1) { bctx.globalCompositeOperation = 'destination-out'; bctx.globalAlpha = 1 - S.opacity; bctx.fill(path); bctx.globalCompositeOperation = 'source-over'; bctx.globalAlpha = 1; }
   drawKnot(bctx, S.bagColor, Math.max(0.5, S.opacity));
-  blurItems(S.frost * W * 0.034);
+  blurItems(S.frost * U * 0.034);
   bctx.save(); bctx.clip(path); bctx.drawImage(blurL, 0, 0, W, H);
   if (S.haze > 0.005) { bctx.globalAlpha = S.haze * 0.75; bctx.fillStyle = S.bagColor; bctx.fillRect(b.x0 - 4, b.y0 - 4, b.x1 - b.x0 + 8, b.y1 - b.y0 + 8); bctx.globalAlpha = 1; }
   drawSheen(bctx, b); bctx.restore();
@@ -1356,7 +1357,7 @@ function render(ui) {
   cutHole(bctx); cutTears(bctx);
   ctx.drawImage(bagL, 0, 0);
   if (S.caption.trim()) {
-    ctx.fillStyle = captionColor(); ctx.font = 'italic 400 ' + Math.round(W * 0.034) + 'px Newsreader, Georgia, serif';
+    ctx.fillStyle = captionColor(); ctx.font = 'italic 400 ' + Math.round(U * 0.034) + 'px Newsreader, Georgia, serif';
     ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic'; ctx.fillText(S.caption.trim(), W / 2, H - H * 0.04);
   }
   if (grainPat && S.grain > 0.005) {
@@ -1394,8 +1395,19 @@ function frame(now) {
 }
 
 /* ---------- canvas fit + pointer ---------- */
+// On the portfolio (card and popup) the picture fills its frame: the world takes the frame's shape,
+// so nothing is cut off at an edge the viewer can't see.
+const FIT = EMBED || CARD;
+function fitSize() {
+  const r = $('#stage').getBoundingClientRect(), a = r.width > 20 && r.height > 20 ? r.width / r.height : 0.8;
+  const h = 1350; return [Math.round(h * Math.max(0.45, Math.min(3, a))), h];
+}
+let refitT = 0;
 function fit() {
   const st = $('#stage'), r = st.getBoundingClientRect();
+  if (FIT && sim && r.width > 20 && r.height > 20 && Math.abs(r.width / r.height - W / H) > 0.03) {
+    clearTimeout(refitT); refitT = setTimeout(() => { buildWorld(S.fill); }, 150);
+  }
   const s = Math.min(r.width / W, r.height / H);
   cv.style.width = Math.floor(W * s) + 'px'; cv.style.height = Math.floor(H * s) + 'px';
 }
@@ -1447,7 +1459,7 @@ addEventListener('keydown', e => {
 
 /* ---------- toolbar ---------- */
 $('#bShake').onclick = () => {
-  if (sim.hang) { const h = sim.hook; hookAnim = { fx: h.x, fy: h.y, tx: h.x, ty: h.y, t0: performance.now(), dur: 700, wob: W * 0.05, bob: H * 0.05 }; sim.shake(0.35); }
+  if (sim.hang) { const h = sim.hook; hookAnim = { fx: h.x, fy: h.y, tx: h.x, ty: h.y, t0: performance.now(), dur: 700, wob: U * 0.05, bob: H * 0.05 }; sim.shake(0.35); }
   else sim.shake(1);
 };
 $('#bRefill').onclick = () => { hookAnim = null; refill(); };
