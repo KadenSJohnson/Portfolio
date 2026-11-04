@@ -1,0 +1,548 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="A 2D venetian blind you raise with a pull cord and pivot with a tilt wand.">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font:14px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif}
+[hidden]{display:none!important}
+</style>
+<meta name="theme-color" content="#F3F3F3">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Pull Cord Blinds">
+<meta property="og:description" content="A 2D venetian blind you raise with a pull cord and pivot with a tilt wand.">
+<meta property="og:image" content="https://kadenjohnson.me/tools/pull-cord-blinds/og.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%232b6cf0'/%3E%3Cpath d='M5 9h22M5 14h22M5 19h22' stroke='%23fff' stroke-width='3'/%3E%3C/svg%3E">
+<title>Pull Cord Blinds</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700&display=swap">
+<style>
+/* Layout: one full-bleed canvas scene (single dark look, matching the reference), settings tucked behind a gear. */
+:root{
+  --bg:#F3F3F3;
+  --surface:#26282a;
+  --surface-2:#303335;
+  --line:#40454a;
+  --fg:#eef1f1;
+  --muted:#9aa4a6;
+  --accent:#0099ff;
+  --ui:"Figtree",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:dark;
+}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--fg);font-family:var(--ui);-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+#scene{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none;outline:none}
+#scene:focus-visible{box-shadow:inset 0 0 0 2px var(--accent)}
+
+.iconbtn{width:44px;height:44px;display:grid;place-items:center;border:0;border-radius:12px;background:transparent;color:var(--muted);cursor:pointer;transition:background .15s,color .15s}
+.iconbtn:hover{background:var(--surface-2);color:var(--fg)}
+#gear:hover{background:#E8E8E8;color:#0C0C0C}
+.iconbtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+#gear:not(:focus-visible){opacity:0;pointer-events:none}
+#gear{color:#5C5C5C;position:fixed;z-index:5;top:calc(env(safe-area-inset-top,0px) + 8px);right:calc(env(safe-area-inset-right,0px) + 8px)}
+
+#panel{position:fixed;z-index:10;background:var(--surface);border:1px solid var(--line);box-shadow:0 18px 50px rgba(0,0,0,.45);display:flex;flex-direction:column;overflow:hidden}
+@media (min-width:640px){
+  #panel{top:calc(env(safe-area-inset-top,0px) + 60px);right:calc(env(safe-area-inset-right,0px) + 12px);width:320px;max-height:calc(100% - 80px);border-radius:16px}
+}
+@media (max-width:639.98px){
+  #panel{left:0;right:0;bottom:0;max-height:72%;border-radius:18px 18px 0 0;padding-bottom:env(safe-area-inset-bottom,0px)}
+}
+.ph{display:flex;align-items:center;justify-content:space-between;padding:6px 6px 6px max(18px,env(safe-area-inset-left,0px));border-bottom:1px solid var(--line)}
+.ph span{font-weight:700;font-size:15px;letter-spacing:.01em}
+.pb{overflow-y:auto;padding:16px max(18px,env(safe-area-inset-right,0px)) 18px max(18px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:18px}
+.grp{display:flex;flex-direction:column;gap:10px}
+.lab{font-size:11px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.presets{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.preset{height:44px;border-radius:10px;border:2px solid transparent;cursor:pointer;position:relative;overflow:hidden;padding:0}
+.preset[aria-pressed="true"]{border-color:var(--fg)}
+.preset:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.colors{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.cw{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+.cw input{width:44px;height:40px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);padding:3px;cursor:pointer}
+.row{display:flex;flex-direction:column;gap:4px}
+.rowh{display:flex;justify-content:space-between;font-size:13px}
+.rowh output{color:var(--muted);font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;height:32px;accent-color:var(--accent);cursor:pointer}
+.toggle{display:flex;align-items:center;justify-content:space-between;min-height:40px;font-size:14px;cursor:pointer}
+.toggle input{width:22px;height:22px;accent-color:var(--accent)}
+#reset{min-height:42px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);color:var(--fg);font:600 14px var(--ui);cursor:pointer}
+#reset:hover{border-color:var(--muted)}
+#reset:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+</style>
+</head>
+<body>
+<canvas id="scene" tabindex="0" aria-label="Venetian blind with a pull cord"></canvas>
+
+<button id="gear" class="iconbtn" aria-label="Settings" aria-expanded="false">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+</button>
+
+<div id="panel" role="dialog" aria-label="Settings" hidden>
+  <div class="ph"><span>Blind</span>
+    <button id="close" class="iconbtn" aria-label="Close settings"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  </div>
+  <div class="pb">
+    <div class="grp"><div class="lab">Colourway</div><div class="presets" id="presets"></div></div>
+    <div class="colors">
+      <label class="cw"><input type="color" id="c-glass">Window</label>
+      <label class="cw"><input type="color" id="c-slat">Slats</label>
+      <label class="cw"><input type="color" id="c-cord">Cords</label>
+      <label class="cw"><input type="color" id="c-frame">Frame</label>
+    </div>
+    <div class="grp">
+      <div class="lab">Blind</div>
+      <div class="row"><div class="rowh"><label for="s-count">Slats</label><output id="o-count"></output></div><input type="range" id="s-count" min="8" max="32" step="1"></div>
+    </div>
+    <div class="grp">
+      <div class="lab">Feel</div>
+      <div class="row"><div class="rowh"><label for="s-ratio">Lift per pull</label><output id="o-ratio"></output></div><input type="range" id="s-ratio" min="1" max="3" step="0.05"></div>
+      <div class="row"><div class="rowh"><label for="s-fuss">Fussiness</label><output id="o-fuss"></output></div><input type="range" id="s-fuss" min="0.5" max="2" step="0.05"></div>
+      <div class="row"><div class="rowh"><label for="s-weight">Weight</label><output id="o-weight"></output></div><input type="range" id="s-weight" min="900" max="6000" step="50"></div>
+      <label class="toggle" for="s-sound">Sound<input type="checkbox" id="s-sound"></label>
+    </div>
+    <button id="reset">Reset to defaults</button>
+  </div>
+</div>
+
+<script>
+(()=>{
+const PRESETS={
+  classic:{glass:"#2b6cf0",slat:"#ffffff",cord:"#8fb2ff",frame:"#e8e6e8"},
+  dusk:{glass:"#ff6f4f",slat:"#fff3e4",cord:"#ffb39c",frame:"#ece8e6"},
+  night:{glass:"#1c2b78",slat:"#eef0ff",cord:"#5f78f0",frame:"#2d2d30"},
+  mint:{glass:"#1fbf96",slat:"#fbfffd",cord:"#8eeacf",frame:"#e8e6e8"}
+};
+const DEFAULTS={count:17,tilt:0.376,ratio:1.7,fuss:1,weight:2600,sound:true,colors:{...PRESETS.classic}};
+const KEY="pullcord-blinds.v1";
+let set=load();
+function load(){
+  try{const r=JSON.parse(localStorage.getItem(KEY)||"null");if(r){const c=r.colors||{};const old={"#0099ff":"glass","#6cc8f2":"cord"};for(const k in old)if((c[old[k]]||"").toLowerCase()===k)c[old[k]]=PRESETS.classic[old[k]];if(["#76918f","#5f5560","#3b4152","#6f8780"].includes((c.frame||"").toLowerCase()))c.frame=PRESETS.classic.frame;return {...DEFAULTS,...r,colors:{...DEFAULTS.colors,...c}};}}catch(e){}
+  return JSON.parse(JSON.stringify(DEFAULTS));
+}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(set));}catch(e){}}
+
+/* ---------- colour helpers ---------- */
+function hex2rgb(h){h=h.replace("#","");if(h.length===3)h=h.split("").map(c=>c+c).join("");const n=parseInt(h,16);return[(n>>16)&255,(n>>8)&255,n&255];}
+function mix(a,b,t){const A=hex2rgb(a),B=hex2rgb(b);return"rgb("+A.map((v,i)=>Math.round(v+(B[i]-v)*t)).join(",")+")";}
+
+/* ---------- canvas + geometry ---------- */
+const cv=document.getElementById("scene"),ctx=cv.getContext("2d"),panel=document.getElementById("panel");
+let G={},vw=0,vh=0,dpr=1;
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+
+function layout(){
+  const oldGlass=G.glassH;
+  vw=cv.clientWidth;vh=cv.clientHeight;dpr=Math.min(3,window.devicePixelRatio||1);
+  cv.width=Math.round(vw*dpr);cv.height=Math.round(vh*dpr);
+  const narrow=vw<640;
+  let W=Math.min(vw-32,680);
+  let H=narrow?Math.min(vh-130,W*1.55):Math.min(vh-130,W*0.8);
+  if(H<260){H=Math.max(200,vh-40);}
+  const u=W/600;
+  const g={u,W,H,narrow};
+  g.winX=(vw-W)/2;
+  g.winY=Math.max(60,(vh-H)/2-(narrow?10:0));
+  if(g.winY+H>vh-10)g.winY=Math.max(10,vh-10-H);
+  g.cu=Math.max(u,0.85);g.chromeH=38*g.cu;g.headH=24*u;
+  g.glassTop=g.winY+g.chromeH+g.headH;
+  g.glassBot=g.winY+H;g.glassH=g.glassBot-g.glassTop;
+  g.cx=g.winX+W/2;g.halfLen=(W-16*u)/2;
+  g.ladL=g.winX+68*u;g.ladR=g.winX+W-68*u;
+  g.ex=g.winX+W-37*u;g.ey=g.glassTop;
+  g.wx=g.winX+37*u;g.wl=0.42*(g.winY+H-g.glassTop);g.ww=Math.max(5,7*u);
+  g.gap0=5*u;
+  G=g;geomBlind();
+  if(oldGlass&&S){const k=G.glassH/oldGlass;S.hL*=k;S.hR*=k;S.anchor*=k;S.gs*=k;S.L*=k;}
+  if(S){S.hR=Math.min(S.hR,G.maxH);S.hL=Math.min(S.hL,S.hR);}
+}
+function geomBlind(){
+  const g=G,N=set.count;
+  g.N=N;
+  g.p=(g.glassH-g.gap0)/(N+0.8);
+  g.railT=0.8*g.p;
+  g.ws=g.p*1.15;
+  g.stackT=Math.max(1.2,g.p*0.2);
+  g.railNat=g.glassTop+g.gap0+N*g.p;
+  g.maxH=Math.max(0,g.railNat-(g.glassTop+g.gap0+N*g.stackT)-1);
+  g.base=0.45*g.glassH;
+  g.tasW=Math.max(7,10*g.u);g.tasH=Math.max(18,26*g.u);
+}
+const natural=i=>G.glassTop+G.gap0+i*G.p;
+const slatY=(i,h)=>Math.min(natural(i),G.railNat-h-(G.N-i)*G.stackT);
+function stackCount(h){let c=0;for(let i=0;i<G.N;i++)if(G.railNat-h-(G.N-i)*G.stackT<natural(i)-0.01)c++;return c;}
+
+/* ---------- state ---------- */
+let S=null;
+layout();
+S={hL:0.035*G.glassH,hR:0.3*G.glassH,locked:true,jam:false,constrained:false,vf:0,
+   held:false,pid:null,off:{x:0,y:0},ptr:{x:0,y:0},gs:0,anchor:0,prevDist:0,prevHx:0,sp:0,slowT:0,vx:0,
+   theta:0,omega:0,L:0,rattle:0,shake:0,spin:0,spinT:0,stackCnt:0,lastTick:0,wand:{held:false,pid:null,x0:0,t0:0,swing:0,vs:0,notch:0}};
+S.finger={i:-1,fx:0,dy:0,v:0,held:false,pid:null,y0:0,dy0:0,k:320,damp:34}; // nearly critically damped: settles back without bouncing
+S.hR=Math.min(S.hR,G.maxH);S.hL=Math.min(S.hL,S.hR);
+S.L=G.base+(S.hL+S.hR)/2/set.ratio;
+S.stackCnt=stackCount(S.hL)+stackCount(S.hR);
+
+/* ---------- sound ---------- */
+let ac=null,noiseBuf=null;
+function audio(){
+  if(!set.sound)return null;
+  try{
+    if(!ac){ac=new(window.AudioContext||window.webkitAudioContext)();
+      noiseBuf=ac.createBuffer(1,ac.sampleRate*0.6,ac.sampleRate);const d=noiseBuf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;}
+    if(ac.state==="suspended")ac.resume();
+  }catch(e){return null;}
+  return ac;
+}
+function hit(freq,q,gain,dur){const a=audio();if(!a)return;const t=a.currentTime;
+  const s=a.createBufferSource();s.buffer=noiseBuf;const f=a.createBiquadFilter();f.type="bandpass";f.frequency.value=freq;f.Q.value=q;
+  const g=a.createGain();g.gain.setValueAtTime(gain,t);g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+  s.connect(f).connect(g).connect(a.destination);s.start(t,Math.random()*0.5);s.stop(t+dur+0.03);}
+function tone(f0,f1,gain,dur){const a=audio();if(!a)return;const t=a.currentTime;
+  const o=a.createOscillator();o.type="sine";o.frequency.setValueAtTime(f0,t);o.frequency.exponentialRampToValueAtTime(f1,t+dur);
+  const g=a.createGain();g.gain.setValueAtTime(gain,t);g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+  o.connect(g).connect(a.destination);o.start(t);o.stop(t+dur+0.03);}
+function sTick(loud){const now=performance.now();if(now-S.lastTick<14)return;S.lastTick=now;hit(2400+Math.random()*1400,5,loud?0.16:0.09,0.028);}
+function sClack(){hit(1100,2.5,0.4,0.08);tone(230,110,0.28,0.1);}
+function sThump(){tone(150,55,0.5,0.2);hit(520,1.4,0.3,0.14);}
+function sLock(){hit(1900,9,0.22,0.035);}
+
+/* ---------- physics ---------- */
+function handPos(){return{x:S.ptr.x+S.off.x,y:Math.max(G.ey+8,S.ptr.y+S.off.y)};}
+function step(dt,t){
+  const g=G,sc=g.glassH/400;
+  const lockDx=Math.max(16,26*g.u);
+  const slowThr=80*sc*set.fuss,fastThr=420*sc/set.fuss;
+  S.constrained=false;
+  if(S.held){
+    const h=handPos(),dxE=h.x-g.ex;
+    const dist=Math.hypot(dxE,h.y-g.ey);
+    const k=Math.min(1,dt/0.08);
+    const rate=(dist-S.prevDist)/dt;S.prevDist=dist;
+    S.sp+=(Math.max(0,rate)-S.sp)*k;
+    S.vx+=((h.x-S.prevHx)/dt-S.vx)*k;S.prevHx=h.x;
+    S.locked=S.jam||dxE>lockDx;
+    if(dist>S.anchor){
+      if(S.jam){S.constrained=true;}
+      else{
+        const d=dist-S.anchor,dh=d*set.ratio;
+        const lag=clamp(clamp((S.sp-fastThr)/(fastThr*0.8),0,0.95)+clamp(-dxE/(70*g.u),0,0.7),0,0.95);
+        const rR=Math.min(dh,Math.max(0,g.maxH-S.hR));
+        let nL=S.hL+rR*(1-lag)+(dh-rR);
+        nL=Math.min(nL,g.maxH,S.hR+rR);
+        if(rR>0.001||nL>S.hL+0.001){
+          S.hR+=rR;S.hL=Math.max(S.hL,nL);S.anchor=dist;
+          if(lag>0.05)S.rattle=Math.min(1,S.rattle+lag*0.08);
+        }else S.constrained=true;
+        if(rR>0&&S.sp<slowThr){
+          S.slowT+=dt;
+          if(S.slowT>0.32){S.jam=true;S.locked=true;S.constrained=true;S.shake=1;sClack();}
+        }else if(S.sp>=slowThr)S.slowT=Math.max(0,S.slowT-dt*3);
+      }
+    }else if(dist<S.anchor){
+      S.slowT=0;
+      if(!S.locked){
+        if(S.hR>0||S.hL>0){const dl=(S.anchor-dist)*set.ratio;S.hR=Math.max(0,S.hR-dl);S.hL=Math.max(0,S.hL-dl);S.anchor=dist;}
+      }else if(S.jam&&S.anchor-dist>10*g.u){S.jam=false;S.locked=dxE>lockDx;sTick(true);}
+    }
+  }else{
+    const target=g.base+(S.hL+S.hR)/2/set.ratio;
+    S.L+=(target-S.L)*Math.min(1,dt*10);
+    if(!S.locked&&(S.hR>0||S.hL>0)){
+      S.vf+=set.weight*sc*dt;
+      const dd=S.vf*dt;
+      S.hR=Math.max(0,S.hR-dd);S.hL=Math.max(0,S.hL-dd);
+      if(S.hR===0&&S.hL===0){if(S.vf>150*sc){sThump();S.rattle=Math.min(1,S.rattle+0.7);S.shake=Math.max(S.shake,0.5);}S.vf=0;}
+    }else S.vf=0;
+    const a=-(2400/Math.max(40,S.L))*Math.sin(S.theta)-1.8*S.omega;
+    S.omega+=a*dt;S.theta+=S.omega*dt;
+  }
+  const sc2=stackCount(S.hL)+stackCount(S.hR);
+  if(sc2!==S.stackCnt){
+    const falling=sc2<S.stackCnt&&S.vf>0;
+    sTick(falling);
+    if(falling)S.rattle=Math.min(1,S.rattle+0.05);
+    S.stackCnt=sc2;
+  }
+  const W_=S.wand;
+  if(!W_.held){W_.vs+=(-90*W_.swing-9*W_.vs)*dt;W_.swing+=W_.vs*dt;}
+  const F=S.finger;
+  if(F.i>=0&&!F.held){F.v+=(-F.k*F.dy-F.damp*F.v)*dt;F.dy+=F.v*dt;if(Math.abs(F.dy)<0.3&&Math.abs(F.v)<4){F.dy=0;F.v=0;F.i=-1;}}
+  S.rattle*=Math.exp(-dt*5);S.shake*=Math.exp(-dt*8);
+  if(S.spinT>0){S.spinT-=dt;S.spin+=dt*12;}
+}
+
+/* ---------- drawing ---------- */
+function rrectPath(x,y,w,h,r){ctx.roundRect?ctx.roundRect(x,y,w,h,r):ctx.rect(x,y,w,h);}
+function rrect(x,y,w,h,r){ctx.beginPath();ctx.roundRect?ctx.roundRect(x,y,w,h,r):ctx.rect(x,y,w,h);}
+function drawBar(yl,yr,th,fill){
+  const g=G;const m=(yr-yl)/(g.ladR-g.ladL),a=Math.atan(m),c=Math.cos(a),s=Math.sin(a);
+  const cy=yl+m*(g.cx-g.ladL),hl=g.halfLen;
+  const x1=g.cx-hl*c,y1=cy-hl*s,x2=g.cx+hl*c,y2=cy+hl*s;
+  ctx.fillStyle=fill;ctx.beginPath();
+  ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.lineTo(x2-s*th,y2+c*th);ctx.lineTo(x1-s*th,y1+c*th);ctx.closePath();ctx.fill();
+  const at=lx=>{const d=lx-g.cx;return{x:g.cx+d*c-s*th/2,y:cy+d*s+c*th/2};};
+  return{L:at(g.ladL),R:at(g.ladR)};
+}
+// How far each slat is pushed where the finger is: the grabbed slat moves with the finger, and once it
+// closes the gap to its neighbour it pushes that one along too (down pushes the slats below, up the ones above).
+function fingerOffsets(gap){
+  const F=S.finger,N=G.N,d=new Array(N).fill(0);if(F.i<0||!F.dy)return d;
+  d[F.i]=F.dy;
+  if(F.dy>0){for(let j=F.i+1;j<N;j++){d[j]=Math.max(0,d[j-1]-gap)*0.92;if(d[j]<0.2)break;}
+             if(F.i>0)d[F.i-1]=F.dy*0.12;}
+  else{for(let j=F.i-1;j>=0;j--){d[j]=Math.min(0,d[j-1+2]+gap)*0.92;if(d[j]>-0.2)break;}
+       if(F.i<N-1)d[F.i+1]=F.dy*0.12;}
+  return d;
+}
+function drawBentBar(yl,yr,th,fill,amt){
+  const g=G;if(!amt)return drawBar(yl,yr,th,fill);
+  const m=(yr-yl)/(g.ladR-g.ladL),a=Math.atan(m),c=Math.cos(a),s=Math.sin(a);
+  const cy=yl+m*(g.cx-g.ladL),hl=g.halfLen,sig=Math.max(40*g.u,g.W*0.11),fx=S.finger.fx;
+  const bend=x=>amt*Math.exp(-((x-fx)*(x-fx))/(2*sig*sig));
+  const n=48,top=[];
+  for(let k=0;k<=n;k++){const dd=-hl+2*hl*k/n,x=g.cx+dd*c;top.push({x,y:cy+dd*s+bend(x)});}
+  ctx.fillStyle=fill;ctx.beginPath();ctx.moveTo(top[0].x,top[0].y);
+  for(const q of top)ctx.lineTo(q.x,q.y);
+  for(let k=n;k>=0;k--){const q=top[k];ctx.lineTo(q.x-s*th,q.y+c*th);}
+  ctx.closePath();ctx.fill();
+  const at=lx=>{const dd=lx-g.cx;return{x:g.cx+dd*c-s*th/2,y:cy+dd*s+c*th/2+bend(lx)};};
+  return{L:at(g.ladL),R:at(g.ladR)};
+}
+function draw(t){
+  const g=G,u=g.u,col=set.colors;
+  const tassel=mix(col.glass,"#000000",0.42);
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.fillStyle="#F3F3F3";ctx.fillRect(0,0,vw,vh);
+
+  const shx=S.shake*3*u*Math.sin(t*90);
+  // window body
+  ctx.save();
+  rrect(g.winX,g.winY,g.W,g.H,10*u);ctx.clip();
+  ctx.fillStyle=col.glass;ctx.fillRect(g.winX,g.glassTop-1,g.W,g.glassH+2);
+
+  // slats
+  ctx.save();ctx.beginPath();ctx.rect(g.winX,g.glassTop,g.W,g.glassH);ctx.clip();
+  ctx.translate(shx,0);
+  const ptsL=[{x:g.ladL,y:g.glassTop}],ptsR=[{x:g.ladR,y:g.glassTop}];
+  const ra=S.rattle*g.p*0.12;
+  const bandNow=Math.max(g.p*0.12,g.ws*Math.abs(Math.sin(set.tilt*Math.PI/2))),bOff=g.p*0.32-bandNow/2;
+  const face=set.tilt<0?mix(col.slat,"#000000",0.07):col.slat;
+  const fo=fingerOffsets(Math.max(0,g.p-bandNow-1));S._band=bandNow;S._bOff=bOff;
+  for(let i=0;i<g.N;i++){
+    const yl=slatY(i,S.hL)+ra*Math.sin(t*47+i*2.3),yr=slatY(i,S.hR)+ra*Math.sin(t*53+i*1.7+1);
+    const p=drawBentBar(yl+bOff,yr+bOff,bandNow,face,fo[i]);ptsL.push(p.L);ptsR.push(p.R);
+  }
+  const rp=drawBar(g.railNat-S.hL,g.railNat-S.hR,g.railT,col.slat);ptsL.push(rp.L);ptsR.push(rp.R);
+  ctx.strokeStyle=col.cord;ctx.lineWidth=Math.max(1.4,2.6*u);ctx.lineJoin="round";ctx.lineCap="round";
+  for(const pts of[ptsL,ptsR]){ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);for(let k=1;k<pts.length;k++)ctx.lineTo(pts[k].x,pts[k].y);ctx.stroke();}
+  ctx.restore();
+
+  // headrail
+  ctx.fillStyle=col.slat;ctx.fillRect(g.winX,g.winY+g.chromeH,g.W,g.headH+0.5);
+  // chrome bar
+  ctx.fillStyle=col.frame;ctx.fillRect(g.winX,g.winY,g.W,g.chromeH);
+  const cu=g.cu,cyb=g.winY+g.chromeH/2,br=6*cu;
+  ctx.fillStyle=mix(col.frame,"#000000",0.14);ctx.fillRect(g.winX,g.winY+g.chromeH-Math.max(1,cu),g.W,Math.max(1,cu));
+  [["#ff5f57","#e0443e","#4d0000"],["#febc2e","#dea123","#985700"],["#28c840","#1aab29","#006500"]].forEach(([f,st,gl],k)=>{
+    const x=g.winX+(20+k*20)*cu;
+    ctx.fillStyle=f;ctx.beginPath();ctx.arc(x,cyb,br,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle=st;ctx.lineWidth=Math.max(0.7,0.8*cu);ctx.stroke();
+    ctx.strokeStyle=gl;ctx.fillStyle=gl;ctx.lineWidth=Math.max(1,1.3*cu);ctx.lineCap="round";
+    if(k===0){const a=2.5*cu;ctx.beginPath();ctx.moveTo(x-a,cyb-a);ctx.lineTo(x+a,cyb+a);ctx.moveTo(x+a,cyb-a);ctx.lineTo(x-a,cyb+a);ctx.stroke();}
+    else if(k===1){ctx.beginPath();ctx.moveTo(x-3.3*cu,cyb);ctx.lineTo(x+3.3*cu,cyb);ctx.stroke();}
+    else{const a=3.1*cu,b=1.1*cu;ctx.beginPath();ctx.moveTo(x-a,cyb-a);ctx.lineTo(x+b,cyb-a);ctx.lineTo(x-a,cyb+b);ctx.closePath();ctx.fill();
+      ctx.beginPath();ctx.moveTo(x+a,cyb+a);ctx.lineTo(x-b,cyb+a);ctx.lineTo(x+a,cyb-b);ctx.closePath();ctx.fill();}
+  });
+  ctx.restore();
+
+  // tilt wand
+  {
+    const W_=S.wand,top={x:g.wx+shx,y:g.ey},len=g.wl,ww=g.ww;
+    const ang=Math.atan2(W_.swing,len);
+    ctx.save();ctx.translate(top.x,top.y);ctx.rotate(-ang);
+    ctx.fillStyle=mix(col.frame,"#000000",0.25);ctx.fillRect(-ww*0.45,-3*u,ww*0.9,6*u+2);
+    ctx.beginPath();rrectPath(-ww/2,4*u,ww,len,ww/2);
+    ctx.fillStyle=mix(col.slat,col.glass,0.3);ctx.globalAlpha=0.92;ctx.fill();ctx.globalAlpha=1;
+    ctx.save();ctx.clip();
+    const st=9*u,ph=((set.tilt*70*u)%st+st)%st;
+    ctx.lineWidth=Math.max(1,1.6*u);
+    for(let y=-st*2+ph;y<len+st*2;y+=st){
+      ctx.strokeStyle="rgba(255,255,255,0.75)";ctx.beginPath();ctx.moveTo(-ww,y+ww*0.6);ctx.lineTo(ww,y-ww*0.6);ctx.stroke();
+      ctx.strokeStyle=mix(col.glass,"#000000",0.15);ctx.globalAlpha=0.35;ctx.beginPath();ctx.moveTo(-ww,y+st/2+ww*0.6);ctx.lineTo(ww,y+st/2-ww*0.6);ctx.stroke();ctx.globalAlpha=1;
+    }
+    ctx.restore();ctx.restore();
+  }
+  // cord lock
+  ctx.fillStyle=S.locked?tassel:mix(col.slat,col.frame,0.35);
+  ctx.fillRect(g.ex-4*u+shx,g.ey-6*u,8*u,5*u);
+
+  // pull cord
+  const cw=Math.max(1.4,2.6*u);
+  ctx.strokeStyle=col.cord;ctx.lineWidth=cw;ctx.lineCap="round";
+  const E={x:g.ex+shx,y:g.ey};
+  let end,dirA;
+  if(S.held){
+    const h=handPos();h.x+=0;let dx=h.x-g.ex,dy=h.y-g.ey;const dist=Math.hypot(dx,dy)||1;dx/=dist;dy/=dist;
+    let hd=h;
+    ctx.beginPath();ctx.moveTo(E.x,E.y);
+    if(dist>S.anchor&&S.constrained){
+      const over=dist-S.anchor,dd=S.anchor+14*u*(1-Math.exp(-over/(30*u)));
+      hd={x:g.ex+dx*dd,y:g.ey+dy*dd};ctx.lineTo(hd.x,hd.y);
+    }else if(dist<S.anchor-0.5){
+      const sag=Math.sqrt(Math.max(0,S.anchor*S.anchor-dist*dist))*0.45;
+      let px=-dy,py=dx;if(px<0){px=-px;py=-py;}
+      ctx.quadraticCurveTo((E.x+h.x)/2+px*sag,(E.y+h.y)/2+py*sag,h.x,h.y);
+    }else ctx.lineTo(h.x,h.y);
+    ctx.stroke();
+    if(S.gs>0.5){ctx.beginPath();ctx.moveTo(hd.x,hd.y);ctx.lineTo(hd.x,hd.y+S.gs);ctx.stroke();end={x:hd.x,y:hd.y+S.gs};dirA=0;}
+    else{end=hd;dirA=Math.atan2(dx,dy);}
+  }else{
+    end={x:E.x+Math.sin(S.theta)*S.L,y:E.y+Math.cos(S.theta)*S.L};dirA=S.theta;
+    ctx.beginPath();ctx.moveTo(E.x,E.y);ctx.lineTo(end.x,end.y);ctx.stroke();
+  }
+  ctx.save();ctx.translate(end.x,end.y);ctx.rotate(-dirA);
+  ctx.fillStyle=tassel;ctx.fillRect(-g.tasW/2,0,g.tasW,g.tasH);
+  ctx.restore();
+  S._end=end;
+}
+
+/* ---------- input ---------- */
+// The red, yellow and green window buttons open and close the settings
+function lightAt(p){const g=G,cu=g.cu,cyb=g.winY+g.chromeH/2,r=Math.max(12,9*cu);
+  for(let k=0;k<3;k++){const x=g.winX+(20+k*20)*cu;if(Math.hypot(p.x-x,p.y-cyb)<=r)return true}return false}
+function freeGeom(){const d={x:Math.sin(S.theta),y:Math.cos(S.theta)};return{E:{x:G.ex,y:G.ey},d};}
+cv.addEventListener("pointerdown",e=>{
+  audio();
+  const p={x:e.clientX,y:e.clientY},g=G;
+  if(lightAt(p)){e.preventDefault();openPanel(panel.hidden);return;}
+  {const W_=S.wand,bx=g.wx+W_.swing,by=g.ey+g.wl+4*g.u,dx=bx-g.wx,dy=by-g.ey,l2=dx*dx+dy*dy;
+   const t=clamp(((p.x-g.wx)*dx+(p.y-g.ey)*dy)/l2,0,1);
+   if(!W_.held&&t*Math.sqrt(l2)>6*g.u&&Math.hypot(p.x-(g.wx+dx*t),p.y-(g.ey+dy*t))<24){
+     e.preventDefault();W_.held=true;W_.pid=e.pointerId;W_.x0=p.x;W_.t0=set.tilt;W_.notch=Math.round(set.tilt*24);
+     try{cv.setPointerCapture(e.pointerId);}catch(_){}return;}}
+  // reload button
+  if(S.held)return;
+  const {E,d}=freeGeom(),tot=S.L+g.tasH;
+  const t=clamp((p.x-E.x)*d.x+(p.y-E.y)*d.y,0,tot);
+  const c={x:E.x+d.x*t,y:E.y+d.y*t};
+  if(Math.hypot(p.x-c.x,p.y-c.y)>26||t<12*g.u){grabSlat(e,p);return;}
+  e.preventDefault();
+  if(t>=S.L){const tip={x:E.x+d.x*S.L,y:E.y+d.y*S.L};S.gs=0;S.off={x:tip.x-p.x,y:tip.y-p.y};S.anchor=S.L;}
+  else{S.gs=S.L-t;S.off={x:c.x-p.x,y:c.y-p.y};S.anchor=t;}
+  S.ptr=p;S.held=true;S.pid=e.pointerId;S.prevDist=S.anchor;S.prevHx=c.x;S.sp=0;S.slowT=0;S.vx=0;S.vf=0;S.jam=false;
+  try{cv.setPointerCapture(e.pointerId);}catch(_){}
+});
+function slatAt(p){
+  const g=G;if(p.x<g.winX+8*g.u||p.x>g.winX+g.W-8*g.u||p.y<g.glassTop||p.y>g.glassBot)return -1;
+  const m0=(slatY(0,S.hR)-slatY(0,S.hL)),fo=fingerOffsets(0);let best=-1,bd=1e9;
+  for(let i=0;i<g.N;i++){
+    const yl=slatY(i,S.hL),yr=slatY(i,S.hR),y=yl+(yr-yl)*(p.x-g.ladL)/(g.ladR-g.ladL)+(S._bOff||0)+(S._band||0)/2;
+    const dist=Math.abs(p.y-y);if(dist<bd){bd=dist;best=i;}
+  }
+  return bd<Math.max(g.p*0.75,10)?best:-1;
+}
+function grabSlat(e,p){
+  const i=slatAt(p);if(i<0)return;
+  e.preventDefault();const F=S.finger;
+  if(F.i!==i){F.dy=0;F.v=0;}
+  F.i=i;F.fx=p.x;F.held=true;F.pid=e.pointerId;F.y0=p.y;F.dy0=F.dy;
+  hit(1700+Math.random()*500,6,0.07,0.025);cv.style.cursor="grabbing";
+  try{cv.setPointerCapture(e.pointerId);}catch(_){}
+}
+cv.addEventListener("pointermove",e=>{
+  const Fg=S.finger;
+  if(Fg.held&&e.pointerId===Fg.pid){
+    const g=G,lim=g.p*2.6,raw=Fg.dy0+(e.clientY-Fg.y0);
+    const prev=Fg.dy;Fg.dy=lim*Math.tanh(raw/lim);   // soft limit: the slat gets stiffer the further it bends
+    Fg.fx=clamp(e.clientX,g.winX+10*g.u,g.winX+g.W-10*g.u);
+    if(Math.abs(Fg.dy-prev)>g.p*0.35)sTick(false);
+    return;
+  }
+  const W_=S.wand;
+  if(W_.held&&e.pointerId===W_.pid){
+    const dx=e.clientX-W_.x0;
+    set.tilt=clamp(W_.t0+dx/(120*G.cu),-1,1);
+    W_.swing=clamp(dx*0.25,-18*G.u,18*G.u);
+    const n=Math.round(set.tilt*24);if(n!==W_.notch){W_.notch=n;hit(1500+Math.random()*500,6,0.06,0.02);}
+    return;
+  }if(S.held&&e.pointerId===S.pid){S.ptr={x:e.clientX,y:e.clientY};}
+  else if(e.pointerType==="mouse"){const q={x:e.clientX,y:e.clientY};cv.style.cursor=lightAt(q)?"pointer":slatAt(q)>=0?"grab":"";}});
+function release(e){
+  const Fg=S.finger;
+  if(Fg.held&&e.pointerId===Fg.pid){Fg.held=false;Fg.v=0;cv.style.cursor="";if(Math.abs(Fg.dy)>G.p*0.6){S.rattle=Math.min(1,S.rattle+0.25);hit(1300,3,0.18,0.05);}return;}
+  const W_=S.wand;
+  if(W_.held&&e.pointerId===W_.pid){W_.held=false;W_.vs=0;save();return;}
+  if(!S.held||e.pointerId!==S.pid)return;
+  const h=handPos(),dxE=h.x-G.ex;
+  S.held=false;
+  const wasLocked=S.locked;
+  S.locked=S.jam||dxE>Math.max(16,26*G.u);
+  if(S.locked&&!S.jam)sLock();
+  S.jam=false;
+  S.L=Math.min(S.anchor+S.gs,Math.hypot(dxE,h.y-G.ey)+S.gs);
+  S.theta=S.gs>0?Math.atan2(dxE,h.y-G.ey)*0.6:Math.atan2(dxE,h.y-G.ey);
+  S.omega=clamp(S.vx/Math.max(40,S.L),-8,8);
+}
+cv.addEventListener("pointerup",release);
+// a double click on the window buttons only toggles the settings (it shouldn't open the portfolio popup)
+cv.addEventListener("dblclick",e=>{if(lightAt({x:e.clientX,y:e.clientY}))e.preventDefault();});
+cv.addEventListener("pointercancel",release);
+cv.addEventListener("keydown",e=>{
+  if(e.key==="ArrowDown"){e.preventDefault();audio();const dh=G.glassH*0.05;S.hR=Math.min(G.maxH,S.hR+dh);S.hL=Math.min(S.hR,S.hL+dh);S.locked=true;}
+  else if(e.key==="ArrowUp"){e.preventDefault();audio();S.locked=false;}
+  else if(e.key==="ArrowLeft"||e.key==="ArrowRight"){e.preventDefault();set.tilt=clamp(set.tilt+(e.key==="ArrowRight"?0.08:-0.08),-1,1);save();}
+});
+
+/* ---------- loop ---------- */
+let last=performance.now();
+function frame(now){
+  let dt=Math.min(0.05,(now-last)/1000);last=now;
+  const n=dt>0.02?2:1;for(let i=0;i<n;i++)step(Math.max(0.001,dt/n),now/1000);
+  draw(now/1000);
+  requestAnimationFrame(frame);
+}
+window.addEventListener("resize",()=>{layout();});
+requestAnimationFrame(frame);
+
+/* ---------- settings UI ---------- */
+const $=id=>document.getElementById(id);
+const gear=$("gear");
+function openPanel(o){panel.hidden=!o;gear.setAttribute("aria-expanded",String(o));}
+gear.addEventListener("click",()=>openPanel(panel.hidden));
+$("close").addEventListener("click",()=>openPanel(false));
+cv.addEventListener("pointerdown",e=>{if(!panel.hidden&&G.narrow&&!lightAt({x:e.clientX,y:e.clientY}))openPanel(false);},true);
+
+const pre=$("presets");
+Object.entries(PRESETS).forEach(([k,c])=>{
+  const b=document.createElement("button");b.className="preset";b.dataset.k=k;b.setAttribute("aria-label",k);
+  b.style.background=`repeating-linear-gradient(180deg,${c.slat} 0 7px,${c.glass} 7px 11px)`;
+  b.style.boxShadow=`inset 0 9px 0 ${c.frame}`;
+  b.addEventListener("click",()=>{set.colors={...c};sync();save();});
+  pre.appendChild(b);
+});
+const sliders=[["count","o-count",v=>v],["ratio","o-ratio",v=>(+v).toFixed(2)+"×"],["fuss","o-fuss",v=>(+v).toFixed(2)+"×"],["weight","o-weight",v=>Math.round(v/26)+"%"]];
+sliders.forEach(([k,o,f])=>{
+  const el=$("s-"+k);
+  el.addEventListener("input",()=>{set[k]=+el.value;$(o).textContent=f(set[k]);if(k==="count"){geomBlind();S.hR=Math.min(S.hR,G.maxH);S.hL=Math.min(S.hL,S.hR);S.stackCnt=stackCount(S.hL)+stackCount(S.hR);}save();});
+});
+["glass","slat","cord","frame"].forEach(k=>{const el=$("c-"+k);el.addEventListener("input",()=>{set.colors[k]=el.value;sync(true);save();});});
+$("s-sound").addEventListener("change",e=>{set.sound=e.target.checked;save();});
+$("reset").addEventListener("click",()=>{set=JSON.parse(JSON.stringify(DEFAULTS));geomBlind();S.hR=Math.min(S.hR,G.maxH);S.hL=Math.min(S.hL,S.hR);sync();save();});
+function sync(skipInputs){
+  sliders.forEach(([k,o,f])=>{$("s-"+k).value=set[k];$(o).textContent=f(set[k]);});
+  if(!skipInputs)["glass","slat","cord","frame"].forEach(k=>$("c-"+k).value=set.colors[k]);
+  $("s-sound").checked=set.sound;
+  document.documentElement.style.setProperty("--accent",set.colors.glass);
+  pre.querySelectorAll(".preset").forEach(b=>{const c=PRESETS[b.dataset.k];const on=Object.keys(c).every(k=>c[k].toLowerCase()===set.colors[k].toLowerCase());b.setAttribute("aria-pressed",String(on));});
+}
+sync();
+})();
+</script>
+</body>
+</html>

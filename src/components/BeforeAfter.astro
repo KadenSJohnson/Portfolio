@@ -1,0 +1,37 @@
+---
+import { srcsetFor, CARD_SIZES } from "../lib/srcset";
+// Before/after compare. The card shows a static split; the lightbox shows both full-length
+// homepages side by side behind a draggable handle; each side scrolls on its own.
+import type { Compare } from "../data/projects";
+interface Props { ba: Compare; big?: boolean; eager?: boolean }
+const { ba, big = false, eager = false } = Astro.props;
+const { before, after, beforeLabel: lb, afterLabel: la } = ba;
+const rangeLabel = `Compare the KPM homepage in ${lb} with now. Slide left to see more of now, right to see more of ${lb}.`;
+---
+{big && ba.full ? (
+  <>
+    <div class="ba big split" style="--pos:50%">
+      <div class="ba-layer ba-after" tabindex="0" aria-label={`KPM homepage ${la.toLowerCase()}. Scroll to see the full page.`}>
+        <img src={`/images/${ba.full.after[0]}`} width={ba.full.after[1]} height={ba.full.after[2]} alt={`Full KPM Analytics homepage ${la.toLowerCase()}`} decoding="async" />
+      </div>
+      <div class="ba-layer ba-before" tabindex="0" aria-label={`KPM homepage in ${lb}. Scroll to see the full page.`}>
+        <img src={`/images/${ba.full.before[0]}`} width={ba.full.before[1]} height={ba.full.before[2]} alt={`Full KPM Analytics homepage in ${lb}`} decoding="async" />
+      </div>
+      <span class="ba-line" aria-hidden="true"><span class="ba-knob"><svg viewBox="0 0 24 24"><path d="M9 6l-6 6 6 6M15 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.6" /></svg></span></span>
+      <span class="ba-tag l" aria-hidden="true">{lb}</span><span class="ba-tag r" aria-hidden="true">{la}</span>
+      <input class="ba-range" type="range" min="0" max="100" value="50" aria-label={rangeLabel} />
+    </div>
+    <p class="ba-note">
+      Each side scrolls on its own. Drag the handle to compare.
+      {ba.links?.map(([t, u]) => <a href={u} target="_blank" rel="noopener">{t} ↗</a>)}
+    </p>
+  </>
+) : (
+  <div class={`ba${big ? " big" : ""}`} style="--pos:50%">
+    <img class="ba-after" src={`/images/${after}`} srcset={srcsetFor(`/images/${after}`, undefined, 2160)} sizes={CARD_SIZES} alt={`KPM Analytics homepage ${la.toLowerCase()}`} loading={eager ? "eager" : "lazy"} fetchpriority={eager ? "high" : undefined} />
+    <img class="ba-before" src={`/images/${before}`} srcset={srcsetFor(`/images/${before}`, undefined, 2160)} sizes={CARD_SIZES} alt={`KPM Analytics homepage in ${lb}`} loading={eager ? "eager" : "lazy"} />
+    <span class="ba-line" aria-hidden="true"><span class="ba-knob"><svg viewBox="0 0 24 24"><path d="M9 6l-6 6 6 6M15 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.6" /></svg></span></span>
+    <span class="ba-tag l" aria-hidden="true">{lb}</span><span class="ba-tag r" aria-hidden="true">{la}</span>
+    {big && <input class="ba-range" type="range" min="0" max="100" value="50" aria-label={rangeLabel} />}
+  </div>
+)}

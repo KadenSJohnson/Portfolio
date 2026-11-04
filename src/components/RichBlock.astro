@@ -1,0 +1,38 @@
+---
+// One Portable Text block: a paragraph (normal, lead or note) or one of the custom case study blocks
+import type { Block } from "../lib/content";
+import Meta from "./Meta.astro";
+import Stats from "./Stats.astro";
+import Figs from "./Figs.astro";
+import ProblemSolution from "./ProblemSolution.astro";
+import RichMedia from "./RichMedia.astro";
+interface Props { block: Block; li?: boolean }
+const b = Astro.props.block;
+const Tag = Astro.props.li ? "li" : "p";
+type Piece = { text: string; strong: boolean; em: boolean; href?: string };
+let pieces: Piece[] = [];
+let cls: string | undefined;
+if (b._type === "block") {
+  cls = b.style === "lead" ? "lead" : b.style === "note" ? "note" : undefined;
+  pieces = (b.children || []).map((c) => {
+    const marks = c.marks || [];
+    const link = (b.markDefs || []).find((m) => marks.includes(m._key));
+    return { text: c.text, strong: marks.includes("strong"), em: marks.includes("em"), href: link?.href };
+  });
+}
+---
+{b._type === "block" && (
+  <Tag class={cls}>
+    {pieces.map((pc) =>
+      pc.href ? (
+        <a class="ext" href={pc.href} target="_blank" rel="noopener">{pc.strong ? <strong>{pc.text}</strong> : pc.em ? <em>{pc.text}</em> : pc.text}</a>
+      ) : pc.strong ? <strong>{pc.text}</strong> : pc.em ? <em>{pc.text}</em> : pc.text
+    )}
+  </Tag>
+)}
+{b._type === "metaTable" && <Meta rows={b.rows || []} />}
+{b._type === "stats" && <Stats items={b.items || []} />}
+{b._type === "figures" && <Figs items={b.items || []} cols={b.cols || 2} />}
+{b._type === "pullQuote" && <blockquote class="pull">{b.text}<cite>{b.cite}</cite></blockquote>}
+{b._type === "problemSolution" && <ProblemSolution problem={b.problem} solution={b.solution} />}
+{(b._type === "rtImage" || b._type === "rtVideo" || b._type === "rtGallery") && <RichMedia block={b} />}

@@ -1,0 +1,23 @@
+---
+import { CATS, type CatKey } from "../data/projects";
+import type { Project } from "../lib/content";
+interface Props { projects: Project[] }
+const works = Astro.props.projects;
+const cats = (Object.keys(CATS) as CatKey[]).map((k) => ({ k, ...CATS[k], n: works.filter((w) => w.categories.includes(k)).length })).filter((c) => c.n);
+---
+<nav class="filters" aria-label="Filter work by category">
+  <button class="chip" type="button" data-filter="all" aria-pressed="true">All <span class="ct">{works.length}</span></button>
+  {cats.map((c) => (
+    <button class="chip" type="button" data-filter={c.k} aria-pressed="false">
+      <span class="dot"><svg viewBox="0 0 24 24" aria-hidden="true"><use href={`#${c.icon}`} /></svg></span>{c.name} <span class="ct">{c.n}</span>
+    </button>
+  ))}
+  <div class="filter-pick">
+    <label class="sr" for="cat-select">Show work in</label>
+    <select id="cat-select">
+      <option value="all">All work ({works.length})</option>
+      {cats.map((c) => <option value={c.k}>{c.name} ({c.n})</option>)}
+    </select>
+    <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 6l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2.2" /></svg>
+  </div>
+</nav>
