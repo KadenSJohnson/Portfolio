@@ -193,6 +193,7 @@ import { Model3D } from "./model3d.js";
   const close = () => { if (dlg.open) dlg.close(); };
   dlg.addEventListener("close", () => {
     closeZoom();
+    content.querySelectorAll("iframe").forEach((f) => f.remove()); // stop a live demo once the popup closes
     document.documentElement.style.overflow = "";
     lbDisposers.forEach((off) => off()); lbDisposers = [];
     setHash("");

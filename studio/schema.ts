@@ -8,6 +8,7 @@ const CATEGORY_OPTIONS = [
   { title: "Icon Design", value: "icon" },
   { title: "App Icon", value: "app" },
   { title: "Tools", value: "tools" },
+  { title: "Experiments", value: "exp" },
   { title: "Other Design", value: "other" },
 ];
 
@@ -83,6 +84,8 @@ const project = defineType({
     defineField({ name: "categories", type: "array", of: [{ type: "string" }], options: { list: CATEGORY_OPTIONS, layout: "grid" } }),
     defineField({ name: "coverVideo", title: "Card video", type: "file", options: { accept: "video/mp4,video/quicktime,video/webm" },
       description: "Plays on the card and at the top of the popup, in place of the card image. MP4 plays in every browser." }),
+    defineField({ name: "embed", title: "Live demo in the popup", type: "string",
+      description: "A page on the site to run at the top of the popup instead of the image, e.g. /tools/pull-cord-blinds/. The card still shows the card image." }),
     defineField({ name: "image", title: "Card image", type: "image", options: { hotspot: true }, description: "Shown on the card and at the top of the popup." }),
     imageFileField("imageFile", "Card image file"),
     defineField({ name: "imageLabel", title: "Image description", type: "string", description: "Alt text, and the label when there's no image yet." }),

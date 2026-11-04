@@ -32,7 +32,7 @@ const f = it.coverVideo
 </article>
 <template id={`p-${it.id}`} data-title={it.title} data-sub={it.subtitle} data-cats={it.categories.join(" ")}>
   <div class="lb-hero">
-    {f.ba ? <BeforeAfter ba={f.ba} big /> : f.video ? <VideoView video={f.video} /> : f.model ? <ModelView model={f.model} big /> : <Ph src={it.imageFile} image={it.image} label={it.imageLabel} ratio="16/9" />}
+    {it.embed ? <div class="embed-wrap"><iframe src={it.embed} title={`${it.title}, live demo`} allow="autoplay; fullscreen" loading="lazy"></iframe></div> : f.ba ? <BeforeAfter ba={f.ba} big /> : f.video ? <VideoView video={f.video} /> : f.model ? <ModelView model={f.model} big /> : <Ph src={it.imageFile} image={it.image} label={it.imageLabel} ratio="16/9" />}
   </div>
   <div class="lb-body"><RichText blocks={it.body} /></div>
 </template>

@@ -1,11 +1,12 @@
 // Portfolio content: categories, gallery items (work, quotes, contact) and image file names.
 
-export type CatKey = "uxui" | "icon" | "app" | "tools" | "other";
+export type CatKey = "uxui" | "icon" | "app" | "tools" | "exp" | "other";
 export const CATS: Record<CatKey, { name: string; color: string; icon: string }> = {
   uxui: { name: "UX/UI Design", color: "yellow", icon: "i-uxui" },
   icon: { name: "Icon Design", color: "red", icon: "i-icon" },
   app: { name: "App Icon", color: "blue", icon: "i-app" },
   tools: { name: "Tools", color: "green", icon: "i-tools" },
+  exp: { name: "Experiments", color: "purple", icon: "i-exp" },
   other: { name: "Other Design", color: "orange", icon: "i-other" },
 };
 
