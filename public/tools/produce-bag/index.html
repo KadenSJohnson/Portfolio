@@ -1,0 +1,1628 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Produce Bag</title>
+<meta name="description" content="Fill a frosted plastic produce bag with fruit or your own photos, swing it, tear it, and export the picture.">
+<meta name="theme-color" content="#0d0d10">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Produce Bag">
+<meta property="og:description" content="Fill a frosted plastic produce bag with fruit or your own photos, then export the picture.">
+<meta property="og:image" content="https://kadenjohnson.me/tools/produce-bag/og.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23cde3d6'/%3E%3Ccircle cx='13' cy='19' r='6' fill='%23e45f37'/%3E%3Ccircle cx='20' cy='20' r='5' fill='%23f39443'/%3E%3Cpath d='M8 10h16l-1 15H9z' fill='%23ffffff' fill-opacity='.55'/%3E%3C/svg%3E">
+</head><body>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@1,6..72,400&display=swap">
+<style>
+/* Layout: dark tool shell — panel of collapsible control cards (left on wide screens, bottom sheet on phones), canvas stage, action bar under the canvas */
+:root {
+  --bg: #0d0d10; --panel: #131317; --card: #1a1a1f; --field: #0f0f13; --fill: #27272e; --hover: #31313a;
+  --line: #26262d; --ink: #ececef; --muted: #8d8d96; --tick: #a6a6b0; --accent: #5b8cff;
+  --primary: #e9e9ec; --primary-ink: #111114; --danger: #f2826d; --scrim: rgba(0, 0, 0, .62);
+  --ui: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --cap: "Newsreader", Georgia, "Times New Roman", serif;
+  color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html, body { height: 100%; overflow: hidden; overscroll-behavior: none; }
+body { background: var(--bg); color: var(--ink); font-family: var(--ui); font-size: 13px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  -webkit-tap-highlight-color: transparent; }
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+svg.i { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+
+#app { height: 100%; display: flex; gap: 16px; }
+#main { flex: 1; min-width: 0; display: flex; flex-direction: column; padding-block: 12px; position: relative; }
+#stage { flex: 1; min-height: 0; position: relative; display: grid; place-items: center; }
+#c { display: block; touch-action: none; border-radius: 14px; cursor: grab; }
+#c.grabbing { cursor: grabbing; }
+#stage.drop #c { outline: 2px dashed var(--accent); outline-offset: 4px; }
+
+/* action bars */
+.bar { display: flex; gap: 6px; padding: 6px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; }
+.tb { display: flex; justify-content: center; padding-top: 12px; }
+.btn { height: 40px; min-width: 40px; border: 0; border-radius: 10px; background: var(--fill); display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 0 14px; font-size: 13px; font-weight: 500; white-space: nowrap; }
+.btn.sq { padding: 0; width: 40px; }
+.btn:hover { background: var(--hover); }
+.btn[aria-pressed="true"] { background: var(--hover); box-shadow: inset 0 0 0 1px var(--tick); }
+.btn.primary { background: var(--primary); color: var(--primary-ink); }
+.btn.primary:hover { background: #ffffff; }
+.btn.danger { color: var(--danger); }
+.btn.ghost { background: transparent; box-shadow: inset 0 0 0 1px var(--line); }
+.btn.ghost:hover { background: var(--card); }
+.btn.wide { width: 100%; }
+#selbar { position: absolute; left: 50%; bottom: 10px; transform: translateX(-50%); z-index: 3; max-width: 100%; }
+
+/* panel */
+#panel { width: 340px; flex: none; margin-block: 12px; background: var(--panel); border: 1px solid var(--line); border-radius: 16px; display: flex; flex-direction: column; z-index: 20; min-height: 0; }
+.ph { display: flex; align-items: center; justify-content: space-between; padding: 8px 8px 2px 16px; }
+.ph h2 { margin: 0; font-size: 13px; font-weight: 500; color: var(--muted); }
+.pbody { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; padding: 6px 8px 12px; display: flex; flex-direction: column; gap: 8px; }
+@media (max-width: 899px) {
+  #panel { position: fixed; left: 0; right: 0; bottom: 0; width: auto; margin: 0; max-height: 64%; border-radius: 18px 18px 0 0; border-bottom: 0;
+    padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+}
+.card { background: var(--card); border-radius: 14px; padding: 0 14px 12px; }
+.hd { width: 100%; height: 46px; display: flex; align-items: center; justify-content: space-between; border: 0; background: transparent; padding: 0; font-size: 13px; font-weight: 500; }
+.hd svg { color: var(--muted); transition: transform .15s; }
+.hd[aria-expanded="false"] svg { transform: rotate(-90deg); }
+.card:has(.hd[aria-expanded="false"]) { padding-bottom: 0; }
+.bd { display: flex; flex-direction: column; gap: 8px; }
+.row { display: grid; grid-template-columns: minmax(76px, 36%) minmax(0, 1fr); align-items: center; gap: 10px; min-height: 40px; }
+.row.top { align-items: start; }
+.row.top .lbl { padding-top: 7px; }
+.lbl { font-size: 13px; min-width: 0; }
+
+/* scrub slider: drag sideways to change, tap to jump */
+.rng { --p: 0; display: grid; grid-template-columns: minmax(0, 1fr) 3.2ch; align-items: center; gap: 10px; font-family: var(--mono); font-size: 12.5px; touch-action: pan-y; cursor: ew-resize; user-select: none; -webkit-user-select: none; }
+.rng .trk { position: relative; height: 40px; border-radius: 999px; background: var(--field); overflow: hidden; }
+.rng .fl { position: absolute; inset: 0 auto 0 0; width: calc(var(--p) * 100%); background: var(--fill); border-radius: 999px; }
+.rng .fl::after { content: ""; position: absolute; top: 50%; width: 1.5px; height: 16px; margin-top: -8px; background: var(--tick); border-radius: 1px;
+  left: max(14px, calc(100% - 14px)); }
+.rng .v { text-align: right; font-variant-numeric: tabular-nums; pointer-events: none; }
+.rng.on .fl, .rng:hover .fl { background: var(--hover); }
+
+/* segmented */
+.seg { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); background: var(--field); border-radius: 12px; padding: 3px; gap: 2px; }
+.seg button { height: 34px; border: 0; background: transparent; border-radius: 9px; font-size: 12.5px; color: var(--muted); padding: 0 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.seg button[aria-pressed="true"] { background: var(--fill); color: var(--ink); }
+
+/* fields */
+.sel { position: relative; }
+.sel select { -webkit-appearance: none; appearance: none; width: 100%; height: 40px; border-radius: 10px; border: 0; background: var(--field); padding: 0 34px 0 12px; font-size: 13px; }
+.sel svg { position: absolute; right: 12px; top: 12px; pointer-events: none; color: var(--muted); }
+.txt { width: 100%; height: 40px; border-radius: 10px; border: 0; background: var(--field); padding: 0 12px; font-size: 13px; min-width: 0; }
+.txt::placeholder { color: var(--muted); }
+.txt.cap { font-family: var(--cap); font-style: italic; font-size: 15px; }
+.clr { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 8px; }
+.clr label { width: 40px; height: 40px; border-radius: 10px; position: relative; overflow: hidden; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .1); cursor: pointer; }
+.clr label input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+.clr .txt { font-family: var(--mono); font-size: 12.5px; }
+.presets { display: flex; flex-wrap: wrap; gap: 8px; }
+.presets button { width: 54px; height: 28px; border-radius: 999px; border: 0; padding: 0; display: flex; overflow: hidden; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08); }
+.presets button span { flex: 1; }
+.presets button[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--card), 0 0 0 3.5px var(--ink); }
+.pair { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; }
+
+/* add sheet */
+#addsheet { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(80px + env(safe-area-inset-bottom, 0px)); width: min(420px, calc(100% - 32px)); background: var(--panel); border: 1px solid var(--line); border-radius: 16px; z-index: 25; display: flex; flex-direction: column; }
+.sbody { padding: 4px 10px 10px; display: flex; flex-direction: column; gap: 10px; }
+.tiles { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+.tile { aspect-ratio: 1; max-width: 100%; border: 0; background: var(--card); border-radius: 12px; padding: 8px; display: grid; place-items: center; }
+.tile:hover { background: var(--fill); }
+.tile img { width: 100%; height: 100%; object-fit: contain; }
+.upload { position: relative; overflow: hidden; }
+.upload input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.busy { font-size: 12px; color: var(--muted); text-align: center; }
+
+/* overlays */
+.overlay { position: fixed; inset: 0; background: var(--scrim); z-index: 40; display: grid; place-items: center;
+  padding: max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+.dlg { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; width: min(440px, 100%); max-height: 100%; overflow: auto; padding: 8px; display: flex; flex-direction: column; gap: 8px; }
+.dlg .ph { padding: 8px 8px 4px 8px; }
+.dlg .ph h2 { color: var(--ink); font-size: 15px; font-weight: 600; }
+.dlg .card { padding-top: 12px; }
+#exp .dlg { width: min(520px, 100%); }
+#exp img { display: block; max-width: 100%; max-height: 66vh; width: auto; height: auto; align-self: center; border-radius: 10px; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div id="app">
+  <aside id="panel" hidden>
+    <div class="ph"><h2>Settings</h2><button class="btn sq ghost" id="closePanel" aria-label="Close settings"><svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div class="pbody">
+      <section class="card" data-sec="bag">
+        <button class="hd" aria-expanded="true">Bag<svg class="i" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
+        <div class="bd">
+          <div class="row"><span class="lbl">Style</span><div class="seg" data-seg="style"><button data-v="handles">Handles</button><button data-v="knot">Knot</button><button data-v="diecut">Die-cut</button></div></div>
+          <div class="row"><span class="lbl">Placement</span><div class="seg" data-seg="hang"><button data-v="1">Hanging</button><button data-v="0">Floor</button></div></div>
+          <div class="row"><span class="lbl">Width</span><div class="rng" id="s-bagW" data-k="bagW" data-min="0.32" data-max="0.74" data-step="0.01" role="slider" tabindex="0" aria-label="Width"><div class="fl"></div><span class="v"></span></div></div>
+          <div class="row"><span class="lbl">Height</span><div class="rng" id="s-bagH" data-k="bagH" data-min="0.26" data-max="0.58" data-step="0.01" role="slider" tabindex="0" aria-label="Height"><div class="fl"></div><span class="v"></span></div></div>
+          <div class="row"><span class="lbl">Stretch</span><div class="rng" id="s-stretch" data-k="stretch" data-min="0" data-max="1" data-step="0.01" role="slider" tabindex="0" aria-label="Stretch"><div class="fl"></div><span class="v"></span></div></div>
+          <div class="row"><span class="lbl">Strength</span><div class="rng" id="s-strength" data-k="strength" data-min="0" data-max="1" data-step="0.01" role="slider" tabindex="0" aria-label="Strength"><div class="fl"></div><span class="v"></span></div></div>
+        </div>
+      </section>
+      <section class="card" data-sec="plastic">
+        <button class="hd" aria-expanded="true">Plastic<svg class="i" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
+        <div class="bd">
+          <div class="row"><span class="lbl">Frost</span><div class="rng" id="s-frost" data-k="frost" data-min="0" data-max="1" data-step="0.01" role="slider" tabindex="0" aria-label="Frost"><div class="fl"></div><span class="v"></span></div></div>
+          <div class="row"><span class="lbl">Haze</span><div class="rng" id="s-haze" data-k="haze" data-min="0" data-max="1" data-step="0.01" role="slider" tabindex="0" aria-label="Haze"><div class="fl"></div><span class="v"></span></div></div>
+          <div class="row"><span class="lbl">Opacity</span><div class="rng" id="s-opacity" data-k="opacity" data-min="0" data-max="1" data-step="0.01" role="slider" tabindex="0" aria-label="Opacity"><div class="fl"></div><span class="v"></span></div></div>
+          <div class="row"><span class="lbl">Sheen</span><div class="rng" id="s-sheen" data-k="sheen" data-min="0" data-max="1" data-step="0.01" role="slider" tabindex="0" aria-label="Sheen"><div class="fl"></div><span class="v"></span></div></div>
+        </div>
+      </section>
+      <section class="card" data-sec="colors">
+        <button class="hd" aria-expanded="true">Colors<svg class="i" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
+        <div class="bd">
+          <div class="row top"><span class="lbl">Presets</span><div class="presets" id="presets"></div></div>
+          <div class="row"><span class="lbl">Bag</span><div class="clr" data-c="bagColor"><label aria-label="Pick bag color"><input type="color" id="c-bag"></label><input class="txt" id="h-bag" type="text" maxlength="7" spellcheck="false" autocomplete="off" aria-label="Bag color hex"></div></div>
+          <div class="row"><span class="lbl">Background</span><div class="clr" data-c="bg"><label aria-label="Pick background color"><input type="color" id="c-bg"></label><input class="txt" id="h-bg" type="text" maxlength="7" spellcheck="false" autocomplete="off" aria-label="Background color hex"></div></div>
+          <button class="btn ghost wide" id="fromItems"><svg class="i" viewBox="0 0 24 24"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg>Match background to contents</button>
+        </div>
+      </section>
+      <section class="card" data-sec="contents">
+        <button class="hd" aria-expanded="true">Contents<svg class="i" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
+        <div class="bd">
+          <div class="row"><span class="lbl">Size</span><div class="rng" id="s-itemSize" data-k="itemSize" data-min="0.5" data-max="1.6" data-step="0.01" role="slider" tabindex="0" aria-label="Size"><div class="fl"></div><span class="v"></span></div></div>
+          <div class="row"><span class="lbl">Gravity</span><div class="rng" id="s-gravity" data-k="gravity" data-min="0" data-max="1" data-step="0.01" role="slider" tabindex="0" aria-label="Gravity"><div class="fl"></div><span class="v"></span></div></div>
+          <div class="row" id="cutRow" hidden><span class="lbl">Cutout</span><div class="rng" id="s-cut" data-k="cut" data-min="8" data-max="110" data-step="1" role="slider" tabindex="0" aria-label="Cutout"><div class="fl"></div><span class="v"></span></div></div>
+        </div>
+      </section>
+      <section class="card" data-sec="look">
+        <button class="hd" aria-expanded="true">Texture<svg class="i" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
+        <div class="bd">
+          <div class="row"><span class="lbl">Style</span><div class="sel"><select id="s-grainStyle" data-k="grainStyle" aria-label="Texture style"><option value="fine">Fine grain</option><option value="coarse">Coarse grain</option><option value="halftone">Halftone</option><option value="none">None</option></select><svg class="i" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></div></div>
+          <div class="row"><span class="lbl">Amount</span><div class="rng" id="s-grain" data-k="grain" data-min="0" data-max="1" data-step="0.01" role="slider" tabindex="0" aria-label="Texture amount"><div class="fl"></div><span class="v"></span></div></div>
+          <div class="row"><span class="lbl">Caption</span><input class="txt cap" type="text" id="s-caption" data-k="caption" placeholder="day 435" maxlength="40" autocomplete="off" aria-label="Caption"></div>
+        </div>
+      </section>
+      <div class="pair"><button class="btn ghost" id="newCanvas">New canvas</button><button class="btn ghost danger" id="clearAll">Empty bag</button></div>
+    </div>
+  </aside>
+
+  <div id="main">
+    <div id="stage">
+      <canvas id="c" aria-label="Bag canvas"></canvas>
+      <div id="selbar" class="bar" hidden>
+        <button class="btn" data-sel="dup"><svg class="i" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="3"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>Duplicate</button>
+        <button class="btn sq" data-sel="smaller" aria-label="Smaller"><svg class="i" viewBox="0 0 24 24"><path d="M6 12h12"/></svg></button>
+        <button class="btn sq" data-sel="bigger" aria-label="Bigger"><svg class="i" viewBox="0 0 24 24"><path d="M12 6v12M6 12h12"/></svg></button>
+        <button class="btn danger" data-sel="del"><svg class="i" viewBox="0 0 24 24"><path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12"/></svg>Delete</button>
+      </div>
+    </div>
+    <div class="tb">
+      <div class="bar" id="toolbar">
+        <button class="btn sq" id="bSet" aria-label="Settings" aria-pressed="false"><svg class="i" viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></button>
+        <button class="btn" id="bAdd"><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Add</button>
+        <button class="btn sq" id="bShake" aria-label="Shake"><svg class="i" viewBox="0 0 24 24"><path d="M7 4c-2 2-2 4 0 6s2 4 0 6M12 6v12M17 4c2 2 2 4 0 6s-2 4 0 6"/></svg></button>
+        <button class="btn sq" id="bRefill" aria-label="Refill"><svg class="i" viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 1 14-5.3L20 9M20 4v5h-5M20 12a8 8 0 0 1-14 5.3L4 15M4 20v-5h5"/></svg></button>
+        <button class="btn primary" id="bSave"><svg class="i" viewBox="0 0 24 24"><path d="M12 16V5M7 10l5-5 5 5M5 20h14"/></svg>Export PNG</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="addsheet" hidden>
+  <div class="ph"><h2>Add to bag</h2><button class="btn sq ghost" id="closeAdd" aria-label="Close"><svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+  <div class="sbody">
+    <label class="btn primary wide upload"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><circle cx="9" cy="11" r="2"/><path d="M21 16l-5-5-8 8"/></svg>Upload photos<input type="file" id="file" accept="image/*" multiple></label>
+    <div class="busy" id="busy" hidden></div>
+    <div class="tiles" id="tiles"></div>
+  </div>
+</div>
+
+<div id="setup" class="overlay" hidden>
+  <div class="dlg" role="dialog" aria-label="New bag">
+    <div class="ph"><h2>New bag</h2></div>
+    <div class="card"><div class="bd">
+      <div class="row"><span class="lbl">Canvas</span><div class="seg" data-chips="aspect"></div></div>
+      <div class="row"><span class="lbl">Bag</span><div class="seg" data-chips="style"></div></div>
+      <div class="row"><span class="lbl">Placement</span><div class="seg" data-chips="hang"></div></div>
+      <div class="row"><span class="lbl">Fill</span><div class="sel"><select id="setupFill" aria-label="Fill with"><option value="oranges">Oranges</option><option value="lemons">Lemons</option><option value="pumpkin">Pumpkin</option><option value="mixed">Mixed</option><option value="empty">Empty</option></select><svg class="i" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></div></div>
+      <div class="row top"><span class="lbl">Colors</span><div class="presets" id="setupPresets"></div></div>
+    </div></div>
+    <button class="btn primary wide" id="start">Start</button>
+  </div>
+</div>
+
+<div id="exp" class="overlay" hidden>
+  <div class="dlg">
+    <img id="expImg" alt="Snapshot of the bag">
+    <div class="pair"><button class="btn" id="copyImg">Copy</button><button class="btn primary" id="closeExp">Done</button></div>
+  </div>
+</div>
+
+<script>
+/* Produce Bag — 2D physics: XPBD rope bag + rigid compound-circle items */
+(function (G) {
+'use strict';
+const DENS = 1.2e-4, PMAX = 1.2;
+
+function resample(pts, sp) {
+  const L = [0];
+  for (let i = 1; i < pts.length; i++) L.push(L[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]));
+  const tot = L[L.length - 1];
+  const n = Math.max(1, Math.round(tot / sp));
+  const out = [];
+  let j = 0;
+  for (let k = 0; k <= n; k++) {
+    const d = tot * k / n;
+    while (j < pts.length - 2 && L[j + 1] < d) j++;
+    const seg = (L[j + 1] - L[j]) || 1, t = Math.min(1, Math.max(0, (d - L[j]) / seg));
+    out.push([pts[j][0] + (pts[j + 1][0] - pts[j][0]) * t, pts[j][1] + (pts[j + 1][1] - pts[j][1]) * t]);
+  }
+  return out;
+}
+
+/* alpha: Uint8 array (w*h) of alpha values. Returns physical shape in texture pixels. */
+function makeShape(alpha, w, h) {
+  const st = Math.max(1, Math.ceil(Math.max(w, h) / 56));
+  const gw = Math.ceil(w / st), gh = Math.ceil(h / st);
+  const m = new Uint8Array(gw * gh);
+  let area = 0, sx = 0, sy = 0;
+  for (let gy = 0; gy < gh; gy++) for (let gx = 0; gx < gw; gx++) {
+    const px = Math.min(w - 1, Math.floor((gx + 0.5) * st)), py = Math.min(h - 1, Math.floor((gy + 0.5) * st));
+    if (alpha[py * w + px] > 110) { m[gy * gw + gx] = 1; area++; sx += gx + 0.5; sy += gy + 0.5; }
+  }
+  if (area < 3) {
+    const r = Math.max(w, h) / 2;
+    return { area: Math.PI * r * r, I: Math.PI * r * r * r * r / 2, cx: w / 2, cy: h / 2, circles: [{ x: 0, y: 0, r }] };
+  }
+  const cx = sx / area, cy = sy / area;
+  let I = 0;
+  for (let gy = 0; gy < gh; gy++) for (let gx = 0; gx < gw; gx++) if (m[gy * gw + gx]) {
+    const dx = gx + 0.5 - cx, dy = gy + 0.5 - cy; I += dx * dx + dy * dy + 1 / 6;
+  }
+  // chamfer distance to outside
+  const D = new Float32Array(gw * gh), S2 = Math.SQRT2;
+  for (let i = 0; i < gw * gh; i++) D[i] = m[i] ? 1e9 : 0;
+  const get = (x, y) => (x < 0 || y < 0 || x >= gw || y >= gh) ? 0 : D[y * gw + x];
+  for (let y = 0; y < gh; y++) for (let x = 0; x < gw; x++) {
+    const i = y * gw + x; if (!m[i]) continue;
+    D[i] = Math.min(D[i], get(x - 1, y) + 1, get(x, y - 1) + 1, get(x - 1, y - 1) + S2, get(x + 1, y - 1) + S2);
+  }
+  for (let y = gh - 1; y >= 0; y--) for (let x = gw - 1; x >= 0; x--) {
+    const i = y * gw + x; if (!m[i]) continue;
+    D[i] = Math.min(D[i], get(x + 1, y) + 1, get(x, y + 1) + 1, get(x + 1, y + 1) + S2, get(x - 1, y + 1) + S2);
+  }
+  const cov = new Uint8Array(gw * gh); let covered = 0, dmax0 = 0; const circles = [];
+  for (let k = 0; k < 9; k++) {
+    let best = -1, bd = 0;
+    for (let i = 0; i < gw * gh; i++) if (m[i] && !cov[i] && D[i] > bd) { bd = D[i]; best = i; }
+    if (best < 0) break;
+    if (k === 0) dmax0 = bd; else if (bd < dmax0 * 0.24) break;
+    const bx = best % gw, by = (best / gw) | 0, r = Math.max(0.6, bd - 0.15);
+    circles.push({ x: (bx + 0.5 - cx) * st, y: (by + 0.5 - cy) * st, r: r * st });
+    const R = r * 1.12, R2 = R * R;
+    for (let y = Math.max(0, Math.floor(by - R)); y <= Math.min(gh - 1, Math.ceil(by + R)); y++)
+      for (let x = Math.max(0, Math.floor(bx - R)); x <= Math.min(gw - 1, Math.ceil(bx + R)); x++) {
+        const i = y * gw + x;
+        if (m[i] && !cov[i] && (x - bx) * (x - bx) + (y - by) * (y - by) <= R2) { cov[i] = 1; covered++; }
+      }
+    if (area - covered < area * 0.05) break;
+  }
+  return { area: area * st * st, I: I * st ** 4, cx: cx * st, cy: cy * st, circles };
+}
+
+function genW(b, qx, qy, nx, ny) { const rn = (qx - b.x) * ny - (qy - b.y) * nx; return b.invM + rn * rn * b.invI; }
+function imp(b, qx, qy, px, py) {
+  const rx = qx - b.x, ry = qy - b.y;
+  b.x += px * b.invM; b.y += py * b.invM; b.a += (rx * py - ry * px) * b.invI;
+}
+// displacement of body point q since substep start
+function disp(b, qx, qy, out) {
+  const c = Math.cos(b.a), s = Math.sin(b.a);
+  const rx = qx - b.x, ry = qy - b.y;
+  const lx = rx * c + ry * s, ly = -rx * s + ry * c;
+  const oc = Math.cos(b.oa), os = Math.sin(b.oa);
+  out[0] = qx - (b.ox + lx * oc - ly * os); out[1] = qy - (b.oy + lx * os + ly * oc);
+}
+const tmpA = [0, 0], tmpB = [0, 0];
+
+class Sim {
+  constructor(Wc, Hc) {
+    this.Wc = Wc; this.Hc = Hc;
+    this.items = []; this.P = []; this.links = []; this.loop = []; this.loopLinks = []; this.closed = true;
+    this.g = 2200; this.alpha = 2e-5; this.maxF = 25000; this.mu = 0.42;
+    this.hook = { x: Wc / 2, y: 0 }; this.drag = null; this.grace = 0; this.sub = 10; this.thick = 3;
+    this.onRip = null; this.segs = []; this.slack = 1; this.linkIters = 1; this.bagMu = 0.3; this.minRatio = 0.35; this.linkDamp = 0; this.rigidDamp = 0; this.itemRigid = 0.5;
+  }
+
+  static restGeom(style, hang, Wc, Hc, bw, bh) {
+    const g = { hookX: Wc / 2 };
+    if (style === 'knot') { g.hookY = 0.13 * Hc; g.yTop = g.hookY + 0.12 * Hc; }
+    else if (style === 'diecut') { g.tabW = 0.32 * bw; g.tabLen = 1.18 * g.tabW; g.hookY = 0.06 * Hc; g.yTop = g.hookY + g.tabLen + 0.11 * Hc; }
+    else { g.hookY = -0.08 * Hc; g.yTop = 0.17 * Hc; g.hs = 0.44 * bw; }
+    g.yBot = Math.min(g.yTop + bh, Hc * 0.965);
+    if (!hang) {
+      const dy = (Hc - 4) - g.yBot;
+      g.hookY += dy; g.yTop += dy; g.yBot += dy;
+    }
+    return g;
+  }
+
+  buildBag(o) {
+    // o: {style, hang, bw, bh, keepB}
+    const { style, hang, bw, bh } = o;
+    const g = Sim.restGeom(style, hang, this.Wc, this.Hc, bw, bh);
+    const old = o.keepB ? { P: this.P, B: this.Bidx, links: this.links, loopLinksB: this.Blinks } : null;
+    const P = [], links = [];
+    const sp = bw / 22, cx = g.hookX;
+    this.style = style; this.hang = hang; this.geom = g; this.bw = bw; this.bh = bh;
+    this.hook = { x: cx, y: g.hookY };
+    const add = (x, y, role, wInv = 1 / 0.12) => { P.push({ x, y, ox: x, oy: y, vx: 0, vy: 0, w: wInv, pin: false, role }); return P.length - 1; };
+    const link = (a, b, kind, opt = {}) => {
+      const L = Math.hypot(P[b].x - P[a].x, P[b].y - P[a].y);
+      links.push({ a, b, L, kind, lam: 0, f: 0, broken: false,
+        rope: kind !== 'brace' && kind !== 'tab', stiff: kind === 'brace' || kind === 'tab',
+        rip: kind === 'bag' || kind === 'top' || kind === 'handle', collide: !!opt.collide });
+      return links.length - 1;
+    };
+    const x0 = cx - bw / 2, x1 = cx + bw / 2, rc = 0.2 * bw, yT = g.yTop, yB = g.yBot;
+    const path = [[x0, yT], [x0, yB - rc]];
+    for (let i = 1; i <= 8; i++) { const t = Math.PI - (Math.PI / 2) * i / 8; path.push([x0 + rc + rc * Math.cos(t), yB - rc + rc * Math.sin(t)]); }
+    path.push([x1 - rc, yB]);
+    for (let i = 1; i <= 8; i++) { const t = Math.PI / 2 - (Math.PI / 2) * i / 8; path.push([x1 - rc + rc * Math.cos(t), yB - rc + rc * Math.sin(t)]); }
+    path.push([x1, yT]);
+    const Bp = resample(path, sp);
+    const B = Bp.map(p => add(p[0], p[1], 'B'));
+    const pinIt = (i) => { P[i].anchor = true; P[i].offX = P[i].x - cx; P[i].offY = P[i].y - g.hookY; P[i].pin = !!hang; };
+    let loop = [];
+    const loopLinks = [];
+    const Blinks = [];
+    if (style === 'knot' || style === 'diecut') {
+      let AL, AR, tl, tr;
+      if (style === 'knot') {
+        AL = AR = add(cx, g.hookY, 'A');
+        tl = resample([[cx, g.hookY], Bp[0]], sp).slice(1, -1);
+        tr = resample([Bp[Bp.length - 1], [cx, g.hookY]], sp).slice(1, -1);
+      } else {
+        AL = add(cx - g.tabW / 2, g.hookY, 'A'); AR = add(cx + g.tabW / 2, g.hookY, 'A');
+        tl = resample([[cx - g.tabW / 2, g.hookY], [cx - g.tabW / 2, g.hookY + g.tabLen], Bp[0]], sp).slice(1, -1);
+        tr = resample([Bp[Bp.length - 1], [cx + g.tabW / 2, g.hookY + g.tabLen], [cx + g.tabW / 2, g.hookY]], sp).slice(1, -1);
+      }
+      pinIt(AL); if (AR !== AL) pinIt(AR);
+      const TL = tl.map(p => add(p[0], p[1], 'T')), TR = tr.map(p => add(p[0], p[1], 'T'));
+      loop = [AL, ...TL, ...B, ...TR];
+      if (AR !== AL) loop.push(AR);
+      for (let i = 0; i < loop.length; i++) {
+        const a = loop[i], b = loop[(i + 1) % loop.length];
+        const kind = (i === loop.length - 1 && AR !== AL) ? 'tab' : (P[a].role === 'B' && P[b].role === 'B' ? 'bag' : 'top');
+        const li = link(a, b, kind, { collide: true });
+        loopLinks.push(li);
+        if (kind === 'bag') Blinks.push(li);
+      }
+      if (style === 'diecut') {
+        const lim = g.hookY + g.tabLen + 1;
+        const Lt = [AL, ...TL.filter(i => P[i].y <= lim)];
+        const Rt = [AR, ...TR.filter(i => P[i].y <= lim).reverse()];
+        const n = Math.min(Lt.length, Rt.length);
+        for (let k = 0; k < n; k++) {
+          if (k > 0) link(Lt[k], Rt[k], 'brace');
+          if (k + 1 < n) { link(Lt[k], Rt[k + 1], 'brace'); link(Rt[k], Lt[k + 1], 'brace'); }
+          if (k + 2 < n) { link(Lt[k], Lt[k + 2], 'brace'); link(Rt[k], Rt[k + 2], 'brace'); }
+        }
+      }
+      this.closed = true;
+    } else {
+      loop = [...B];
+      for (let i = 0; i < B.length - 1; i++) { const li = link(B[i], B[i + 1], 'bag', { collide: true }); loopLinks.push(li); Blinks.push(li); }
+      const hl = resample([Bp[0], [cx - g.hs / 2, g.hookY]], sp).slice(1);
+      const hr = resample([Bp[Bp.length - 1], [cx + g.hs / 2, g.hookY]], sp).slice(1);
+      const HL = hl.map(p => add(p[0], p[1], 'H')), HR = hr.map(p => add(p[0], p[1], 'H'));
+      pinIt(HL[HL.length - 1]); pinIt(HR[HR.length - 1]);
+      let prev = B[0]; for (const i of HL) { link(prev, i, 'handle'); prev = i; }
+      prev = B[B.length - 1]; for (const i of HR) { link(prev, i, 'handle'); prev = i; }
+      this.handleL = [B[0], ...HL]; this.handleR = [B[B.length - 1], ...HR];
+      this.closed = false;
+    }
+    // carry over B chain state (style switch)
+    if (old && old.B && old.B.length === B.length) {
+      for (let i = 0; i < B.length; i++) {
+        const s = old.P[old.B[i]], d = P[B[i]];
+        d.x = s.x; d.y = s.y; d.ox = s.ox; d.oy = s.oy; d.vx = s.vx; d.vy = s.vy;
+      }
+      for (let i = 0; i < Blinks.length && i < old.loopLinksB.length; i++) links[Blinks[i]].broken = old.links[old.loopLinksB[i]].broken;
+      // place non-B particles on straight lines between their chain neighbours' current positions
+      if (o.hookX != null && hang) this.hook.x = o.hookX;
+      this._relaxTop(P, links, B);
+      this.grace = 0.6;
+    } else this.grace = 1.2;
+    this.P = P; this.links = links; this.loop = loop; this.loopLinks = loopLinks; this.Bidx = B; this.Blinks = Blinks;
+    this.sp = sp;
+  }
+
+  _relaxTop(P, links, B) {
+    // move pinned anchors to hook; interpolate chain particles between corner and anchor
+    const chains = [];
+    const Bset = new Set(B);
+    // walk from each B end through non-B links
+    const adj = new Map();
+    for (const L of links) { if (L.kind === 'brace') continue; (adj.get(L.a) || adj.set(L.a, []).get(L.a)).push(L.b); (adj.get(L.b) || adj.set(L.b, []).get(L.b)).push(L.a); }
+    for (const start of [B[0], B[B.length - 1]]) {
+      const chain = [start]; const seen = new Set([start]); let cur = start;
+      for (;;) {
+        const nx = (adj.get(cur) || []).find(j => !seen.has(j) && !Bset.has(j));
+        if (nx === undefined) break;
+        chain.push(nx); seen.add(nx); cur = nx;
+        if (P[nx].anchor) break;
+      }
+      chains.push(chain);
+    }
+    for (const ch of chains) {
+      const s = P[ch[0]], e = P[ch[ch.length - 1]];
+      const ex = this.hook.x + (e.offX || 0), ey = this.hook.y + (e.offY || 0);
+      for (let k = 1; k < ch.length; k++) {
+        const t = k / (ch.length - 1), p = P[ch[k]];
+        p.x = p.ox = s.x + (ex - s.x) * t; p.y = p.oy = s.y + (ey - s.y) * t; p.vx = p.vy = 0;
+      }
+    }
+    for (const L of links) {
+      if (L.kind !== 'top' && L.kind !== 'handle') continue;
+      const d = Math.hypot(P[L.b].x - P[L.a].x, P[L.b].y - P[L.a].y);
+      if (d > L.L) L.L = d;
+    }
+  }
+
+  setHang(h) {
+    this.hang = h;
+    for (const p of this.P) if (p.anchor) {
+      p.pin = h;
+    }
+  }
+
+  // ---- items ----
+  makeItem(shape, scale, x, y, a = 0) {
+    const it = { shape, x, y, a, ox: x, oy: y, oa: a, vx: 0, vy: 0, va: 0, size: 1 };
+    this.setScale(it, scale);
+    return it;
+  }
+  setScale(it, s) {
+    it.scale = s;
+    it.circles = it.shape.circles.map(c => ({ lx: c.x * s, ly: c.y * s, r: c.r * s }));
+    const m = it.shape.area * s * s * DENS, I = it.shape.I * s ** 4 * DENS;
+    it.invM = 1 / m; it.invI = 1 / I;
+    it.br = Math.max(...it.circles.map(c => Math.hypot(c.lx, c.ly) + c.r));
+  }
+
+  // pack items into the bag rest body
+  pack(items) {
+    const g = this.geom, bw = this.bw, cx = this.hook.x;
+    const xl = cx - bw / 2 + 6, xr = cx + bw / 2 - 6;
+    const placed = [];
+    const order = items.slice().sort((a, b) => b.br - a.br);
+    for (const it of order) {
+      const r = Math.min(it.br, (xr - xl) / 2);
+      let best = null;
+      for (let k = 0; k <= 16; k++) {
+        const x = xl + r + (xr - xl - 2 * r) * (k / 16);
+        let y = g.yBot - r - 4;
+        for (const q of placed) {
+          const dx = Math.abs(q.x - x), rr = q.r + r;
+          if (dx < rr) { const yy = q.y - Math.sqrt(rr * rr - dx * dx); if (yy < y) y = yy; }
+        }
+        // verify no overlaps (approx)
+        if (!best || y > best.y + 0.5) best = { x, y };
+      }
+      it.x = it.ox = best.x; it.y = it.oy = best.y; it.a = it.oa = (Math.random() - 0.5) * 0.8;
+      it.vx = it.vy = it.va = 0;
+      placed.push({ x: best.x, y: best.y, r: r * 0.92 });
+    }
+  }
+
+  insidePoly(x, y) {
+    const lp = this.loop, P = this.P; let c = false;
+    for (let i = 0, j = lp.length - 1; i < lp.length; j = i++) {
+      const a = P[lp[i]], b = P[lp[j]];
+      if ((a.y > y) !== (b.y > y) && x < (b.x - a.x) * (y - a.y) / (b.y - a.y) + a.x) c = !c;
+    }
+    return c;
+  }
+  spawnPoint(it) {
+    const P = this.P, B = this.Bidx;
+    const a = P[B[0]], b = P[B[B.length - 1]];
+    if (!this.closed) {
+      const x = (a.x + b.x) / 2 + (Math.random() - 0.5) * 40;
+      let y = Math.min(a.y, b.y) - it.br - 40;
+      for (const o of this.items) if (Math.abs(o.x - x) < o.br + it.br) y = Math.min(y, o.y - o.br - it.br - 12);
+      return { x, y };
+    }
+    let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9;
+    for (const i of this.loop) { const p = P[i]; x0 = Math.min(x0, p.x); x1 = Math.max(x1, p.x); y0 = Math.min(y0, p.y); y1 = Math.max(y1, p.y); }
+    let best = null, bs = -1e9;
+    for (let k = 0; k < 60; k++) {
+      const x = x0 + Math.random() * (x1 - x0), y = y0 + Math.random() * (y1 - y0);
+      if (!this.insidePoly(x, y)) continue;
+      let clr = 1e9;
+      for (const o of this.items) clr = Math.min(clr, Math.hypot(o.x - x, o.y - y) - o.br - it.br);
+      for (const i of this.loop) clr = Math.min(clr, Math.hypot(P[i].x - x, P[i].y - y) - it.br * 0.8);
+      const score = clr - (y - y0) * 0.02;
+      if (score > bs) { bs = score; best = { x, y }; }
+    }
+    if (!best) best = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+    return best;
+  }
+
+  shake(power = 1) {
+    for (const b of this.items) { b.vy -= (700 + Math.random() * 500) * power; b.vx += (Math.random() - 0.5) * 600 * power; b.va += (Math.random() - 0.5) * 8 * power; }
+    for (const p of this.P) if (!p.pin) { p.vy -= 500 * power; p.vx += (Math.random() - 0.5) * 200 * power; }
+  }
+
+  step(dt) {
+    const n = this.sub, h = dt / n;
+    this.segs.length = 0;
+    for (const li of this.loopLinks) { const L = this.links[li]; if (!L.broken) this.segs.push(L); }
+    if (this.rigidDamp > 0) for (const b of this.items) b.inside = this.insidePoly(b.x, b.y) && !(this.drag && this.drag.item === b);
+    // close polygon for knot: last link included. Closed die-cut includes tab link (in loopLinks).
+    for (let s = 0; s < n; s++) this.substep(h);
+    if (this.grace > 0) this.grace -= dt;
+  }
+
+  substep(h) {
+    const g = this.g, P = this.P, items = this.items, h2 = h * h;
+    for (const b of items) {
+      b.ox = b.x; b.oy = b.y; b.oa = b.a;
+      b.vy += g * h; b.x += b.vx * h; b.y += b.vy * h; b.a += b.va * h;
+    }
+    for (const p of P) {
+      p.ox = p.x; p.oy = p.y;
+      if (p.pin) { p.x = this.hook.x + p.offX; p.y = this.hook.y + p.offY; continue; }
+      p.vy += g * h; p.x += p.vx * h; p.y += p.vy * h;
+    }
+    for (const L of this.links) L.lam = 0;
+    for (let it = 0; it < 2; it++) {
+      for (let k = 0; k < this.linkIters; k++) this.solveLinks(h2, (it + k) & 1);
+      this.solveItems();
+      this.solveItemBag();
+      this.solveBounds();
+    }
+    this.solveSelf();
+    this.solveDrag(h2);
+    const inv = 1 / h, VMAX = 3600;
+    const lin = Math.exp(-0.25 * h), ang = Math.exp(-1.6 * h), air = Math.exp(-2.2 * h);
+    for (const b of items) {
+      b.vx = (b.x - b.ox) * inv * lin; b.vy = (b.y - b.oy) * inv * lin; b.va = (b.a - b.oa) * inv * ang;
+      const sp = Math.hypot(b.vx, b.vy); if (sp > VMAX) { b.vx *= VMAX / sp; b.vy *= VMAX / sp; }
+      if (b.va > 25) b.va = 25; else if (b.va < -25) b.va = -25;
+    }
+    for (const p of P) {
+      p.vx = (p.x - p.ox) * inv; p.vy = (p.y - p.oy) * inv;
+      if (p.pin) continue;
+      p.vx *= air; p.vy *= air;
+      const sp = Math.hypot(p.vx, p.vy); if (sp > VMAX) { p.vx *= VMAX / sp; p.vy *= VMAX / sp; }
+    }
+    if (this.rigidDamp > 0) this.dampRigid(h);
+    if (this.linkDamp > 0) {
+      const kd = this.linkDamp;
+      for (const L of this.links) {
+        if (L.broken) continue;
+        const a = P[L.a], b = P[L.b], wa = a.pin ? 0 : a.w, wb = b.pin ? 0 : b.w, ws = wa + wb;
+        if (!ws) continue;
+        let nx = b.x - a.x, ny = b.y - a.y; const d = Math.hypot(nx, ny) || 1; nx /= d; ny /= d;
+        const dv = ((b.vx - a.vx) * nx + (b.vy - a.vy) * ny) * kd / ws;
+        a.vx += nx * dv * wa; a.vy += ny * dv * wa; b.vx -= nx * dv * wb; b.vy -= ny * dv * wb;
+      }
+    }
+    if (this.grace <= 0 && isFinite(this.maxF)) {
+      for (const L of this.links) {
+        if (!L.rip || L.broken) continue;
+        const f = -L.lam / h2;
+        L.f += (f - L.f) * 0.012;
+        if (L.f > this.maxF) { L.broken = true; L.f = 0; if (this.onRip) this.onRip(L); this.segs = this.segs.filter(s => s !== L); }
+      }
+    } else for (const L of this.links) { const f = -L.lam / h2; L.f += (f - L.f) * 0.012; }
+  }
+
+  // remove non-rigid (flopping) motion of the bag and its contents; rigid swinging is kept
+  dampRigid(h) {
+    const P = this.P, items = this.items, k = 1 - Math.exp(-this.rigidDamp * h), ki = k * this.itemRigid;
+    const pm = 1 / this.P[this.Bidx[0]].w;
+    let M = 0, cx = 0, cy = 0, vx = 0, vy = 0;
+    for (const p of P) { if (p.pin) continue; M += pm; cx += p.x * pm; cy += p.y * pm; vx += p.vx * pm; vy += p.vy * pm; }
+    for (const b of items) { if (!b.inside) continue; const m = 1 / b.invM; M += m; cx += b.x * m; cy += b.y * m; vx += b.vx * m; vy += b.vy * m; }
+    if (!M) return;
+    cx /= M; cy /= M; vx /= M; vy /= M;
+    let Lz = 0, I = 0;
+    for (const p of P) { if (p.pin) continue; const rx = p.x - cx, ry = p.y - cy; Lz += pm * (rx * (p.vy - vy) - ry * (p.vx - vx)); I += pm * (rx * rx + ry * ry); }
+    for (const b of items) { if (!b.inside) continue; const m = 1 / b.invM, rx = b.x - cx, ry = b.y - cy; Lz += m * (rx * (b.vy - vy) - ry * (b.vx - vx)) + b.va / b.invI; I += m * (rx * rx + ry * ry) + 1 / b.invI; }
+    const w = I > 0 ? Lz / I : 0;
+    for (const p of P) { if (p.pin) continue; const tx = vx - w * (p.y - cy), ty = vy + w * (p.x - cx); p.vx += (tx - p.vx) * k; p.vy += (ty - p.vy) * k; }
+    for (const b of items) { if (!b.inside) continue; const tx = vx - w * (b.y - cy), ty = vy + w * (b.x - cx); b.vx += (tx - b.vx) * ki; b.vy += (ty - b.vy) * ki; b.va += (w - b.va) * ki; }
+  }
+
+  solveLinks(h2, rev) {
+    const P = this.P, links = this.links, at = this.alpha / h2;
+    const n = links.length;
+    for (let k = 0; k < n; k++) {
+      const L = links[rev ? n - 1 - k : k];
+      if (L.broken) continue;
+      const a = P[L.a], b = P[L.b];
+      const wa = a.pin ? 0 : a.w, wb = b.pin ? 0 : b.w;
+      if (wa + wb === 0) continue;
+      const dx = b.x - a.x, dy = b.y - a.y, d = Math.hypot(dx, dy) || 1e-9;
+      const RL = L.rope && L.kind !== 'handle' ? L.L * this.slack : L.L;
+      let C = d - RL, al = L.stiff ? 0 : at, track = true;
+      if (L.rope && C <= 0) {
+        C = d - this.minRatio * RL; if (C >= 0) continue; al = 0; track = false;
+      }
+      const dl = (-C - al * (track ? L.lam : 0)) / (wa + wb + al);
+      if (track) L.lam += dl;
+      const nx = dx / d, ny = dy / d;
+      a.x -= wa * dl * nx; a.y -= wa * dl * ny; b.x += wb * dl * nx; b.y += wb * dl * ny;
+    }
+  }
+
+  solveItems() {
+    const items = this.items, mu = this.mu, n = items.length;
+    for (let i = 0; i < n; i++) {
+      const A = items[i];
+      for (let j = i + 1; j < n; j++) {
+        const B = items[j];
+        const ddx = B.x - A.x, ddy = B.y - A.y, rr = A.br + B.br;
+        if (ddx * ddx + ddy * ddy > rr * rr) continue;
+        for (const ca of A.circles) {
+          for (const cb of B.circles) {
+            const cA = Math.cos(A.a), sA = Math.sin(A.a), cB = Math.cos(B.a), sB = Math.sin(B.a);
+            const ax = A.x + ca.lx * cA - ca.ly * sA, ay = A.y + ca.lx * sA + ca.ly * cA;
+            const bx = B.x + cb.lx * cB - cb.ly * sB, by = B.y + cb.lx * sB + cb.ly * cB;
+            let dx = bx - ax, dy = by - ay; const d = Math.hypot(dx, dy);
+            let pen = ca.r + cb.r - d;
+            if (pen <= 0) continue;
+            if (pen > PMAX) pen = PMAX;
+            let nx, ny; if (d < 1e-6) { nx = 0; ny = 1; } else { nx = dx / d; ny = dy / d; }
+            const qx = ax + nx * (ca.r - pen * 0.5), qy = ay + ny * (ca.r - pen * 0.5);
+            const wA = genW(A, qx, qy, nx, ny), wB = genW(B, qx, qy, nx, ny);
+            const dl = pen / (wA + wB);
+            imp(A, qx, qy, -nx * dl, -ny * dl); imp(B, qx, qy, nx * dl, ny * dl);
+            disp(A, qx, qy, tmpA); disp(B, qx, qy, tmpB);
+            let rx = tmpA[0] - tmpB[0], ry = tmpA[1] - tmpB[1];
+            const rn = rx * nx + ry * ny; rx -= rn * nx; ry -= rn * ny;
+            const tl = Math.hypot(rx, ry);
+            if (tl > 1e-7) {
+              const tx = rx / tl, ty = ry / tl, corr = Math.min(tl, mu * dl);
+              const dlt = corr / (genW(A, qx, qy, tx, ty) + genW(B, qx, qy, tx, ty));
+              imp(A, qx, qy, -tx * dlt, -ty * dlt); imp(B, qx, qy, tx * dlt, ty * dlt);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  solveItemBag() {
+    const P = this.P, segs = this.segs, th = this.thick, mu = this.bagMu;
+    for (const b of this.items) {
+      for (const c of b.circles) {
+        for (const L of segs) {
+          const cb = Math.cos(b.a), sb = Math.sin(b.a);
+          const cx = b.x + c.lx * cb - c.ly * sb, cy = b.y + c.lx * sb + c.ly * cb;
+          const pa = P[L.a], pb = P[L.b];
+          const ex = pb.x - pa.x, ey = pb.y - pa.y;
+          const mx = (pa.x + pb.x) * 0.5 - cx, my = (pa.y + pb.y) * 0.5 - cy, lim = c.r + th + L.L;
+          if (mx * mx + my * my > lim * lim * 1.3) continue;
+          const ee = ex * ex + ey * ey || 1e-9;
+          let t = ((cx - pa.x) * ex + (cy - pa.y) * ey) / ee; t = t < 0 ? 0 : t > 1 ? 1 : t;
+          const sx = pa.x + ex * t, sy = pa.y + ey * t;
+          const dx = cx - sx, dy = cy - sy, d = Math.hypot(dx, dy);
+          let pen = c.r + th - d;
+          if (pen <= 0) continue;
+          if (pen > PMAX) pen = PMAX;
+          let nx, ny;
+          if (d < 1e-6) { nx = -ey / Math.sqrt(ee); ny = ex / Math.sqrt(ee); } else { nx = dx / d; ny = dy / d; }
+          const wa = pa.pin ? 0 : pa.w, wb = pb.pin ? 0 : pb.w;
+          const qx = cx - nx * c.r, qy = cy - ny * c.r;
+          const ws = (1 - t) * (1 - t) * wa + t * t * wb;
+          const dl = pen / (genW(b, qx, qy, nx, ny) + ws);
+          imp(b, qx, qy, nx * dl, ny * dl);
+          pa.x -= nx * dl * (1 - t) * wa; pa.y -= ny * dl * (1 - t) * wa;
+          pb.x -= nx * dl * t * wb; pb.y -= ny * dl * t * wb;
+          // friction
+          disp(b, qx, qy, tmpA);
+          const sdx = (pa.x - pa.ox) * (1 - t) + (pb.x - pb.ox) * t, sdy = (pa.y - pa.oy) * (1 - t) + (pb.y - pb.oy) * t;
+          let rx = tmpA[0] - sdx, ry = tmpA[1] - sdy;
+          const rn = rx * nx + ry * ny; rx -= rn * nx; ry -= rn * ny;
+          const tl = Math.hypot(rx, ry);
+          if (tl > 1e-7) {
+            const tx = rx / tl, ty = ry / tl, corr = Math.min(tl, mu * dl);
+            const dlt = corr / (genW(b, qx, qy, tx, ty) + ws);
+            imp(b, qx, qy, -tx * dlt, -ty * dlt);
+            pa.x += tx * dlt * (1 - t) * wa; pa.y += ty * dlt * (1 - t) * wa;
+            pb.x += tx * dlt * t * wb; pb.y += ty * dlt * t * wb;
+          }
+        }
+      }
+    }
+  }
+
+  solveBounds() {
+    const W = this.Wc, H = this.Hc, mu = this.mu;
+    for (const b of this.items) {
+      for (const c of b.circles) {
+        for (let side = 0; side < 3; side++) {
+          const cb = Math.cos(b.a), sb = Math.sin(b.a);
+          const cx = b.x + c.lx * cb - c.ly * sb, cy = b.y + c.lx * sb + c.ly * cb;
+          let pen, nx, ny;
+          if (side === 0) { pen = cy + c.r - H; nx = 0; ny = -1; }
+          else if (side === 1) { pen = c.r - cx; nx = 1; ny = 0; }
+          else { pen = cx + c.r - W; nx = -1; ny = 0; }
+          if (pen <= 0) continue;
+          const qx = cx - nx * c.r, qy = cy - ny * c.r;
+          const dl = pen / genW(b, qx, qy, nx, ny);
+          imp(b, qx, qy, nx * dl, ny * dl);
+          disp(b, qx, qy, tmpA);
+          let rx = tmpA[0], ry = tmpA[1]; const rn = rx * nx + ry * ny; rx -= rn * nx; ry -= rn * ny;
+          const tl = Math.hypot(rx, ry);
+          if (tl > 1e-7) {
+            const tx = rx / tl, ty = ry / tl, corr = Math.min(tl, mu * 1.2 * dl);
+            const dlt = corr / genW(b, qx, qy, tx, ty);
+            imp(b, qx, qy, -tx * dlt, -ty * dlt);
+          }
+        }
+      }
+    }
+    for (const p of this.P) {
+      if (p.pin) continue;
+      if (p.y > H - 2) { p.y = H - 2; p.x -= (p.x - p.ox) * 0.6; }
+      if (p.x < 2) p.x = 2; else if (p.x > W - 2) p.x = W - 2;
+    }
+  }
+
+  solveSelf() {
+    const P = this.P, lp = this.loop, n = lp.length, dmin = this.sp * 0.45, d2 = dmin * dmin;
+    for (let i = 0; i < n; i++) {
+      const a = P[lp[i]];
+      for (let j = i + 2; j < n; j++) {
+        if (this.closed && i === 0 && j === n - 1) continue;
+        const b = P[lp[j]];
+        const dx = b.x - a.x, dy = b.y - a.y, dd = dx * dx + dy * dy;
+        if (dd >= d2 || dd < 1e-9) continue;
+        const wa = a.pin ? 0 : a.w, wb = b.pin ? 0 : b.w; if (wa + wb === 0) continue;
+        const d = Math.sqrt(dd), k = (dmin - d) / (d * (wa + wb));
+        a.x -= dx * k * wa; a.y -= dy * k * wa; b.x += dx * k * wb; b.y += dy * k * wb;
+      }
+    }
+  }
+
+  solveDrag(h2) {
+    const D = this.drag; if (!D) return;
+    if (D.type === 'item') {
+      const b = D.item; if (this.items.indexOf(b) < 0) { this.drag = null; return; }
+      const c = Math.cos(b.a), s = Math.sin(b.a);
+      const qx = b.x + D.lx * c - D.ly * s, qy = b.y + D.lx * s + D.ly * c;
+      const dx = D.tx - qx, dy = D.ty - qy, C = Math.hypot(dx, dy);
+      if (C < 1e-6) return;
+      const nx = dx / C, ny = dy / C, al = 4e-7 / h2;
+      const dl = C / (genW(b, qx, qy, nx, ny) + al);
+      imp(b, qx, qy, nx * dl, ny * dl);
+      // damp spin while held
+      b.a = b.oa + (b.a - b.oa) * 0.9;
+    } else if (D.type === 'p') {
+      const p = this.P[D.i]; if (!p || p.pin) return;
+      const al = 3e-6 / h2, k = p.w / (p.w + al);
+      p.x += (D.tx - p.x) * k; p.y += (D.ty - p.y) * k;
+    }
+  }
+
+  // ---- queries ----
+  polygon() { return this.loop.map(i => this.P[i]); }
+  hitItem(x, y) {
+    for (let k = this.items.length - 1; k >= 0; k--) {
+      const b = this.items[k], c = Math.cos(b.a), s = Math.sin(b.a);
+      if ((x - b.x) ** 2 + (y - b.y) ** 2 > (b.br + 20) ** 2) continue;
+      for (const cc of b.circles) {
+        const cx = b.x + cc.lx * c - cc.ly * s, cy = b.y + cc.lx * s + cc.ly * c;
+        if ((x - cx) ** 2 + (y - cy) ** 2 <= (cc.r * 1.08 + 6) ** 2) return b;
+      }
+    }
+    return null;
+  }
+  hitParticle(x, y, r) {
+    let best = -1, bd = r * r;
+    this.P.forEach((p, i) => { const d = (p.x - x) ** 2 + (p.y - y) ** 2; if (d < bd) { bd = d; best = i; } });
+    return best;
+  }
+  toLocal(b, x, y) { const c = Math.cos(b.a), s = Math.sin(b.a), rx = x - b.x, ry = y - b.y; return [rx * c + ry * s, -rx * s + ry * c]; }
+  brokenCount() { return this.links.filter(l => l.broken).length; }
+}
+
+G.BagPhys = { Sim, makeShape, resample };
+})(typeof window !== 'undefined' ? window : globalThis);
+
+</script>
+<script>
+(() => {
+'use strict';
+const { Sim, makeShape } = window.BagPhys;
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const STORE = 'producebag.v1';
+const ASPECTS = { '1:1': [1080, 1080], '4:5': [1080, 1350], '3:4': [1080, 1440], '9:16': [1080, 1920] };
+const BG_SW = ['#cde3d6', '#ffffff', '#d4e2ee', '#f1d8d0', '#eee5c2', '#24292b'];
+const BAG_SW = ['#fbfbf9', '#ebebea', '#e4edf5', '#f6e5eb', '#f3f0de', '#e1eee5'];
+const DEF = { setupDone: false, aspect: '4:5', style: 'handles', hang: true, fill: 'oranges', bg: '#cde3d6', bagColor: '#fbfbf9',
+  frost: 0.62, haze: 0.18, opacity: 0.92, sheen: 0.25, stretch: 0.45, strength: 0.45, bagW: 0.5, bagH: 0.42,
+  itemSize: 1, gravity: 0.5, grainStyle: 'fine', grain: 0.42, caption: '', cut: 42 };
+let S = Object.assign({}, DEF);
+try { const s = JSON.parse(localStorage.getItem(STORE) || 'null'); if (s && typeof s === 'object') for (const k in DEF) if (k in s && typeof s[k] === typeof DEF[k]) S[k] = s[k]; } catch (e) {}
+if (!ASPECTS[S.aspect]) S.aspect = DEF.aspect;
+const save = () => { try { localStorage.setItem(STORE, JSON.stringify(S)); } catch (e) {} };
+
+const cv = $('#c'), ctx = cv.getContext('2d');
+let W = 1080, H = 1350, sim = null, sel = null, queue = [], nextSpawn = 0, photos = [], photoSeq = 0;
+const mk = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
+let bagL, bctx, sharpL, sctx2, itemL, ictx, blurL, fctx, smallL, sctx, grainPat = null;
+const Q = 0.5;
+
+/* ---------- capability check ---------- */
+const FILTER_OK = (() => { try { const c = mk(8, 8), x = c.getContext('2d'); x.filter = 'blur(2px)'; if (x.filter !== 'blur(2px)') return false; x.fillStyle = '#000'; x.fillRect(4, 4, 2, 2); return x.getImageData(2, 4, 1, 1).data[3] > 0; } catch (e) { return false; } })();
+
+/* ---------- samples ---------- */
+function rnd(a, b) { return a + Math.random() * (b - a); }
+const SAMPLES = {
+  orange: { label: 'Orange', size: 0.21, draw(x, c) {
+    c.width = c.height = 360; const r = 166, cx = 180, cy = 180, warm = Math.random() < 0.3;
+    const g = x.createRadialGradient(cx - 55, cy - 65, 8, cx, cy, r * 1.08);
+    if (warm) { g.addColorStop(0, '#f6913a'); g.addColorStop(0.6, '#f39443'); g.addColorStop(1, '#f9c26f'); }
+    else { g.addColorStop(0, '#dc4c2b'); g.addColorStop(0.5, '#e45f37'); g.addColorStop(0.82, '#ec8a4c'); g.addColorStop(1, '#f5bb6b'); }
+    x.fillStyle = g; x.beginPath(); x.arc(cx, cy, r, 0, 7); x.fill();
+    if (warm) { const p = x.createRadialGradient(cx - 90, cy + 90, 4, cx - 90, cy + 90, 150); p.addColorStop(0, 'rgba(244,92,140,.75)'); p.addColorStop(1, 'rgba(244,92,140,0)'); x.fillStyle = p; x.globalCompositeOperation = 'source-atop'; x.fillRect(0, 0, 360, 360); x.globalCompositeOperation = 'source-over'; }
+    const t = rnd(-2.6, -0.5), sx = cx + Math.cos(t) * r * 0.55, sy = cy + Math.sin(t) * r * 0.55;
+    x.fillStyle = '#2b9a72'; x.beginPath(); x.ellipse(sx, sy, 21, 13, t + 1.4, 0, 7); x.fill();
+  } },
+  lemon: { label: 'Lemon', size: 0.2, draw(x, c) {
+    c.width = 380; c.height = 280;
+    x.beginPath(); x.ellipse(190, 140, 158, 116, rnd(-0.05, 0.05), 0, 7);
+    x.ellipse(28, 146, 26, 17, 0.2, 0, 7); x.ellipse(352, 133, 24, 15, 0.2, 0, 7);
+    fruitFill(x, 190, 140, 158, ['#eaa90c', '#f3bf1c', '#f8d43c', '#fde98f']);
+    blush(x, 150, 210, 140, 'rgba(176,206,70,.45)', c);
+    dot(x, 352, 133, 9, 6, 0.2, '#2b9a72');
+  } },
+  lime: { label: 'Lime', size: 0.155, draw(x, c) {
+    c.width = 310; c.height = 270;
+    x.beginPath(); x.ellipse(155, 135, 138, 122, 0, 0, 7);
+    fruitFill(x, 155, 135, 138, ['#3a8a2b', '#4f9f30', '#7cbd43', '#d2e98a']);
+    if (Math.random() < 0.4) blush(x, 90, 200, 120, 'rgba(240,210,80,.5)', c);
+    const t = rnd(-2.6, -0.6); dot(x, 155 + Math.cos(t) * 70, 135 + Math.sin(t) * 64, 16, 11, t + 1.4, '#2f6f2a');
+  } },
+  apple: { label: 'Apple', size: 0.19, draw(x, c) {
+    c.width = 340; c.height = 360;
+    x.beginPath();
+    x.moveTo(170, 92); x.bezierCurveTo(240, 50, 335, 90, 330, 190); x.bezierCurveTo(325, 290, 250, 355, 205, 345);
+    x.bezierCurveTo(185, 340, 155, 340, 135, 345); x.bezierCurveTo(90, 355, 15, 290, 10, 190); x.bezierCurveTo(5, 90, 100, 50, 170, 92);
+    fruitFill(x, 170, 200, 165, ['#c42530', '#d63a35', '#e8673f', '#f6b866']);
+    blush(x, 90, 270, 150, 'rgba(244,92,140,.6)', c);
+    x.strokeStyle = '#3d454c'; x.lineWidth = 12; x.lineCap = 'round'; x.beginPath(); x.moveTo(170, 100); x.quadraticCurveTo(168, 50, 186, 22); x.stroke();
+    dot(x, 222, 46, 36, 15, -0.45, '#2b9a72');
+  } },
+  pumpkin: { label: 'Pumpkin', size: 0.4, draw(x, c) {
+    c.width = 440; c.height = 350;
+    x.beginPath();
+    for (const [ex, rx] of [[118, 112], [322, 112], [220, 124]]) { x.moveTo(ex + rx, 214); x.ellipse(ex, 214, rx, 128, 0, 0, 7); }
+    fruitFill(x, 220, 214, 215, ['#e04d0a', '#ef620f', '#f5843a', '#fbc06a']);
+    blush(x, 80, 300, 160, 'rgba(244,92,120,.35)', c);
+    x.strokeStyle = 'rgba(190,60,0,.18)'; x.lineWidth = 7; x.globalCompositeOperation = 'source-atop';
+    for (const ex of [168, 272]) { x.beginPath(); x.moveTo(ex, 110); x.quadraticCurveTo(ex + (ex < 220 ? -14 : 14), 214, ex, 330); x.stroke(); }
+    x.globalCompositeOperation = 'source-over';
+    x.strokeStyle = '#3d454c'; x.lineWidth = 34; x.lineCap = 'round'; x.beginPath(); x.moveTo(214, 110); x.quadraticCurveTo(206, 48, 258, 26); x.stroke();
+  } },
+};
+// shared look: a deep core up and to the left, warming to a pale rim, like the oranges
+function fruitFill(x, cx, cy, R, cols) {
+  const g = x.createRadialGradient(cx - R * 0.33, cy - R * 0.39, 8, cx, cy, R * 1.08);
+  g.addColorStop(0, cols[0]); g.addColorStop(0.5, cols[1]); g.addColorStop(0.82, cols[2]); g.addColorStop(1, cols[3]);
+  x.fillStyle = g; x.fill();
+}
+function blush(x, bx, by, r, col, c) {
+  const p = x.createRadialGradient(bx, by, 4, bx, by, r); p.addColorStop(0, col); p.addColorStop(1, col.replace(/[\d.]+\)$/, '0)'));
+  x.save(); x.globalCompositeOperation = 'source-atop'; x.fillStyle = p; x.fillRect(0, 0, c.width, c.height); x.restore();
+}
+function dot(x, px, py, rx, ry, a, col) { x.fillStyle = col; x.beginPath(); x.ellipse(px, py, rx, ry, a, 0, 7); x.fill(); }
+const texCache = {};
+function alphaOf(c) { const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data, a = new Uint8Array(c.width * c.height); for (let i = 0; i < a.length; i++) a[i] = d[i * 4 + 3]; return a; }
+function avgColor(c) {
+  const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let r = 0, g = 0, b = 0, n = 0;
+  for (let i = 0; i < d.length; i += 16) if (d[i + 3] > 200) { r += d[i]; g += d[i + 1]; b += d[i + 2]; n++; }
+  return n ? [r / n, g / n, b / n] : [200, 120, 80];
+}
+function texInfo(c) { return { tex: c, shape: makeShape(alphaOf(c), c.width, c.height), avg: avgColor(c) }; }
+function sampleTex(kind) {
+  const list = texCache[kind] || (texCache[kind] = []);
+  if (list.length < 4) { const c = mk(10, 10); SAMPLES[kind].draw(c.getContext('2d'), c); list.push(texInfo(c)); return list[list.length - 1]; }
+  return list[(Math.random() * list.length) | 0];
+}
+
+/* ---------- world ---------- */
+function bagOpts(keep) { return { style: S.style, hang: S.hang, bw: W * S.bagW, bh: H * S.bagH, keepB: !!keep, hookX: sim ? sim.hook.x : undefined }; }
+function applyPhys() {
+  if (!sim) return;
+  const s = S.stretch;
+  sim.slack = s < 0.45 ? 0.91 + 0.09 * (s / 0.45) : 1 + 0.1 * ((s - 0.45) / 0.55);
+  sim.alpha = 1.6e-4 * s * s * s;
+  const t = Math.max(0, 1 - s / 0.45);
+  sim.linkIters = s < 0.45 ? 2 + Math.round(t * 6) : 1 + Math.round((1 - s) * 3);
+  sim.minRatio = 0.35 + 0.6 * t * t;
+  sim.linkDamp = 0.2 + 0.75 * t;
+  sim.rigidDamp = 80 * t * t;
+  sim.bagMu = 0.3 + (1 - s) * 0.9;
+  sim.maxF = S.strength >= 0.995 ? Infinity : 30000 * Math.pow(8, S.strength) * (1 + 1.2 * (1 - s) * (1 - s));
+  sim.g = 300 + S.gravity * 3800;
+}
+function setLayers() {
+  bagL = mk(W, H); bctx = bagL.getContext('2d'); sharpL = mk(W, H); sctx2 = sharpL.getContext('2d');
+  itemL = mk(Math.round(W * Q), Math.round(H * Q)); ictx = itemL.getContext('2d');
+  blurL = mk(itemL.width, itemL.height); fctx = blurL.getContext('2d');
+  smallL = mk(8, 8); sctx = smallL.getContext('2d');
+}
+function newItem(info, base, kind, extra) {
+  const it = sim.makeItem(info.shape, base * S.itemSize, 0, 0, rnd(-0.6, 0.6));
+  it.tex = info.tex; it.avg = info.avg; it.base = base; it.kind = kind; it.info = info;
+  return Object.assign(it, extra || {});
+}
+function sampleItem(kind) {
+  const info = sampleTex(kind), c = info.tex;
+  return newItem(info, SAMPLES[kind].size * W / Math.max(c.width, c.height), kind);
+}
+const FILLS = { oranges: ['orange', 'orange', 'orange', 'orange'], lemons: ['lemon', 'lemon', 'lemon', 'lemon', 'lemon', 'lemon'], pumpkin: ['pumpkin'], mixed: ['orange', 'lemon', 'apple', 'lime', 'orange', 'lemon'], empty: [] };
+function buildWorld(fill) {
+  [W, H] = ASPECTS[S.aspect];
+  cv.width = W; cv.height = H; setLayers();
+  sim = null; sel = null; queue = [];
+  sim = new Sim(W, H); applyPhys();
+  sim.buildBag(bagOpts(false));
+  (FILLS[fill] || []).forEach(k => sim.items.push(sampleItem(k)));
+  sim.pack(sim.items);
+  settle(80);
+  fit(); updateSel(); updateCut();
+}
+function settle(n) { for (let i = 0; i < n; i++) sim.step(1 / 60); }
+function refill() {
+  sim.buildBag(bagOpts(false));
+  sim.pack(sim.items);
+  settle(50);
+}
+function rescaleAll() { for (const it of sim.items) sim.setScale(it, it.base * S.itemSize * it.size); }
+function enqueue(items) { for (const it of items) queue.push(it); }
+function spawnFromQueue(now) {
+  if (!queue.length || now < nextSpawn) return;
+  if (sim.items.length >= 48) { queue = []; return; }
+  const it = queue.shift(), p = sim.spawnPoint(it);
+  it.x = it.ox = p.x; it.y = it.oy = p.y; it.vx = it.vy = 0;
+  sim.items.push(it); nextSpawn = now + 260;
+}
+
+/* ---------- background removal ---------- */
+function loadFile(file) {
+  return new Promise((res, rej) => {
+    const url = URL.createObjectURL(file), img = new Image();
+    img.onload = () => {
+      const s = Math.min(1, 720 / Math.max(img.naturalWidth, img.naturalHeight));
+      const c = mk(Math.max(1, Math.round(img.naturalWidth * s)), Math.max(1, Math.round(img.naturalHeight * s)));
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(url); res(c);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); rej(new Error('That file could not be read as an image.')); };
+    img.src = url;
+  });
+}
+function cutout(src, tol) {
+  const w = src.width, h = src.height, N = w * h;
+  const d = src.getContext('2d').getImageData(0, 0, w, h).data;
+  const bg = new Uint8Array(N), border = [];
+  for (let x = 0; x < w; x++) { border.push(x, (h - 1) * w + x); }
+  for (let y = 1; y < h - 1; y++) { border.push(y * w, y * w + w - 1); }
+  let clear = 0; for (const i of border) if (d[i * 4 + 3] < 200) clear++;
+  if (clear > border.length * 0.1) {
+    for (let i = 0; i < N; i++) bg[i] = d[i * 4 + 3] < 110 ? 1 : 0;
+  } else {
+    // border palette by k-means
+    const pts = border.filter((_, k) => k % 3 === 0).map(i => [d[i * 4], d[i * 4 + 1], d[i * 4 + 2]]);
+    let C = [pts[0], pts[(pts.length / 3) | 0], pts[(2 * pts.length / 3) | 0]].map(p => p.slice());
+    let cnt = [0, 0, 0];
+    for (let it = 0; it < 8; it++) {
+      const acc = C.map(() => [0, 0, 0]); cnt = [0, 0, 0];
+      for (const p of pts) { let bi = 0, bd = 1e9; C.forEach((c, k) => { const dd = (p[0] - c[0]) ** 2 + (p[1] - c[1]) ** 2 + (p[2] - c[2]) ** 2; if (dd < bd) { bd = dd; bi = k; } }); cnt[bi]++; acc[bi][0] += p[0]; acc[bi][1] += p[1]; acc[bi][2] += p[2]; }
+      C = C.map((c, k) => cnt[k] ? acc[k].map(v => v / cnt[k]) : c);
+    }
+    const cen = C.filter((_, k) => cnt[k] >= pts.length * 0.08);
+    const dist = new Float32Array(N);
+    for (let i = 0; i < N; i++) {
+      let m = 1e9; const r = d[i * 4], g = d[i * 4 + 1], b = d[i * 4 + 2];
+      for (const c of cen) { const dd = (r - c[0]) ** 2 * 0.9 + (g - c[1]) ** 2 * 1.2 + (b - c[2]) ** 2 * 0.9; if (dd < m) m = dd; }
+      dist[i] = Math.sqrt(m);
+    }
+    const q = new Int32Array(N); let qh = 0, qt = 0;
+    for (const i of border) if (!bg[i] && dist[i] < tol) { bg[i] = 1; q[qt++] = i; }
+    while (qh < qt) {
+      const i = q[qh++], x = i % w, y = (i / w) | 0;
+      if (x > 0 && !bg[i - 1] && dist[i - 1] < tol) { bg[i - 1] = 1; q[qt++] = i - 1; }
+      if (x < w - 1 && !bg[i + 1] && dist[i + 1] < tol) { bg[i + 1] = 1; q[qt++] = i + 1; }
+      if (y > 0 && !bg[i - w] && dist[i - w] < tol) { bg[i - w] = 1; q[qt++] = i - w; }
+      if (y < h - 1 && !bg[i + w] && dist[i + w] < tol) { bg[i + w] = 1; q[qt++] = i + w; }
+    }
+    // enclosed pockets of background colour (gaps between objects)
+    const seen = new Uint8Array(N), t2 = tol * 0.6;
+    for (let s = 0; s < N; s++) {
+      if (bg[s] || seen[s] || dist[s] >= t2) continue;
+      qh = 0; qt = 0; q[qt++] = s; seen[s] = 1;
+      while (qh < qt) { const i = q[qh++], x = i % w, y = (i / w) | 0;
+        for (const j of [x > 0 ? i - 1 : -1, x < w - 1 ? i + 1 : -1, y > 0 ? i - w : -1, y < h - 1 ? i + w : -1])
+          if (j >= 0 && !seen[j] && !bg[j] && dist[j] < t2) { seen[j] = 1; q[qt++] = j; } }
+      if (qt > N * 0.003) for (let k = 0; k < qt; k++) bg[q[k]] = 1;
+    }
+  }
+  // open: erode then dilate the subject mask
+  let m = new Uint8Array(N); for (let i = 0; i < N; i++) m[i] = bg[i] ? 0 : 1;
+  const morph = (src, keepIfAll) => { const o = new Uint8Array(N); for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) { const i = y * w + x;
+    const a = src[i], l = x ? src[i - 1] : 0, r = x < w - 1 ? src[i + 1] : 0, u = y ? src[i - w] : 0, dn = y < h - 1 ? src[i + w] : 0;
+    o[i] = keepIfAll ? (a & l & r & u & dn) : (a | l | r | u | dn); } return o; };
+  m = morph(morph(m, true), false);
+  // components
+  const lab = new Int32Array(N).fill(-1), comps = [], q = new Int32Array(N);
+  for (let s = 0; s < N; s++) {
+    if (!m[s] || lab[s] >= 0) continue;
+    let qh = 0, qt = 0; q[qt++] = s; lab[s] = comps.length; let x0 = w, x1 = 0, y0 = h, y1 = 0;
+    while (qh < qt) { const i = q[qh++], x = i % w, y = (i / w) | 0;
+      if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y;
+      for (const j of [x > 0 ? i - 1 : -1, x < w - 1 ? i + 1 : -1, y > 0 ? i - w : -1, y < h - 1 ? i + w : -1])
+        if (j >= 0 && m[j] && lab[j] < 0) { lab[j] = comps.length; q[qt++] = j; } }
+    comps.push({ id: comps.length, n: qt, x0, x1, y0, y1 });
+  }
+  if (!comps.length) return [];
+  const big = Math.max(...comps.map(c => c.n));
+  const keep = comps.filter(c => c.n >= Math.max(big * 0.12, N * 0.004)).sort((a, b) => b.n - a.n).slice(0, 8);
+  return keep.map(c => {
+    const pad = 3, cw = c.x1 - c.x0 + 1 + pad * 2, ch = c.y1 - c.y0 + 1 + pad * 2;
+    const out = mk(cw, ch), ox = out.getContext('2d'), od = ox.createImageData(cw, ch);
+    for (let y = 0; y < ch; y++) for (let x = 0; x < cw; x++) {
+      const sx = x + c.x0 - pad, sy = y + c.y0 - pad; if (sx < 0 || sy < 0 || sx >= w || sy >= h) continue;
+      let a = 0; for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) { const xx = sx + dx, yy = sy + dy; if (xx >= 0 && yy >= 0 && xx < w && yy < h && lab[yy * w + xx] === c.id) a++; }
+      if (!a) continue;
+      const si = (sy * w + sx) * 4, oi = (y * cw + x) * 4;
+      od.data[oi] = d[si]; od.data[oi + 1] = d[si + 1]; od.data[oi + 2] = d[si + 2]; od.data[oi + 3] = Math.round(a / 9 * d[si + 3]);
+    }
+    ox.putImageData(od, 0, 0); return out;
+  });
+}
+async function addFiles(files) {
+  const list = [...files].filter(f => f.type.startsWith('image/'));
+  if (!list.length) return;
+  const busy = $('#busy'); busy.hidden = false; busy.textContent = 'Cutting out ' + list.length + (list.length > 1 ? ' photos' : ' photo');
+  let failed = false;
+  for (const f of list) {
+    try {
+      const src = await loadFile(f);
+      await new Promise(r => setTimeout(r, 0));
+      const comps = cutout(src, S.cut);
+      if (!comps.length) { failed = true; busy.textContent = 'No subject found in ' + f.name + '. Try a photo with a plainer background.'; continue; }
+      const photo = { id: ++photoSeq, src };
+      photos.push(photo);
+      const big = Math.max(...comps.map(c => Math.max(c.width, c.height)));
+      const base = 0.24 * W / big;
+      enqueue(comps.map((c, k) => newItem(texInfo(c), base, 'photo', { photo: photo.id, comp: k })));
+    } catch (e) { failed = true; busy.textContent = e.message; }
+  }
+  updateCut();
+  if (!failed) { busy.hidden = true; closeAdd(); }
+}
+let recutTimer = 0;
+function recut() {
+  clearTimeout(recutTimer);
+  recutTimer = setTimeout(() => {
+    for (const ph of photos) {
+      const comps = cutout(ph.src, S.cut);
+      for (const it of sim.items.filter(i => i.photo === ph.id)) {
+        const c = comps[it.comp];
+        if (!c) { sim.items.splice(sim.items.indexOf(it), 1); if (sel === it) sel = null; continue; }
+        const info = texInfo(c); it.tex = c; it.shape = info.shape; it.avg = info.avg; it.info = info;
+        sim.setScale(it, it.base * S.itemSize * it.size);
+      }
+    }
+    updateSel();
+  }, 120);
+}
+function updateCut() { $('#cutRow').hidden = !sim || ![...sim.items, ...queue].some(i => i.kind === 'photo'); }
+
+/* ---------- rendering ---------- */
+function mulberry(a) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function makeGrain() {
+  const st = S.grainStyle; if (st === 'none') { grainPat = null; return; }
+  let c;
+  if (st === 'halftone') {
+    c = mk(10, 10); const x = c.getContext('2d'); x.fillStyle = '#9a9a9a'; x.fillRect(0, 0, 10, 10);
+    x.fillStyle = '#383838'; x.beginPath(); x.arc(5, 5, 2.6, 0, 7); x.fill();
+  } else {
+    const n = st === 'coarse' ? 160 : 256; c = mk(n, n); const x = c.getContext('2d'), id = x.createImageData(n, n);
+    for (let i = 0; i < n * n; i++) { const v = 128 + ((Math.random() + Math.random() - 1) * 150) | 0; id.data[i * 4] = id.data[i * 4 + 1] = id.data[i * 4 + 2] = v; id.data[i * 4 + 3] = 255; }
+    x.putImageData(id, 0, 0);
+  }
+  grainPat = ctx.createPattern(c, 'repeat');
+  try { if (st === 'halftone') grainPat.setTransform(new DOMMatrix().rotate(45).scale(1.1)); else if (st === 'coarse') grainPat.setTransform(new DOMMatrix().scale(2.6)); } catch (e) {}
+}
+function drawOne(c, it) {
+  const s = it.scale; c.save(); c.translate(it.x, it.y); c.rotate(it.a);
+  c.drawImage(it.tex, -it.shape.cx * s, -it.shape.cy * s, it.tex.width * s, it.tex.height * s); c.restore();
+}
+function drawItems(c, onlyOutside) {
+  for (const it of sim.items) {
+    if (onlyOutside && it.inBag) continue;
+    const s = it.scale; c.save(); c.translate(it.x, it.y); c.rotate(it.a);
+    c.drawImage(it.tex, -it.shape.cx * s, -it.shape.cy * s, it.tex.width * s, it.tex.height * s); c.restore();
+  }
+}
+function smoothClosed(path, pts) {
+  const n = pts.length; if (n < 3) return;
+  const g = i => pts[((i % n) + n) % n];
+  let a = g(n - 1), b = g(0); path.moveTo((a[0] + b[0]) / 2, (a[1] + b[1]) / 2);
+  for (let i = 0; i < n; i++) { const p = g(i), q = g(i + 1); path.quadraticCurveTo(p[0], p[1], (p[0] + q[0]) / 2, (p[1] + q[1]) / 2); }
+  path.closePath();
+}
+// one handle: outer edge = the chain, inner edge offset toward the other handle; stops at a tear
+function handleGeom(ch, other) {
+  const P = sim.P, bw = sim.bw, pts = ch.map(i => P[i]), op = other.map(i => P[i]), n = pts.length;
+  let end = n;
+  for (let k = 0; k < n - 1; k++) { const L = sim.links.find(l => l.a === ch[k] && l.b === ch[k + 1]); if (L && L.broken) { end = k + 1; break; } }
+  const inner = [];
+  for (let k = 0; k < n; k++) {
+    const p = pts[k], q = pts[Math.min(n - 1, k + 1)], o = pts[Math.max(0, k - 1)], m = op[Math.min(op.length - 1, k)];
+    let tx = q.x - o.x, ty = q.y - o.y; const tl = Math.hypot(tx, ty) || 1; tx /= tl; ty /= tl;
+    let nx = -ty, ny = tx; if (nx * (m.x - p.x) + ny * (m.y - p.y) < 0) { nx = -nx; ny = -ny; }
+    const wdt = bw * (0.2 - 0.085 * k / (n - 1));
+    inner.push([p.x + nx * wdt, p.y + ny * wdt]);
+  }
+  return { pts: pts.map(p => [p.x, p.y]), inner, end, n };
+}
+function bagPath() {
+  const P = sim.P, lp = sim.loop, n = lp.length, path = new Path2D();
+  if (sim.style === 'handles' && sim.handleL && sim.handleR) {
+    const L = handleGeom(sim.handleL, sim.handleR), R = handleGeom(sim.handleR, sim.handleL), out = [];
+    for (let k = L.end - 1; k >= 1; k--) out.push(L.pts[k]);
+    for (const i of sim.Bidx) out.push([P[i].x, P[i].y]);
+    for (let k = 1; k < R.end; k++) out.push(R.pts[k]);
+    for (let k = R.end - 1; k >= 0; k--) out.push(R.inner[k]);
+    // the opening between the handles dips into the bag
+    const r0 = R.inner[0], l0 = L.inner[0];
+    let cx = 0, cy = 0; for (const i of sim.Bidx) { cx += P[i].x; cy += P[i].y; } cx /= sim.Bidx.length; cy /= sim.Bidx.length;
+    const mx = (r0[0] + l0[0]) / 2, my = (r0[1] + l0[1]) / 2; let dx = cx - mx, dy = cy - my; const dl = Math.hypot(dx, dy) || 1;
+    const qx = mx + dx / dl * sim.bw * 0.22, qy = my + dy / dl * sim.bw * 0.22;
+    for (let k = 1; k < 8; k++) { const t = k / 8, u = 1 - t; out.push([u * u * r0[0] + 2 * u * t * qx + t * t * l0[0], u * u * r0[1] + 2 * u * t * qy + t * t * l0[1]]); }
+    for (let k = 0; k < L.end; k++) out.push(L.inner[k]);
+    smoothClosed(path, out);
+    return path;
+  }
+  smoothClosed(path, lp.map(i => [P[i].x, P[i].y]));
+  const pt = i => P[lp[((i % n) + n) % n]];
+  if (sim.style === 'diecut') {
+    const AL = pt(0), AR = pt(n - 1), L1 = pt(1), R1 = pt(n - 2);
+    const ex = AR.x - AL.x, ey = AR.y - AL.y, el = Math.hypot(ex, ey) || 1, ox = ey / el, oy = -ex / el;
+    const mx = (AL.x + AR.x) / 2, my = (AL.y + AR.y) / 2, k = el * 0.6;
+    path.moveTo((AL.x + L1.x) / 2, (AL.y + L1.y) / 2); path.lineTo(AL.x, AL.y);
+    path.quadraticCurveTo(mx + ox * k, my + oy * k, AR.x, AR.y); path.lineTo((AR.x + R1.x) / 2, (AR.y + R1.y) / 2); path.closePath();
+  }
+  return path;
+}
+function blurItems(r) {
+  ictx.setTransform(1, 0, 0, 1, 0, 0); ictx.clearRect(0, 0, itemL.width, itemL.height);
+  ictx.setTransform(Q, 0, 0, Q, 0, 0); drawItems(ictx);
+  fctx.clearRect(0, 0, blurL.width, blurL.height);
+  if (r < 0.5) { fctx.drawImage(itemL, 0, 0); return; }
+  if (FILTER_OK) { fctx.filter = 'blur(' + (r * Q).toFixed(1) + 'px)'; fctx.drawImage(itemL, 0, 0); fctx.filter = 'none'; return; }
+  const k = Math.max(1 / 24, Math.min(1, 1.6 / (r * Q)));
+  const sw = Math.max(2, Math.round(itemL.width * k)), sh = Math.max(2, Math.round(itemL.height * k));
+  if (smallL.width !== sw || smallL.height !== sh) { smallL.width = sw; smallL.height = sh; }
+  sctx.imageSmoothingQuality = 'high'; sctx.clearRect(0, 0, sw, sh); sctx.drawImage(itemL, 0, 0, sw, sh);
+  fctx.imageSmoothingQuality = 'high'; fctx.drawImage(smallL, 0, 0, blurL.width, blurL.height);
+}
+function bbox() { let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; for (const p of sim.P) { if (p.x < x0) x0 = p.x; if (p.y < y0) y0 = p.y; if (p.x > x1) x1 = p.x; if (p.y > y1) y1 = p.y; } return { x0, y0, x1, y1 }; }
+// only the pieces of a handle that have torn free are drawn separately
+function drawHandles(c, col, alpha) {
+  if (sim.style !== 'handles' || !sim.handleL) return;
+  for (const g of [handleGeom(sim.handleL, sim.handleR), handleGeom(sim.handleR, sim.handleL)]) {
+    if (g.end >= g.n) continue;
+    c.save(); c.globalAlpha = alpha; c.fillStyle = col; c.beginPath();
+    const pts = [];
+    for (let k = g.end; k < g.n; k++) pts.push(g.pts[k]);
+    for (let k = g.n - 1; k >= g.end; k--) pts.push(g.inner[k]);
+    const p = new Path2D(); smoothClosed(p, pts); c.fill(p); c.restore();
+  }
+}
+function drawKnot(c, col, alpha) {
+  if (sim.style !== 'knot') return;
+  const P = sim.P, lp = sim.loop, A = P[lp[0]];
+  // point away from the body of the bag (centroid of the bag chain), smoothed so it never flips
+  let sx = 0, sy = 0; for (const i of sim.Bidx) { sx += P[i].x; sy += P[i].y; }
+  const target = Math.atan2(A.y - sy / sim.Bidx.length, A.x - sx / sim.Bidx.length);
+  if (sim.knotAng == null) sim.knotAng = target;
+  let diff = target - sim.knotAng; diff = Math.atan2(Math.sin(diff), Math.cos(diff));
+  sim.knotAng += diff * 0.08;
+  const base = sim.knotAng, dx = Math.cos(base), dy = Math.sin(base), bw = sim.bw, L = bw * 0.2, Wd = bw * 0.052;
+  c.save(); c.globalAlpha = alpha; c.fillStyle = col;
+  for (const s of [-0.42, 0.36]) {
+    const a = base + s, cx = A.x + Math.cos(a) * L * 0.62, cy = A.y + Math.sin(a) * L * 0.62;
+    c.beginPath(); c.ellipse(cx, cy, L * 0.62, Wd * (s > 0 ? 0.95 : 1.1), a, 0, 7); c.fill();
+  }
+  c.beginPath(); c.ellipse(A.x - dx * bw * 0.02, A.y - dy * bw * 0.02, bw * 0.045, bw * 0.038, base, 0, 7); c.fill();
+  c.restore();
+}
+function cutHole(c) {
+  if (sim.style !== 'diecut') return;
+  const P = sim.P, lp = sim.loop, n = lp.length, AL = P[lp[0]], AR = P[lp[n - 1]];
+  const tw = Math.hypot(AR.x - AL.x, AR.y - AL.y), ang = Math.atan2(AR.y - AL.y, AR.x - AL.x);
+  const hw = tw * 0.52, hh = tw * 0.78, top = tw * 0.06;
+  c.save(); c.translate((AL.x + AR.x) / 2, (AL.y + AR.y) / 2); c.rotate(ang);
+  c.globalCompositeOperation = 'destination-out'; c.beginPath();
+  if (c.roundRect) c.roundRect(-hw / 2, top, hw, hh, hw / 2); else c.ellipse(0, top + hh / 2, hw / 2, hh / 2, 0, 0, 7);
+  c.fill(); c.restore();
+}
+function cutTears(c) {
+  const P = sim.P, b = bbox(), cx = (b.x0 + b.x1) / 2, cy = (b.y0 + b.y1) / 2;
+  c.save(); c.globalCompositeOperation = 'destination-out'; c.fillStyle = '#000';
+  sim.loopLinks.forEach((li, idx) => {
+    const L = sim.links[li]; if (!L.broken) return;
+    const a = P[L.a], q = P[L.b], gap = Math.hypot(q.x - a.x, q.y - a.y); if (gap < 3) return;
+    const mx = (a.x + q.x) / 2, my = (a.y + q.y) / 2; let nx = cx - mx, ny = cy - my; const nl = Math.hypot(nx, ny) || 1; nx /= nl; ny /= nl;
+    const depth = Math.min(gap * 0.65 + 14, sim.bw * 0.3), ax = mx + nx * depth, ay = my + ny * depth, R = mulberry(li * 977 + 13);
+    c.beginPath(); c.moveTo(a.x, a.y);
+    const seg = (x0, y0, x1, y1) => { for (let k = 1; k <= 5; k++) { const t = k / 6, j = (R() - 0.5) * Math.max(6, gap * 0.12); c.lineTo(x0 + (x1 - x0) * t - ny * j, y0 + (y1 - y0) * t + nx * j); } c.lineTo(x1, y1); };
+    seg(a.x, a.y, ax, ay); seg(ax, ay, q.x, q.y); c.closePath(); c.fill();
+  });
+  c.restore();
+}
+function drawSheen(c, b) {
+  if (S.sheen <= 0.01) return;
+  const w = b.x1 - b.x0, h = b.y1 - b.y0;
+  c.save(); c.translate(b.x0 + w * 0.5, b.y0 + h * 0.5); c.rotate(-0.55);
+  for (const [off, wd, a] of [[-0.22, 0.09, 1], [-0.08, 0.035, 0.7], [0.3, 0.06, 0.6]]) {
+    const x0 = off * w * 1.4, gw = wd * w * 1.4;
+    const g = c.createLinearGradient(x0 - gw, 0, x0 + gw, 0);
+    g.addColorStop(0, 'rgba(255,255,255,0)'); g.addColorStop(0.5, 'rgba(255,255,255,' + (S.sheen * 0.55 * a).toFixed(3) + ')'); g.addColorStop(1, 'rgba(255,255,255,0)');
+    c.fillStyle = g; c.fillRect(x0 - gw, -h, gw * 2, h * 2);
+  }
+  c.restore();
+}
+function hexToRgb(h) { const n = parseInt(h.slice(1), 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; }
+function captionColor() {
+  const it = sim.items[0]; if (!it) return 'rgba(40,46,43,.85)';
+  const [r, g, b] = it.avg, k = 0.78; return 'rgb(' + [r * k, g * k, b * k].map(v => v | 0).join(',') + ')';
+}
+function render(ui) {
+  const path = bagPath();
+  ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
+  ctx.fillStyle = S.bg; ctx.fillRect(0, 0, W, H);
+  // items outside the bag stay sharp
+  // sharp layer: everything outside the bag. Items whose centre is inside only show where they rise
+  // past an open rim or out of a tear; small poke-throughs at the walls are hidden by a band along the walls.
+  for (const it of sim.items) it.inBag = sim.insidePoly(it.x, it.y);
+  sctx2.setTransform(1, 0, 0, 1, 0, 0); sctx2.globalCompositeOperation = 'source-over'; sctx2.clearRect(0, 0, W, H);
+  if (sim.items.some(i => i.inBag)) {
+    for (const it of sim.items) if (it.inBag) drawOne(sctx2, it);
+    sctx2.globalCompositeOperation = 'destination-out'; sctx2.fill(path);
+    const walls = new Path2D();
+    for (const li of sim.loopLinks) { const L = sim.links[li]; if (L.broken) continue; const a = sim.P[L.a], q = sim.P[L.b]; walls.moveTo(a.x, a.y); walls.lineTo(q.x, q.y); }
+    sctx2.lineWidth = W * 0.05; sctx2.lineCap = 'round'; sctx2.lineJoin = 'round'; sctx2.stroke(walls);
+    sctx2.globalCompositeOperation = 'source-over';
+  }
+  sctx2.save(); const out = new Path2D(); out.rect(-10, -10, W + 20, H + 20); out.addPath(path); sctx2.clip(out, 'evenodd'); drawItems(sctx2, true); sctx2.restore();
+  ctx.drawImage(sharpL, 0, 0);
+  // bag layer
+  const b = bbox();
+  bctx.setTransform(1, 0, 0, 1, 0, 0); bctx.globalAlpha = 1; bctx.globalCompositeOperation = 'source-over'; bctx.clearRect(0, 0, W, H);
+  bctx.fillStyle = S.bagColor; bctx.fill(path);
+  if (S.opacity < 1) { bctx.globalCompositeOperation = 'destination-out'; bctx.globalAlpha = 1 - S.opacity; bctx.fill(path); bctx.globalCompositeOperation = 'source-over'; bctx.globalAlpha = 1; }
+  drawKnot(bctx, S.bagColor, Math.max(0.5, S.opacity));
+  blurItems(S.frost * W * 0.034);
+  bctx.save(); bctx.clip(path); bctx.drawImage(blurL, 0, 0, W, H);
+  if (S.haze > 0.005) { bctx.globalAlpha = S.haze * 0.75; bctx.fillStyle = S.bagColor; bctx.fillRect(b.x0 - 4, b.y0 - 4, b.x1 - b.x0 + 8, b.y1 - b.y0 + 8); bctx.globalAlpha = 1; }
+  drawSheen(bctx, b); bctx.restore();
+  drawHandles(bctx, S.bagColor, Math.max(0.45, S.opacity * 0.8));
+  cutHole(bctx); cutTears(bctx);
+  ctx.drawImage(bagL, 0, 0);
+  if (S.caption.trim()) {
+    ctx.fillStyle = captionColor(); ctx.font = 'italic 400 ' + Math.round(W * 0.034) + 'px Newsreader, Georgia, serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic'; ctx.fillText(S.caption.trim(), W / 2, H - H * 0.04);
+  }
+  if (grainPat && S.grain > 0.005) {
+    ctx.save(); ctx.globalCompositeOperation = S.grainStyle === 'halftone' ? 'soft-light' : 'overlay'; ctx.globalAlpha = S.grain * (S.grainStyle === 'halftone' ? 0.9 : 0.55);
+    ctx.fillStyle = grainPat; ctx.fillRect(0, 0, W, H); ctx.restore();
+  }
+  if (ui && sel && sim.items.includes(sel)) {
+    ctx.save(); ctx.strokeStyle = accentCol; ctx.lineWidth = Math.max(3, W / cv.clientWidth * 2); ctx.setLineDash([14, 10]);
+    ctx.beginPath(); ctx.arc(sel.x, sel.y, sel.br + 10, 0, 7); ctx.stroke(); ctx.restore();
+  }
+}
+
+/* ---------- loop ---------- */
+let expC = null, accentCol = '#1f7a57', last = performance.now(), acc = 0, hookAnim = null, hookTarget = null, running = true;
+function frame(now) {
+  requestAnimationFrame(frame);
+  if (!sim || document.hidden) { last = now; return; }
+  let dt = Math.min(0.1, (now - last) / 1000); last = now; acc += dt;
+  spawnFromQueue(now);
+  let steps = 0;
+  while (acc >= 1 / 60 && steps < 3) {
+    if (hookAnim) {
+      const t = Math.min(1, (now - hookAnim.t0) / hookAnim.dur), e = t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+      sim.hook.x = hookAnim.fx + (hookAnim.tx - hookAnim.fx) * e + (hookAnim.wob ? Math.sin(t * Math.PI * 6) * (1 - t) * hookAnim.wob : 0);
+      sim.hook.y = hookAnim.fy + (hookAnim.ty - hookAnim.fy) * e + (hookAnim.bob ? -Math.sin(t * Math.PI * 4) * (1 - t) * hookAnim.bob : 0);
+      if (t >= 1) hookAnim = null;
+    } else if (hookTarget) {
+      sim.hook.x += (hookTarget.x - sim.hook.x) * 0.35; sim.hook.y += (hookTarget.y - sim.hook.y) * 0.35;
+    }
+    sim.step(1 / 60); acc -= 1 / 60; steps++;
+  }
+  if (steps === 3) acc = 0;
+  render(true);
+  if (sel && !sim.items.includes(sel)) { sel = null; updateSel(); }
+}
+
+/* ---------- canvas fit + pointer ---------- */
+function fit() {
+  const st = $('#stage'), r = st.getBoundingClientRect();
+  const s = Math.min(r.width / W, r.height / H);
+  cv.style.width = Math.floor(W * s) + 'px'; cv.style.height = Math.floor(H * s) + 'px';
+}
+new ResizeObserver(fit).observe($('#stage'));
+function toWorld(e) { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) * W / r.width, (e.clientY - r.top) * H / r.height]; }
+let ptr = null;
+cv.addEventListener('pointerdown', e => {
+  if (!sim) return;
+  cv.setPointerCapture(e.pointerId); cv.classList.add('grabbing');
+  const [x, y] = toWorld(e), tol = 44 * W / cv.getBoundingClientRect().width;
+  const it = sim.hitItem(x, y);
+  if (it) {
+    sel = it; updateSel();
+    const [lx, ly] = sim.toLocal(it, x, y); sim.drag = { type: 'item', item: it, lx, ly, tx: x, ty: y }; ptr = { id: e.pointerId }; return;
+  }
+  const pi = sim.hitParticle(x, y, tol);
+  if (pi >= 0) {
+    const p = sim.P[pi];
+    if (sim.hang && p.role !== 'B') { hookAnim = null; ptr = { id: e.pointerId, hook: true, ox: sim.hook.x - x, oy: sim.hook.y - y }; hookTarget = { x: sim.hook.x, y: sim.hook.y }; }
+    else { sim.drag = { type: 'p', i: pi, tx: x, ty: y }; ptr = { id: e.pointerId }; }
+    return;
+  }
+  sel = null; updateSel(); ptr = null;
+});
+cv.addEventListener('pointermove', e => {
+  if (!ptr || e.pointerId !== ptr.id) return;
+  const [x, y] = toWorld(e);
+  if (ptr.hook) hookTarget = { x: Math.max(-W * 0.1, Math.min(W * 1.1, x + ptr.ox)), y: Math.max(-H * 0.25, Math.min(H * 0.85, y + ptr.oy)) };
+  else if (sim.drag) { sim.drag.tx = x; sim.drag.ty = y; }
+});
+const endPtr = e => { if (!ptr || e.pointerId !== ptr.id) return; ptr = null; sim.drag = null; hookTarget = null; cv.classList.remove('grabbing'); };
+cv.addEventListener('pointerup', endPtr); cv.addEventListener('pointercancel', endPtr);
+
+/* ---------- selection actions ---------- */
+function updateSel() { $('#selbar').hidden = !sel; accentCol = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#1f7a57'; }
+$('#selbar').addEventListener('click', e => {
+  const b = e.target.closest('[data-sel]'); if (!b || !sel) return;
+  const a = b.dataset.sel;
+  if (a === 'del') { sim.items.splice(sim.items.indexOf(sel), 1); sel = null; updateCut(); }
+  else if (a === 'dup') { const it = newItem(sel.info, sel.base, sel.kind, { photo: sel.photo, comp: sel.comp }); it.size = sel.size; sim.setScale(it, it.base * S.itemSize * it.size); enqueue([it]); }
+  else { sel.size = Math.max(0.3, Math.min(3, sel.size * (a === 'bigger' ? 1.15 : 1 / 1.15))); sim.setScale(sel, sel.base * S.itemSize * sel.size); }
+  updateSel();
+});
+addEventListener('keydown', e => {
+  if (e.target.matches('input, select, .rng')) return;
+  if ((e.key === 'Delete' || e.key === 'Backspace') && sel) { sim.items.splice(sim.items.indexOf(sel), 1); sel = null; updateSel(); }
+  if (e.key === 'Escape') { closeAdd(); if (!$('#exp').hidden) $('#exp').hidden = true; }
+});
+
+/* ---------- toolbar ---------- */
+$('#bShake').onclick = () => {
+  if (sim.hang) { const h = sim.hook; hookAnim = { fx: h.x, fy: h.y, tx: h.x, ty: h.y, t0: performance.now(), dur: 700, wob: W * 0.05, bob: H * 0.05 }; sim.shake(0.35); }
+  else sim.shake(1);
+};
+$('#bRefill').onclick = () => { hookAnim = null; refill(); };
+function openAdd() { $('#addsheet').hidden = false; $('#busy').hidden = true; }
+function closeAdd() { $('#addsheet').hidden = true; }
+$('#bAdd').onclick = () => { $('#addsheet').hidden ? openAdd() : closeAdd(); };
+$('#closeAdd').onclick = closeAdd;
+$('#file').addEventListener('change', e => { addFiles(e.target.files); e.target.value = ''; });
+const tiles = $('#tiles');
+for (const k of Object.keys(SAMPLES)) {
+  const b = document.createElement('button'); b.className = 'tile'; b.setAttribute('aria-label', 'Add ' + SAMPLES[k].label);
+  const img = document.createElement('img'); img.alt = ''; img.src = sampleTex(k).tex.toDataURL(); b.append(img);
+  b.onclick = () => { enqueue([sampleItem(k)]); }; tiles.append(b);
+}
+const panel = $('#panel');
+function setPanel(open) { panel.hidden = !open; $('#bSet').setAttribute('aria-pressed', String(open)); requestAnimationFrame(fit); }
+$('#bSet').onclick = () => setPanel(panel.hidden);
+$('#closePanel').onclick = () => setPanel(false);
+let dlNS; const dlReady = (window.claude && window.claude.use ? window.claude.use('downloads') : Promise.resolve(null)).then(ns => { dlNS = ns; }, () => { dlNS = null; });
+function showSnapshot(url) { $('#expImg').src = url; $('#exp').hidden = false; $('#copyImg').textContent = 'Copy'; }
+$('#bSave').onclick = () => {
+  // snapshot the current frame at full resolution, without the selection ring
+  render(false); expC = mk(W, H); expC.getContext('2d').drawImage(cv, 0, 0); render(true);
+  const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
+  expC.toBlob(async blob => {
+    if (!blob) return;
+    if (dlNS) {
+      try { await dlNS.save({ filename: 'produce-bag-' + stamp + '.png', data: blob }); return; }
+      catch (e) { if (e && (e.code === 'declined' || e.code === 'rate_limited')) return; }
+    }
+    if (!window.claude) { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'produce-bag-' + stamp + '.png'; document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); return; }
+    showSnapshot(expC.toDataURL('image/png'));
+  }, 'image/png');
+};
+$('#closeExp').onclick = () => { $('#exp').hidden = true; };
+$('#copyImg').onclick = () => {
+  const btn = $('#copyImg');
+  try {
+    const blob = new Promise(res => expC.toBlob(res, 'image/png'));
+    navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]).then(() => { btn.textContent = 'Copied'; }, () => { btn.textContent = 'Hold image to save'; });
+  } catch (e) { btn.textContent = 'Hold image to save'; }
+};
+// drag & drop, paste
+const stage = $('#stage');
+stage.addEventListener('dragover', e => { e.preventDefault(); stage.classList.add('drop'); });
+stage.addEventListener('dragleave', () => stage.classList.remove('drop'));
+stage.addEventListener('drop', e => { e.preventDefault(); stage.classList.remove('drop'); if (e.dataTransfer.files.length) addFiles(e.dataTransfer.files); });
+addEventListener('paste', e => { const f = [...(e.clipboardData?.files || [])]; if (f.length) addFiles(f); });
+
+/* ---------- settings ---------- */
+const FMT = {
+  bagW: v => Math.round(v * 100), bagH: v => Math.round(v * 100), stretch: v => Math.round(v * 100),
+  strength: v => Math.round(v * 100), frost: v => Math.round(v * 100), haze: v => Math.round(v * 100),
+  opacity: v => Math.round(v * 100), sheen: v => Math.round(v * 100), itemSize: v => Math.round(v * 100),
+  gravity: v => Math.round(v * 100), grain: v => Math.round(v * 100), cut: v => v,
+};
+const PRESETS = [['#fbfbf9', '#cde3d6'], ['#ebebea', '#ffffff'], ['#f4f6f8', '#d4e2ee'], ['#f6e5eb', '#f1d8d0'],
+  ['#f3f0de', '#eee5c2'], ['#e8ece9', '#24292b'], ['#ffffff', '#22285e'], ['#f7efe6', '#e8714a']];
+let rebuildPending = false;
+function onSetting(k) {
+  save();
+  if (k === 'stretch' || k === 'strength' || k === 'gravity') applyPhys();
+  else if (k === 'bagW' || k === 'bagH') { if (!rebuildPending) { rebuildPending = true; requestAnimationFrame(() => { rebuildPending = false; refill(); }); } }
+  else if (k === 'itemSize') rescaleAll();
+  else if (k === 'grainStyle') makeGrain();
+  else if (k === 'cut') recut();
+}
+function paintRange(el) {
+  const k = el.dataset.k, min = +el.dataset.min, max = +el.dataset.max;
+  const p = Math.max(0, Math.min(1, (S[k] - min) / (max - min)));
+  el.style.setProperty('--p', String(p));
+  el.querySelector('.v').textContent = FMT[k] ? FMT[k](S[k]) : S[k];
+  el.setAttribute('aria-valuemin', min); el.setAttribute('aria-valuemax', max); el.setAttribute('aria-valuenow', S[k]);
+}
+function setupRange(el) {
+  const k = el.dataset.k, min = +el.dataset.min, max = +el.dataset.max, step = +el.dataset.step;
+  const trk = document.createElement('div'); trk.className = 'trk'; trk.append(el.querySelector('.fl')); el.prepend(trk);
+  const set = v => {
+    v = Math.min(max, Math.max(min, Math.round((v - min) / step) * step + min)); v = +v.toFixed(4);
+    if (v === S[k]) return; S[k] = v; paintRange(el); onSetting(k);
+  };
+  let st = null;
+  el.addEventListener('pointerdown', e => { st = { x: e.clientX, y: e.clientY, v: S[k], drag: false, id: e.pointerId }; });
+  el.addEventListener('pointermove', e => {
+    if (!st || e.pointerId !== st.id) return;
+    const dx = e.clientX - st.x, dy = e.clientY - st.y;
+    if (!st.drag) {
+      if (Math.abs(dx) > 5 && Math.abs(dx) > Math.abs(dy)) { st.drag = true; try { el.setPointerCapture(e.pointerId); } catch (err) {} el.classList.add('on'); }
+      else if (Math.abs(dy) > 8) { st = null; return; }
+      else return;
+    }
+    set(st.v + dx / Math.max(1, trk.clientWidth) * (max - min));
+  });
+  el.addEventListener('pointerup', e => {
+    if (st && !st.drag) { const r = trk.getBoundingClientRect(); set(min + Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)) * (max - min)); }
+    st = null; el.classList.remove('on');
+  });
+  el.addEventListener('pointercancel', () => { st = null; el.classList.remove('on'); });
+  el.addEventListener('dblclick', () => set(DEF[k]));
+  el.addEventListener('keydown', e => {
+    const d = (e.key === 'ArrowRight' || e.key === 'ArrowUp') ? 1 : (e.key === 'ArrowLeft' || e.key === 'ArrowDown') ? -1 : 0;
+    if (d) { e.preventDefault(); set(S[k] + d * step * (e.shiftKey ? 10 : 1)); }
+  });
+}
+$$('.rng').forEach(setupRange);
+for (const el of $$('select[data-k], input.txt[data-k]')) el.addEventListener('input', () => { S[el.dataset.k] = el.value; onSetting(el.dataset.k); });
+function renderPresets(el, obj, after) {
+  el.innerHTML = '';
+  for (const [bag, bg] of PRESETS) {
+    const b = document.createElement('button'); b.setAttribute('aria-label', 'Bag ' + bag + ' on ' + bg);
+    b.setAttribute('aria-pressed', String(obj.bagColor.toLowerCase() === bag && obj.bg.toLowerCase() === bg));
+    b.innerHTML = '<span style="background:' + bag + '"></span><span style="background:' + bg + '"></span>';
+    b.onclick = () => { obj.bagColor = bag; obj.bg = bg; after(); }; el.append(b);
+  }
+}
+function paintClr(c) {
+  const k = c.dataset.c, v = S[k];
+  c.querySelector('label').style.background = v; c.querySelector('input[type=color]').value = v;
+  const t = c.querySelector('.txt'); if (document.activeElement !== t) t.value = v;
+}
+for (const c of $$('.clr')) {
+  const k = c.dataset.c, pick = c.querySelector('input[type=color]'), t = c.querySelector('.txt');
+  pick.addEventListener('input', () => { S[k] = pick.value; save(); syncUI(); });
+  t.addEventListener('input', () => {
+    let v = t.value.trim(); if (!v.startsWith('#')) v = '#' + v;
+    if (/^#[0-9a-f]{6}$/i.test(v)) { S[k] = v.toLowerCase(); save(); syncUI(); }
+  });
+  t.addEventListener('blur', () => paintClr(c));
+}
+function syncUI() {
+  $$('.rng').forEach(paintRange);
+  for (const el of $$('select[data-k], input.txt[data-k]')) if (document.activeElement !== el) el.value = S[el.dataset.k];
+  for (const seg of $$('[data-seg]')) for (const b of seg.children) b.setAttribute('aria-pressed', String(String(seg.dataset.seg === 'hang' ? (S.hang ? 1 : 0) : S[seg.dataset.seg]) === b.dataset.v));
+  $$('.clr').forEach(paintClr);
+  renderPresets($('#presets'), S, () => { save(); syncUI(); });
+}
+for (const seg of $$('[data-seg]')) seg.addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return; const k = seg.dataset.seg;
+  if (k === 'style') {
+    if (S.style === b.dataset.v) return; S.style = b.dataset.v; save();
+    hookAnim = null; sim.buildBag(bagOpts(true));
+  } else {
+    const h = b.dataset.v === '1'; if (h === S.hang) return; S.hang = h; save();
+    if (!h) { hookAnim = null; sim.setHang(false); }
+    else {
+      const g = Sim.restGeom(S.style, true, W, H, sim.bw, sim.bh), an = sim.P.filter(p => p.anchor);
+      const mx = an.reduce((s, p) => s + p.x - p.offX, 0) / an.length, my = an.reduce((s, p) => s + p.y - p.offY, 0) / an.length;
+      sim.hook.x = mx; sim.hook.y = my; sim.setHang(true); sim.grace = 1.4;
+      hookAnim = { fx: mx, fy: my, tx: W / 2, ty: g.hookY, t0: performance.now(), dur: 1100 };
+    }
+  }
+  syncUI();
+});
+let secState = {};
+try { secState = JSON.parse(localStorage.getItem(STORE + '.sec') || '{}') || {}; } catch (e) {}
+for (const sec of $$('.card[data-sec]')) {
+  const hd = sec.querySelector('.hd'), bd = sec.querySelector('.bd'), k = sec.dataset.sec;
+  const setOpen = open => { hd.setAttribute('aria-expanded', String(open)); bd.hidden = !open; };
+  setOpen(secState[k] !== false);
+  hd.onclick = () => {
+    const open = hd.getAttribute('aria-expanded') !== 'true'; setOpen(open); secState[k] = open;
+    try { localStorage.setItem(STORE + '.sec', JSON.stringify(secState)); } catch (e) {}
+  };
+}
+$('#fromItems').onclick = () => {
+  if (!sim.items.length) return;
+  let sx = 0, sy = 0;
+  for (const it of sim.items) {
+    const [r, g, b] = it.avg.map(v => v / 255), mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn; if (d < 0.05) continue;
+    let h = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; h *= 60;
+    sx += Math.cos(h * Math.PI / 180) * d; sy += Math.sin(h * Math.PI / 180) * d;
+  }
+  const hue = (sx || sy) ? (Math.atan2(sy, sx) * 180 / Math.PI + 360) % 360 : 30;
+  const bh = (hue + 150) % 360, [br, bg, bb] = hexToRgb(S.bagColor), bagL2 = (Math.max(br, bg, bb) + Math.min(br, bg, bb)) / 510;
+  S.bg = hslHex(bh, 34, bagL2 > 0.9 ? 84 : 93); save(); syncUI();
+};
+function hslHex(h, s, l) { s /= 100; l /= 100; const k = n => (n + h / 30) % 12, a = s * Math.min(l, 1 - l), f = n => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1))); return '#' + [f(0), f(8), f(4)].map(v => Math.round(v * 255).toString(16).padStart(2, '0')).join(''); }
+$('#clearAll').onclick = () => { sim.items.length = 0; queue = []; sel = null; updateSel(); updateCut(); };
+
+/* ---------- setup ---------- */
+const CHIPS = {
+  aspect: [['1:1', '1:1'], ['4:5', '4:5'], ['3:4', '3:4'], ['9:16', '9:16']],
+  style: [['handles', 'Handles'], ['knot', 'Knot'], ['diecut', 'Die-cut']],
+  hang: [['1', 'Hanging'], ['0', 'Floor']],
+};
+let draft = {};
+function renderSetup() {
+  for (const el of $$('[data-chips]')) {
+    const k = el.dataset.chips; el.innerHTML = '';
+    for (const [v, label] of CHIPS[k]) {
+      const b = document.createElement('button'); b.textContent = label;
+      b.setAttribute('aria-pressed', String(String(k === 'hang' ? (draft.hang ? 1 : 0) : draft[k]) === v));
+      b.onclick = () => { draft[k] = k === 'hang' ? v === '1' : v; renderSetup(); };
+      el.append(b);
+    }
+  }
+  $('#setupFill').value = draft.fill;
+  renderPresets($('#setupPresets'), draft, renderSetup);
+}
+$('#setupFill').addEventListener('input', e => { draft.fill = e.target.value; });
+function openSetup() { draft = { aspect: S.aspect, style: S.style, hang: S.hang, fill: S.fill, bg: S.bg, bagColor: S.bagColor }; renderSetup(); $('#setup').hidden = false; }
+$('#start').onclick = () => {
+  Object.assign(S, draft); S.setupDone = true; save(); $('#setup').hidden = true; hookAnim = null;
+  buildWorld(S.fill); syncUI();
+};
+$('#newCanvas').onclick = () => { setPanel(false); openSetup(); };
+
+/* ---------- boot ---------- */
+makeGrain(); syncUI(); buildWorld(S.fill);
+if (!S.setupDone) openSetup();
+if (matchMedia('(min-width: 900px)').matches) setPanel(true);
+try { document.fonts && document.fonts.load('italic 400 40px Newsreader'); } catch (e) {}
+requestAnimationFrame(frame);
+})();
+</script>
+
+</body></html>
