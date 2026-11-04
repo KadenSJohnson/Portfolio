@@ -86,9 +86,12 @@
 
   if (!reduce && "IntersectionObserver" in window) {
     document.documentElement.classList.add("js-imsg");
+    // plays once the whole card is on screen (or fills the screen, if it's taller than the window)
+    const steps = Array.from({ length: 21 }, (_, i) => i / 20);
     const io = new IntersectionObserver((ents) => ents.forEach((e) => {
-      if (e.isIntersecting) { io.unobserve(e.target); play(e.target); }
-    }), { threshold: 0.55 });
+      const whole = e.intersectionRatio >= 0.98 || e.intersectionRect.height >= window.innerHeight - 4;
+      if (e.isIntersecting && whole) { io.unobserve(e.target); play(e.target); }
+    }), { threshold: steps });
     threads.forEach((t) => io.observe(t));
     threads.forEach((card) => {
       const screen = card.querySelector(".im-screen");
