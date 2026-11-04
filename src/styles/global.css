@@ -5,7 +5,7 @@
 @font-face{font-family:"Timeless Serif";src:url("/fonts/TimelessSerifVF.woff") format("woff");font-weight:300 700;font-style:normal;font-display:swap}
 @font-face{font-family:"Timeless Serif";src:url("/fonts/TimelessSerifItalicVF.woff") format("woff");font-weight:300 700;font-style:italic;font-display:swap}
 :root{
-  --bg:#F7F6F2; --ink:#FF3106; --sub:#FF3106; --mu:#FF7A55; --line:#EAE3D9; --tile:#F0EDE6; --on-ink:#F7F6F2; /* warm paper, orange-red ink */
+  --bg:#F7F6F2; --ink:#E62B00; --sub:#E62B00; --mu:#EE6E4A; --line:#EAE3D9; --tile:#F0EDE6; --on-ink:#F7F6F2; /* warm paper, orange-red ink */
   --grid:#EAE4DE; --dot:#D9CFC5;
   --sel:#0D99FF; /* Figma's selection blue: only the selection box, handles and size label */
   --display:"Timeless Serif",Georgia,"Times New Roman",serif;
